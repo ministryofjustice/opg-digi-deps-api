@@ -145,6 +145,7 @@ class Report implements UserFilterInterface
      * @var boolean
      * @JMS\Groups({"transactions","basic"})
      * @JMS\Type("boolean")
+     * @JMS\Groups({"transactions","basic"})
      * @ORM\Column(name="no_asset_to_add", type="boolean", options={ "default": false})
      */
     private $noAssetToAdd;
