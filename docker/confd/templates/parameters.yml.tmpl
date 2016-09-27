@@ -23,11 +23,7 @@ parameters:
             password: {{ getv (printf "/fixtures/%s/password" .) }}
             roleId: {{ getv (printf "/fixtures/%s/roleid" .) }}
             activated: {{ getv (printf "/fixtures/%s/activated" .) }}
-            {{ if exists (printf "/fixtures/%s/odr" .) }}
             odrEnabled: {{ getv (printf "/fixtures/%s/odr" .) }}
-            {{ else }}
-            odrEnabled: False
-            {{ endif }}
 {{ end }}
 {{ end }}
 
