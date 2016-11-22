@@ -29,8 +29,8 @@ class Role implements RoleInterface
         2 => ['Lay Deputy', self::LAY_DEPUTY],
         //3 => ['Professional Deputy', 'ROLE_PROFESSIONAL_DEPUTY'],
         //4 => ['Local Authority Deputy', 'ROLE_LOCAL_AUTHORITY_DEPUTY'],
-        5 => ['Assisted Digital Support', 'ROLE_AD'],
-        6 => ['Super Admin', 'ROLE_SUPER_ADMIN'],
+        5 => ['Assisted Digital Support', self::AD],
+        6 => ['Super Admin', self::SUPER_ADMIN],
     ];
 
     /**
