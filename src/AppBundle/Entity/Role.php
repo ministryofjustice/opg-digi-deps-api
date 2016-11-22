@@ -14,10 +14,10 @@ use JMS\Serializer\Annotation as JMS;
  */
 class Role implements RoleInterface
 {
-    const ROLE_ADMIN = 1;
-    const ROLE_LAY_DEPUTY = 2;
     const ADMIN = 'ROLE_ADMIN';
     const LAY_DEPUTY = 'ROLE_LAY_DEPUTY';
+    const AD = 'ROLE_AD';
+    const SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
 
     /**
      * Added via digideps:fixtures command.
@@ -25,11 +25,12 @@ class Role implements RoleInterface
      * @JMS\Exclude
      */
     public static $fixtures = [
-        self::ROLE_ADMIN => ['OPG Administrator', self::ADMIN],
-        self::ROLE_LAY_DEPUTY => ['Lay Deputy', self::LAY_DEPUTY],
-        3 => ['Professional Deputy', 'ROLE_PROFESSIONAL_DEPUTY'],
-        4 => ['Local Authority Deputy', 'ROLE_LOCAL_AUTHORITY_DEPUTY'],
+        1 => ['Super user (ex OPG Admin)', self::ADMIN],
+        2 => ['Lay Deputy', self::LAY_DEPUTY],
+        //3 => ['Professional Deputy', 'ROLE_PROFESSIONAL_DEPUTY'],
+        //4 => ['Local Authority Deputy', 'ROLE_LOCAL_AUTHORITY_DEPUTY'],
         5 => ['Assisted Digital Support', 'ROLE_AD'],
+        6 => ['Super Admin', 'ROLE_SUPER_ADMIN'],
     ];
 
     /**
@@ -42,12 +43,6 @@ class Role implements RoleInterface
      * @ORM\SequenceGenerator(sequenceName="role_id_seq", allocationSize=1, initialValue=1)
      */
     private $id;
-
-    /**
-     * @JMS\Groups({"role", "audit_log"})
-     * @ORM\Column(name="name", type="string", length=60 )
-     */
-    private $name;
 
     /**
      * @JMS\Groups({"role"})
@@ -76,28 +71,19 @@ class Role implements RoleInterface
     }
 
     /**
-     * Set name.
-     *
-     * @param string $name
-     *
-     * @return Role
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
      * Get name.
+     *
+     * @JMS\VirtualProperty
+     * @JMS\Groups({"role", "audit_log"})
      *
      * @return string
      */
     public function getName()
     {
-        return $this->name;
+        return self::$fixtures[$this->getId()][0];
     }
+
+
 
     public function getRole()
     {
