@@ -181,7 +181,9 @@ class UserController extends RestController
         $this->setJmsSerialiserGroups($groups);
 
         // only allow admins to access any user, otherwise the user can only see himself
-        if (!$this->isGranted(EntityDir\Role::ADMIN) && !$requestedUserIsLogged) {
+        if (!$this->isGranted(EntityDir\Role::ADMIN)
+            && !$this->isGranted(EntityDir\Role::AD)
+            && !$requestedUserIsLogged) {
             throw $this->createAccessDeniedException("Not authorised to see other user's data");
         }
 
@@ -222,7 +224,7 @@ class UserController extends RestController
      */
     public function userCount()
     {
-        $this->denyAccessUnlessGranted(EntityDir\Role::ADMIN);
+        $this->denyAccessUnlessGranted([EntityDir\Role::ADMIN, EntityDir\Role::AD]);
 
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
         $qb->select('count(user.id)');
@@ -239,7 +241,7 @@ class UserController extends RestController
      */
     public function getAll($order_by, $sort_order, $limit, $offset)
     {
-        $this->denyAccessUnlessGranted(EntityDir\Role::ADMIN);
+        $this->denyAccessUnlessGranted([EntityDir\Role::ADMIN, EntityDir\Role::AD]);
 
         return $this->getRepository('User')->findBy([], [$order_by => $sort_order], $limit, $offset);
     }
