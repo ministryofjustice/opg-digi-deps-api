@@ -260,9 +260,12 @@ class UserController extends RestController
             throw new \RuntimeException('client secret not accepted.', 403);
         }
         $user = $this->findEntityBy('User', ['email' => $email]);
-        if (!$this->getAuthService()->isSecretValidForUser($user, $request)) {
+
+        //TODO consider an AD key from admin area
+        /*$isAd = $this->getUser()->getRole();
+        if (!$isAd && !$this->getAuthService()->isSecretValidForUser($user, $request)) {
             throw new \RuntimeException($user->getRole()->getRole().' user role not allowed from this client.', 403);
-        }
+        }*/
 
         $user->recreateRegistrationToken();
 
