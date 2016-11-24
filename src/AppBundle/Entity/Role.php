@@ -25,12 +25,13 @@ class Role implements RoleInterface
      * @JMS\Exclude
      */
     public static $fixtures = [
-        1 => ['Super user (ex OPG Admin)', self::ADMIN],
+        1 => ['OPG Admin', self::ADMIN],
         2 => ['Lay Deputy', self::LAY_DEPUTY],
+        5 => ['Assisted Digital', self::AD],
         //3 => ['Professional Deputy', 'ROLE_PROFESSIONAL_DEPUTY'],
         //4 => ['Local Authority Deputy', 'ROLE_LOCAL_AUTHORITY_DEPUTY'],
-        5 => ['Assisted Digital Support', self::AD],
-        6 => ['Super Admin', self::SUPER_ADMIN],
+
+        //6 => ['Super Admin', self::SUPER_ADMIN],
     ];
 
     /**
