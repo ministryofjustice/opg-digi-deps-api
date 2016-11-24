@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
@@ -222,16 +223,21 @@ class UserController extends RestController
     }
 
     /**
-     * @Route("/count")
+     * @Route("/count/{adOnly}")
      * @Method({"GET"})
      */
-    public function userCount()
+    public function userCount($adOnly)
     {
         $this->denyAccessUnlessGranted([EntityDir\Role::ADMIN, EntityDir\Role::AD]);
 
+        /** @var $qb QueryBuilder $qb */
         $qb = $this->getDoctrine()->getManager()->createQueryBuilder();
         $qb->select('count(user.id)');
         $qb->from('AppBundle\Entity\User', 'user');
+
+        if ($adOnly) {
+            $qb->where('user.adManaged = true');
+        }
 
         $count = $qb->getQuery()->getSingleScalarResult();
 
