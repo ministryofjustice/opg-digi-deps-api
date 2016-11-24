@@ -59,7 +59,10 @@ class UserController extends RestController
     {
         $user = $this->findEntityBy('User', $id, 'User not found'); /* @var $user User */
 
-        if ($this->getUser()->getId() != $user->getId() && !$this->isGranted(EntityDir\Role::ADMIN)) {
+        if ($this->getUser()->getId() != $user->getId()
+            && !$this->isGranted(EntityDir\Role::ADMIN)
+            && !$this->isGranted(EntityDir\Role::AD)
+        ) {
             throw $this->createAccessDeniedException("Non-admin not authorised to change other user's data");
         }
 
@@ -236,14 +239,18 @@ class UserController extends RestController
     }
 
     /**
-     * @Route("/get-all/{order_by}/{sort_order}/{limit}/{offset}", defaults={"order_by" = "firstname", "sort_order" = "ASC"})
+     * @Route("/get-all/{order_by}/{sort_order}/{limit}/{offset}/{adOnly}", defaults={"order_by" = "firstname", "sort_order" = "ASC"})
      * @Method({"GET"})
      */
-    public function getAll($order_by, $sort_order, $limit, $offset)
+    public function getAll($order_by, $sort_order, $limit, $offset, $adOnly)
     {
         $this->denyAccessUnlessGranted([EntityDir\Role::ADMIN, EntityDir\Role::AD]);
 
-        return $this->getRepository('User')->findBy([], [$order_by => $sort_order], $limit, $offset);
+        $criteria = [];
+        if ($adOnly) {
+            $criteria['adManaged'] = true;
+        }
+        return $this->getRepository('User')->findBy($criteria, [$order_by => $sort_order], $limit, $offset);
     }
 
     /**
@@ -340,6 +347,10 @@ class UserController extends RestController
 
         if (array_key_exists('odr_enabled', $data)) {
             $user->setOdrEnabled($data['odr_enabled']);
+        }
+
+        if (array_key_exists('ad_managed', $data)) {
+            $user->setAdManaged($data['ad_managed']);
         }
     }
 }
