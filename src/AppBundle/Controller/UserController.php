@@ -22,7 +22,7 @@ class UserController extends RestController
      */
     public function add(Request $request)
     {
-        $this->denyAccessUnlessGranted(EntityDir\Role::ADMIN);
+        $this->denyAccessUnlessGranted([EntityDir\Role::ADMIN, EntityDir\Role::AD]);
 
         $data = $this->deserializeBodyContent($request, [
             'role_id' => 'notEmpty',
@@ -44,7 +44,6 @@ class UserController extends RestController
             throw new \RuntimeException("User with email {$user->getEmail()} already exists.");
         }
 
-        // send activation email
         $user->recreateRegistrationToken();
 
         $this->persistAndFlush($user);
