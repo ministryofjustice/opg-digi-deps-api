@@ -21,17 +21,16 @@ class Role implements RoleInterface
 
     /**
      * Added via digideps:fixtures command.
-     *
+     * //TODO remove this table, role name should be used inside user table with no joins
      * @JMS\Exclude
      */
     public static $fixtures = [
         1 => ['OPG Admin', self::ADMIN],
         2 => ['Lay Deputy', self::LAY_DEPUTY],
-        3 => ['Assisted Digital', self::AD],
-        //3 => ['Professional Deputy', 'ROLE_PROFESSIONAL_DEPUTY'],
-        //4 => ['Local Authority Deputy', 'ROLE_LOCAL_AUTHORITY_DEPUTY'],
-
-        //6 => ['Super Admin', self::SUPER_ADMIN],
+        3 => ['Professional Deputy', 'ROLE_PROFESSIONAL_DEPUTY'],
+        4 => ['Local Authority Deputy', 'ROLE_LOCAL_AUTHORITY_DEPUTY'],
+        5 => ['Assisted Digital', self::AD],
+        6 => ['Super Admin', self::SUPER_ADMIN],
     ];
 
     /**
