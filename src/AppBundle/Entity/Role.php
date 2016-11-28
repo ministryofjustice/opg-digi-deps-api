@@ -27,7 +27,7 @@ class Role implements RoleInterface
     public static $fixtures = [
         1 => ['OPG Admin', self::ADMIN],
         2 => ['Lay Deputy', self::LAY_DEPUTY],
-        5 => ['Assisted Digital', self::AD],
+        3 => ['Assisted Digital', self::AD],
         //3 => ['Professional Deputy', 'ROLE_PROFESSIONAL_DEPUTY'],
         //4 => ['Local Authority Deputy', 'ROLE_LOCAL_AUTHORITY_DEPUTY'],
 
