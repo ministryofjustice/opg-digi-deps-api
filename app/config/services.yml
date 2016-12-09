@@ -15,14 +15,30 @@ services:
     user.selfRegistration:
         class: AppBundle\Service\UserRegistrationService
         arguments: [@doctrine.orm.entity_manager]
-    statsService:
-          class: AppBundle\Service\StatsService
-          arguments: [@doctrine.orm.entity_manager]
 
     monolog.processor.add_request_id:
         class: AppBundle\Service\RequestIdLoggerProcessor
         arguments:  [ @service_container ]
         tags:
               - { name: monolog.processor, method: processRecord }
-    
-            
+
+    ReportRepository:
+        class: Doctrine\ORM\EntityRepository
+        factory: ["@doctrine.orm.entity_manager", getRepository]
+        arguments:
+            - AppBundle\Entity\Report\Report
+
+    UserRepository:
+        class: Doctrine\ORM\EntityRepository
+        factory: ["@doctrine.orm.entity_manager", getRepository]
+        arguments:
+            - AppBundle\Entity\User
+
+    StatsService:
+        class: AppBundle\Service\StatsService
+        arguments: ["@UserRepository", "@ReportService"]
+
+    ReportService:
+        class: AppBundle\Service\ReportService
+        arguments:
+            - "@ReportRepository"
