@@ -819,7 +819,6 @@ class User implements UserInterface
 
         return $this;
     }
-<<<<<<< HEAD
 
     /**
      * @return boolean
@@ -836,7 +835,4 @@ class User implements UserInterface
     {
         $this->adManaged = $adManaged;
     }
-
-=======
->>>>>>> master
 }
