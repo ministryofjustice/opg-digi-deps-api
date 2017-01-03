@@ -1235,4 +1235,18 @@ class Report
 
         return $today >= $reportDueOn;
     }
+
+    /**
+     * Function to get the due date for a report based on the logic that the due date is 8 weeks
+     * after the end of the report period.
+     *
+     * @return bool|\DateTime
+     */
+    public function getDueDate()
+    {
+        if (!$this->getEndDate() instanceof \DateTime) {
+            return false;
+        }
+        return $this->getEndDate()->add(new \DateInterval('P56D'));
+    }
 }
