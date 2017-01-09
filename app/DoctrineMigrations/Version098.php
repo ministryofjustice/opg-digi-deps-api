@@ -18,7 +18,7 @@ class Version097 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('ALTER TABLE odr_account ADD is_joint_account VARCHAR(3) DEFAULT NULL');
+        $this->addSql('ALTER TABLE mental_capacity ADD mental_assessment_date DATE DEFAULT NULL');
     }
 
     /**
@@ -29,6 +29,8 @@ class Version097 extends AbstractMigration
         // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('ALTER TABLE odr_account DROP is_joint_account');
+        $this->addSql('CREATE SCHEMA public');
+        $this->addSql('ALTER TABLE mental_capacity DROP mental_assessment_date');
+
     }
 }
