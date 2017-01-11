@@ -12,7 +12,7 @@ services:
         class: AppBundle\EventListener\DoctrineListener
         tags:
             - { name: doctrine.event_listener, event: prePersist, method: prePersist }
-    user.selfRegistration:
+    app.srevice.user_registration_service:
         class: AppBundle\Service\UserRegistrationService
         arguments: [@doctrine.orm.entity_manager]
 
@@ -22,23 +22,23 @@ services:
         tags:
               - { name: monolog.processor, method: processRecord }
 
-    ReportRepository:
+    app.repository.report_repository:
         class: Doctrine\ORM\EntityRepository
         factory: ["@doctrine.orm.entity_manager", getRepository]
         arguments:
             - AppBundle\Entity\Report\Report
 
-    UserRepository:
+    app.repository.user_repository:
         class: Doctrine\ORM\EntityRepository
         factory: ["@doctrine.orm.entity_manager", getRepository]
         arguments:
             - AppBundle\Entity\User
 
-    StatsService:
+    app.service.stats_service:
         class: AppBundle\Service\StatsService
-        arguments: ["@UserRepository", "@ReportService"]
+        arguments: ["@app.repository.user_repository", "@app.service.report_service"]
 
-    ReportService:
+    app.service.report_service:
         class: AppBundle\Service\ReportService
         arguments:
-            - "@ReportRepository"
+            - "@app.repository.report_repository"
