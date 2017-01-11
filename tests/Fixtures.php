@@ -8,6 +8,9 @@ use Doctrine\ORM\EntityManager;
  */
 class Fixtures
 {
+    const PG_DUMP_PATH = '/tmp/dd_phpunit.pgdump';
+    const PG_EXPORT_COMMAND = 'export PGHOST=postgres; export PGPASSWORD=api; export PGDATABASE=digideps_unit_test; export PGUSER=api;';
+
     /**
      * @var EntityManager
      */
@@ -321,12 +324,9 @@ class Fixtures
         return $this->em->getConnection();
     }
 
-    const PG_DUMP_PATH = '/tmp/dd_phpunit.pgdump';
-    const PG_EXPORT_COMMAND = 'export PGHOST=postgres; export PGPASSWORD=api; export PGDATABASE=digideps_unit_test; export PGUSER=api;';
-
     private static function pgCommand($cmd)
     {
-        exec('export PGHOST=postgres; export PGPASSWORD=api; export PGDATABASE=digideps_unit_test; export PGUSER=api; '.$cmd);
+        exec(self::PG_EXPORT_COMMAND.$cmd);
     }
 
     public static function initDb()
@@ -343,7 +343,11 @@ class Fixtures
         if (!file_exists(self::PG_DUMP_PATH)) {
             throw new \RuntimeException(self::PG_DUMP_PATH.' not found');
         }
-//        self::pgCommand("psql -c 'DROP SCHEMA IF EXISTS public cascade; CREATE SCHEMA IF NOT EXISTS public;' 2> /dev/null");
         self::pgCommand('psql < '.self::PG_DUMP_PATH);
+    }
+
+    public static function deleteReportsData()
+    {
+        self::pgCommand('PGOPTIONS=\'--client-min-messages=warning\' psql -c "truncate table deputy_case, report, odr  RESTART IDENTITY cascade";');
     }
 }

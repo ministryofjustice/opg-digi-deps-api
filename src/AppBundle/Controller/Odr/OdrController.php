@@ -2,11 +2,11 @@
 
 namespace AppBundle\Controller\Odr;
 
+use AppBundle\Controller\RestController;
+use AppBundle\Entity as EntityDir;
+use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity as EntityDir;
-use AppBundle\Controller\RestController;
 
 class OdrController extends RestController
 {
@@ -91,15 +91,16 @@ class OdrController extends RestController
                 $this->getEntityManager()->flush($debt);
             }
             // set debts as per "debts" key
-            foreach ($data['debts'] as $row) {
-                $debt = $odr->getDebtByTypeId($row['debt_type_id']);
-                if (!$debt instanceof EntityDir\Odr\Debt) {
-                    continue; //not clear when that might happen. kept similar to transaction below
+            if ($data['has_debts'] == 'yes') {
+                foreach ($data['debts'] as $row) {
+                    $debt = $odr->getDebtByTypeId($row['debt_type_id']);
+                    if (!$debt instanceof EntityDir\Odr\Debt) {
+                        continue; //not clear when that might happen. kept similar to transaction below
+                    }
+                    $debt->setAmountAndDetails($row['amount'], $row['more_details']);
+                    $this->getEntityManager()->flush($debt);
+                    $this->setJmsSerialiserGroups(['debts']); //returns saved data (AJAX operations)
                 }
-                $debt->setAmount($row['amount']);
-                $debt->setMoreDetails($debt->getHasMoreDetails() ? $row['more_details'] : null);
-                $this->getEntityManager()->flush($debt);
-                $this->setJmsSerialiserGroups(['debts']); //returns saved data (AJAX operations)
             }
         }
 
@@ -109,7 +110,7 @@ class OdrController extends RestController
                 if ($e instanceof EntityDir\Odr\IncomeBenefitStateBenefit) {
                     $e
                         ->setPresent($row['present'])
-                        ->setMoreDetails($row['present'] ? $row['more_details']: null);
+                        ->setMoreDetails($row['present'] ? $row['more_details'] : null);
                     $this->getEntityManager()->flush($e);
                 }
             }
@@ -208,68 +209,5 @@ class OdrController extends RestController
         $this->getEntityManager()->flush();
 
         return ['id' => $odr->getId()];
-    }
-
-    /**
-     * REMOVE THIS WHEN OTPP IS MERGED
-     * @Route("/odr/{id}/reset-data-dev")
-     * @Method({"PUT"})
-     */
-    public function resetDataDev(Request $request, $id)
-    {
-        $this->denyAccessUnlessGranted(EntityDir\Role::LAY_DEPUTY);
-
-        $odr = $this->findEntityBy('Odr\Odr', $id, 'Odr not found');
-        /* @var $odr EntityDir\Odr\Odr */
-
-        $em = $this->getEntityManager();
-
-        if ($odr->getVisitsCare()) {
-            $em->remove($odr->getVisitsCare());
-        }
-
-        foreach ($odr->getExpenses() as $e){
-            $em->remove($e);
-        }
-        $odr->setPaidForAnything(null);
-
-        foreach($odr->getStateBenefits() as $e) {
-            $e->setPresent(false);
-            $e->setMoreDetails(null);
-        }
-        $odr->setReceiveStatePension(null);
-        $odr->setReceiveOtherIncome(null);
-        $odr->setReceiveOtherIncomeDetails(null);
-        $odr->setExpectCompensationDamages(null);
-        $odr->setExpectCompensationDamagesDetails(null);
-        foreach($odr->getOneOff() as $e) {
-            $e->setPresent(false);
-            $e->setMoreDetails(null);
-        }
-
-        foreach ($odr->getBankAccounts() as $e){
-            $em->remove($e);
-        }
-
-        foreach ($odr->getAssets() as $e){
-            $em->remove($e);
-        }
-        $odr->setNoAssetToAdd(null);
-
-        foreach ($odr->getDebts() as $e){
-            $e->setAmount(null);
-        }
-        $odr->setHasDebts(null);
-
-        $odr->setActionGiveGiftsToClient(null);
-        $odr->setActionGiveGiftsToClientDetails(null);
-        $odr->setActionPropertyBuy(null);
-        $odr->setActionPropertyMaintenance(null);
-        $odr->setActionPropertySellingRent(null);
-
-        $odr->setActionMoreInfo(null);
-        $odr->setActionMoreInfoDetails(null);
-
-        $em->flush();
     }
 }
