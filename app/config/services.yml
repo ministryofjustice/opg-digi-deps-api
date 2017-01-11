@@ -12,7 +12,7 @@ services:
         class: AppBundle\EventListener\DoctrineListener
         tags:
             - { name: doctrine.event_listener, event: prePersist, method: prePersist }
-    app.srevice.user_registration_service:
+    app.service.user_registration_service:
         class: AppBundle\Service\UserRegistrationService
         arguments: [@doctrine.orm.entity_manager]
 
