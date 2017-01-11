@@ -17,7 +17,7 @@ COPY composer.lock /app/
 WORKDIR /app
 USER app
 ENV  HOME /app
-RUN  composer install --no-interaction --no-scripts
+RUN  composer install --prefere-source --no-interaction --no-scripts
 
 # install remaining parts of app
 ADD  . /app
