@@ -3,6 +3,7 @@
 namespace Tests\AppBundle\Entity\Report;
 
 use AppBundle\Entity as EntityDir;
+use AppBundle\Repository\Report\ReportRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -137,7 +138,7 @@ class ReportRepositoryTest extends WebTestCase
         $em->shouldIgnoreMissing();
 
         $cm = m::mock(ClassMetadata::class);
-        $repo = new EntityDir\Report\ReportRepository($em, $cm);
+        $repo = new ReportRepository($em, $cm);
 
         $newReport = $repo->createNextYearReport($report);
         $this->assertEquals($newReportType, $newReport->getType());
