@@ -309,33 +309,33 @@ class Report
      */
     private $metadata;
 
-    /**
-     * @var ReportType
-     *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Report\ReportType", fetch="EAGER")
-     * @ORM\JoinColumn(name="report_type_id", referencedColumnName="id")
-     */
-    private $reportType;
-
-    /**
-     * @return ReportType
-     */
-    public function getReportType()
-    {
-        return $this->reportType;
-    }
-
-    /**
-     * @param ReportType $reportType
-     *
-     * @return Report
-     */
-    public function setReportType($reportType)
-    {
-        $this->reportType = $reportType;
-
-        return $this;
-    }
+//    /**
+//     * @var ReportType
+//     *
+//     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Report\ReportType", fetch="EAGER")
+//     * @ORM\JoinColumn(name="report_type_id", referencedColumnName="id")
+//     */
+//    private $reportType;
+//
+//    /**
+//     * @return ReportType
+//     */
+//    public function getReportType()
+//    {
+//        return $this->reportType;
+//    }
+//
+//    /**
+//     * @param ReportType $reportType
+//     *
+//     * @return Report
+//     */
+//    public function setReportType($reportType)
+//    {
+//        $this->reportType = $reportType;
+//
+//        return $this;
+//    }
 
     /**
      * Constructor.
