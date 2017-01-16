@@ -63,13 +63,14 @@ class ReportControllerTest extends AbstractTestController
     public function testAddAcl()
     {
         $url = '/report';
-        $this->assertEndpointNotAllowedFor('POST', $url, self::$tokenDeputy, [
+        $this->assertEndpointNotAllowedFor('POST', $url, self::$tokenAdmin, [
             'client' => ['id' => self::$client2->getId()],
         ]);
     }
 
     private $fixedData = [
         'court_order_type_id' => 1,
+        'court_order_type' => ['id' => 1],
         'start_date' => '2015-01-01',
         'end_date' => '2015-12-31',
     ];

@@ -3,14 +3,29 @@
 namespace AppBundle\Controller\Report;
 
 use AppBundle\Controller\RestController;
+use AppBundle\Service\ReportService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity as EntityDir;
+use AppBundle\Service\ClientService;
+use JMS\Serializer\Serializer;
 
+/**
+ * @Route(service="app.controller.report_controller")
+ */
 class ReportController extends RestController
 {
+
+    private $reportService;
+
+
+    public function __construct(ReportService $reportService)
+    {
+        $this->reportService = $reportService;
+    }
+
     /**
      * @Route("/report")
      * @Method({"POST"})
@@ -18,36 +33,11 @@ class ReportController extends RestController
     public function addAction(Request $request)
     {
         $this->denyAccessUnlessGranted(EntityDir\Role::LAY_DEPUTY);
+        $payload = $request->getContent();
+        $reportEntity = $this->reportService->create($payload);
+        $this->denyAccessIfClientDoesNotBelongToUser($reportEntity->getClient());
 
-        $reportData = $this->deserializeBodyContent($request);
-
-        // new report
-        if (empty($reportData['client']['id'])) {
-            throw new \InvalidArgumentException('Missing client.id');
-        }
-        $client = $this->findEntityBy('Client', $reportData['client']['id']);
-        $this->denyAccessIfClientDoesNotBelongToUser($client);
-
-        $report = new EntityDir\Report\Report();
-        $report->setClient($client);
-
-        // add court order type
-        $courtOrderType = $this->findEntityBy('CourtOrderType', $reportData['court_order_type_id']);
-        $report->setCourtOrderType($courtOrderType);
-
-        $this->validateArray($reportData, [
-            'start_date' => 'notEmpty',
-            'end_date' => 'notEmpty',
-        ]);
-
-        // add other stuff
-        $report->setStartDate(new \DateTime($reportData['start_date']));
-        $report->setEndDate(new \DateTime($reportData['end_date']));
-        $report->setReportSeen(true);
-
-        $this->persistAndFlush($report);
-
-        return ['report' => $report->getId()];
+        return ['report' => $reportEntity->getId()];
     }
 
     /**
@@ -59,7 +49,6 @@ class ReportController extends RestController
     public function getById(Request $request, $id)
     {
         $this->denyAccessUnlessGranted(EntityDir\Role::LAY_DEPUTY);
-
         $groups = $request->query->has('groups')
             ? (array) $request->query->get('groups') : ['report'];
         $this->setJmsSerialiserGroups($groups);

@@ -13,7 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Reports.
  *
  * @ORM\Table(name="report")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\Report\ReportRepository")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\Report\ReportRepository")
  */
 class Report
 {
@@ -129,7 +129,7 @@ class Report
     private $mentalCapacity;
 
     /**
-     * @JMS\Exclude
+     * @JMS\Groups({"report"})
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\CourtOrderType")
      * @ORM\JoinColumn( name="court_order_type_id", referencedColumnName="id" )
      */

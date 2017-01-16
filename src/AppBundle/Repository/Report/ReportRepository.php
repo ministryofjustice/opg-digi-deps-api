@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Entity\Report;
+namespace AppBundle\Repository\Report;
 
 use AppBundle\Entity as EntityDir;
 use Doctrine\ORM\EntityRepository;
@@ -70,7 +70,7 @@ class ReportRepository extends EntityRepository
      *
      * @return int changed records
      */
-    public function addTransactionsToReportIfMissing(Report $report)
+    public function addTransactionsToReportIfMissing(EntityDir\Report\Report $report)
     {
         $ret = 0;
 
@@ -82,7 +82,7 @@ class ReportRepository extends EntityRepository
             ->findBy([], ['displayOrder' => 'ASC']);
 
         foreach ($transactionTypes as $transactionType) {
-            $transaction = new Transaction($report, $transactionType, []);
+            $transaction = new EntityDir\Report\Transaction($report, $transactionType, []);
             $report->getTransactions()->add($transaction);
             $this->_em->persist($transaction);
             ++$ret;
@@ -99,7 +99,7 @@ class ReportRepository extends EntityRepository
      *
      * @return int changed records
      */
-    public function addDebtsToReportIfMissing(Report $report)
+    public function addDebtsToReportIfMissing(EntityDir\Report\Report $report)
     {
         $ret = 0;
 
@@ -108,8 +108,8 @@ class ReportRepository extends EntityRepository
             return $ret;
         }
 
-        foreach (Debt::$debtTypeIds as $row) {
-            $debt = new Debt($report, $row[0], $row[1], null);
+        foreach (EntityDir\Report\Debt::$debtTypeIds as $row) {
+            $debt = new EntityDir\Report\Debt($report, $row[0], $row[1], null);
             $this->_em->persist($debt);
             ++$ret;
         }
@@ -123,5 +123,13 @@ class ReportRepository extends EntityRepository
     public function warmUpArrayCacheTransactionTypes()
     {
         $this->_em->createQuery('SELECT tt FROM  AppBundle\Entity\Report\TransactionType tt')->execute();
+    }
+
+    public function save($entity)
+    {
+//        $client = $this->_em->getReference(EntityDir\Client::class, $entity->getClient()->getId());
+//        $entity->setClient($client);
+        $this->_em->persist($entity);
+        $this->_em->flush($entity);
     }
 }
