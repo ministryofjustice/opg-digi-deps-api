@@ -6,17 +6,20 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
- * convert money transaction. moved to 99. kept the number to fix already-released staging
+ * report.type
  */
-class Version095 extends AbstractMigration
+class Version100 extends AbstractMigration
 {
     /**
      * @param Schema $schema
      */
     public function up(Schema $schema)
     {
+        // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
+        $this->addSql("ALTER TABLE report ADD type VARCHAR(3) NOT NULL DEFAULT '102'");
+        $this->addSql("update report set type='104' WHERE court_order_type_id=1");
     }
 
     /**
@@ -24,8 +27,9 @@ class Version095 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
+        // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-
+        $this->addSql('ALTER TABLE report DROP type');
     }
 }

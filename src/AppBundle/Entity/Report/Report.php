@@ -17,7 +17,18 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class Report
 {
+    const HEALTH_WELFARE = 1;
     const PROPERTY_AND_AFFAIRS = 2;
+
+    const TYPE_102 = '102';
+    const TYPE_103 = '103';
+    const TYPE_104 = '104';
+
+    /**
+     * Reports with total amount of assets
+     * Threshold under which reports should be 103, and not 102
+     */
+    const ASSETS_TOTAL_VALUE_103_THRESHOLD = 21000;
 
     /**
      * @var int
@@ -30,6 +41,16 @@ class Report
      * @ORM\SequenceGenerator(sequenceName="report_id_seq", allocationSize=1, initialValue=1)
      */
     private $id;
+
+    /**
+     * @var string
+     * see TYPE_ class constants
+     *
+     * @JMS\Groups({"report"})
+     * @JMS\Type("string")
+     * @ORM\Column(name="type", type="string", length=3, nullable=false)
+     */
+    private $type;
 
     /**
      * @var int
@@ -64,7 +85,7 @@ class Report
 
     /**
      * @deprecated REMOVE WHEN OTPP is merged and migrated
-     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Report\Transaction", mappedBy="report", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Report\Transaction", mappedBy="report", cascade={"persist"}, fetch="LAZY")
      * @ORM\OrderBy({"id" = "ASC"})
      */
     private $transactions;
@@ -129,6 +150,8 @@ class Report
     private $mentalCapacity;
 
     /**
+     * @deprecated? Confirm with PO
+     *
      * @JMS\Groups({"report"})
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\CourtOrderType")
      * @ORM\JoinColumn( name="court_order_type_id", referencedColumnName="id" )
@@ -330,6 +353,22 @@ class Report
         $this->noAssetToAdd = null;
         $this->noTransfersToAdd = null;
         $this->reportSeen = true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 
     /**
@@ -707,11 +746,31 @@ class Report
     /**
      * Get assets.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return Asset[]
      */
     public function getAssets()
     {
         return $this->assets;
+    }
+
+    /**
+     * Get assets total value.
+     *
+     * @JMS\VirtualProperty
+     * @JMS\Type("double")
+     * @JMS\SerializedName("assets_total_value")
+     * @JMS\Groups({"asset"})
+     *
+     * @return float
+     */
+    public function getAssetsTotalValue()
+    {
+        $ret = 0;
+        foreach ($this->getAssets() as $asset) {
+            $ret += $asset->getValueTotal();
+        }
+
+        return $ret;
     }
 
     /**
@@ -979,6 +1038,7 @@ class Report
     }
 
     /**
+     * @deprecated
      * @return Transaction[]
      */
     public function getTransactions()

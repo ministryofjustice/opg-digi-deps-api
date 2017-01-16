@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityRepository;
  */
 class ReportRepository extends EntityRepository
 {
+
     /**
      * Create new year's report copying data over (and set start/endDate accordingly).
      *
@@ -26,6 +27,8 @@ class ReportRepository extends EntityRepository
         $newReport = new EntityDir\Report\Report();
         $newReport->setClient($report->getClient());
         $newReport->setCourtOrderType($report->getCourtOrderType());
+        $newReportType = $this->getReportTypeBasedOnOldReport($report);
+        $newReport->setType($newReportType);
         $newReport->setStartDate($report->getEndDate()->modify('+1 day'));
         $newReport->setEndDate($report->getEndDate()->modify('+12 months -1 day'));
         $newReport->setReportSeen(false);
@@ -118,17 +121,24 @@ class ReportRepository extends EntityRepository
     }
 
     /**
-     *  preload transaction type. Doctrine otherwise fetching every single one.
+     * @param Report $oldReport
+     * @return string
      */
-    public function warmUpArrayCacheTransactionTypes()
+    private function getReportTypeBasedOnOldReport(Report $oldReport)
     {
-        $this->_em->createQuery('SELECT tt FROM  AppBundle\Entity\Report\TransactionType tt')->execute();
+        if (in_array($oldReport->getType(), [Report::TYPE_102, Report::TYPE_103])) {
+            if ($oldReport->getAssetsTotalValue() <= Report::ASSETS_TOTAL_VALUE_103_THRESHOLD) {
+                return Report::TYPE_103;
+            }
+
+            return Report::TYPE_102;
+        }
+
+        return $oldReport->getType();
     }
 
     public function save($entity)
     {
-//        $client = $this->_em->getReference(EntityDir\Client::class, $entity->getClient()->getId());
-//        $entity->setClient($client);
         $this->_em->persist($entity);
         $this->_em->flush($entity);
     }

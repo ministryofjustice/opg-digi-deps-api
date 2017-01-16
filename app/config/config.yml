@@ -1,7 +1,7 @@
 imports:
     - { resource: parameters.yml }
-    - { resource: services.yml }
     - { resource: security.yml }
+    - { resource: services.yml }
 
 framework:
     #esi:             ~
@@ -74,3 +74,6 @@ monolog:
            path: %log_path%
            level: %log_level%
            formatter: logstash_formatter
+
+
+

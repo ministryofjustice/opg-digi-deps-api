@@ -53,10 +53,8 @@ class ReportController extends RestController
             ? (array) $request->query->get('groups') : ['report'];
         $this->setJmsSerialiserGroups($groups);
 
-        $this->getRepository('Report\Report')->warmUpArrayCacheTransactionTypes();
-
         $report = $this->findEntityBy('Report\Report', $id);
-        /* @var $report EntityDir\Report\Report */
+        /* @var $report Report */
         $this->denyAccessIfReportDoesNotBelongToUser($report);
 
         return $report;
@@ -71,7 +69,7 @@ class ReportController extends RestController
         $this->denyAccessUnlessGranted(EntityDir\Role::LAY_DEPUTY);
 
         $currentReport = $this->findEntityBy('Report\Report', $id, 'Report not found');
-        /* @var $currentReport EntityDir\Report\Report */
+        /* @var $currentReport Report */
         $this->denyAccessIfReportDoesNotBelongToUser($currentReport);
         $user = $this->getUser();
         $client = $currentReport->getClient();
@@ -112,13 +110,15 @@ class ReportController extends RestController
     {
         $this->denyAccessUnlessGranted(EntityDir\Role::LAY_DEPUTY);
 
-        $this->getRepository('Report\Report')->warmUpArrayCacheTransactionTypes();
-
         $report = $this->findEntityBy('Report\Report', $id, 'Report not found');
-        /* @var $report EntityDir\Report\Report */
+        /* @var $report Report */
         $this->denyAccessIfReportDoesNotBelongToUser($report);
 
         $data = $this->deserializeBodyContent($request);
+
+        if (!empty($data['type'])) {
+            $report->setType($data['type']);
+        }
 
         if (array_key_exists('has_debts', $data) && in_array($data['has_debts'], ['yes', 'no'])) {
             $report->setHasDebts($data['has_debts']);
@@ -140,11 +140,6 @@ class ReportController extends RestController
                 }
             }
             $this->setJmsSerialiserGroups(['debts']); //returns saved data (AJAX operations)
-        }
-
-        if (array_key_exists('cot_id', $data)) {
-            $cot = $this->findEntityBy('CourtOrderType', $data['cot_id']);
-            $report->setCourtOrderType($cot);
         }
 
         if (array_key_exists('start_date', $data)) {

@@ -6,7 +6,7 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * convert money transaction: fix
  */
 class Version099 extends AbstractMigration
 {
@@ -15,13 +15,56 @@ class Version099 extends AbstractMigration
      */
     public function up(Schema $schema)
     {
+        ini_set('memory_limit', '1024M');
+
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('CREATE TABLE report_type (id VARCHAR(255) NOT NULL, name VARCHAR(255) NOT NULL, display_order INT DEFAULT NULL, PRIMARY KEY(id))');
-        $this->addSql('ALTER TABLE report ADD report_type_id VARCHAR(255) DEFAULT NULL');
-        $this->addSql('ALTER TABLE report ADD CONSTRAINT FK_C42F7784A5D5F193 FOREIGN KEY (report_type_id) REFERENCES report_type (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('CREATE INDEX IDX_C42F7784A5D5F193 ON report (report_type_id)');
+        $sql = 'SELECT
+        t.id,
+        t.report_id as report_id,
+        t.more_details as description, t.amounts as amounts,
+        tt.category as category,
+        tt.id as transaction_type_id
+        FROM transaction t
+        LEFT JOIN transaction_type tt ON t.transaction_type_id = tt.id
+        WHERE t.amounts is not null
+        ';
+        $oldTrans = $this->connection->fetchAll($sql);
+        echo count($oldTrans) . " transactions to migrate: ";
+        $this->connection->beginTransaction();
+
+        $i = 0;
+        foreach ($oldTrans as $trans) {
+            $i++;
+            $newRecords = $this->convertOldToNew($trans);
+            //print_r([$trans, $newRecords]);
+            foreach ($newRecords as $nr) {
+                $this->connection->insert('money_transaction', $nr);
+                if (($i % 1000) == 0) {
+                    echo "$i ";
+                    $this->connection->commit();
+                    $this->connection->beginTransaction();
+                }
+            }
+        }
+        $this->connection->commit();
+    }
+
+    private function convertOldToNew($old)
+    {
+        $amounts = explode(',', $old['amounts']);
+        $ret = [];
+        foreach ($amounts as $amount) {
+            $ret[] = [
+                'report_id'   => $old['report_id'],
+                'category'    => $old['transaction_type_id'],
+                'amount'      => $amount,
+                'description' => trim($old['description'], "\n\t. "),
+            ];
+        }
+
+        return $ret;
     }
 
     /**
@@ -30,12 +73,9 @@ class Version099 extends AbstractMigration
     public function down(Schema $schema)
     {
         // this down() migration is auto-generated, please modify it to your needs
+
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('CREATE SCHEMA public');
-        $this->addSql('ALTER TABLE report DROP CONSTRAINT FK_C42F7784A5D5F193');
-        $this->addSql('DROP TABLE report_type');
-        $this->addSql('DROP INDEX IDX_C42F7784A5D5F193');
-        $this->addSql('ALTER TABLE report DROP report_type_id');
+        $this->addSql('delete from money_transaction');
     }
 }

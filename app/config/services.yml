@@ -34,6 +34,12 @@ services:
         arguments:
             - AppBundle\Entity\User
 
+    app.repository.client_repository:
+        class: Doctrine\ORM\EntiryReposotory
+        factory:  ["@doctrine.orm.entity_manager", getRepository]
+        arguments:
+            - AppBundle\Entity\Client
+
     app.service.stats_service:
         class: AppBundle\Service\StatsService
         arguments: ["@app.repository.user_repository", "@app.service.report_service"]
@@ -42,3 +48,25 @@ services:
         class: AppBundle\Service\ReportService
         arguments:
             - "@app.repository.report_repository"
+            - "@app.service.client_service"
+            - "@serializer"
+
+    app.service.client_service:
+        class:  AppBundle\Service\ClientService
+        arguments:
+            - "@app.repository.client_repository"
+
+    app.controller.report_controller:
+        class: AppBundle\Controller\Report\ReportController
+        lazy:  true
+        arguments:
+            - "@app.service.report_service"
+        calls:
+            - [setContainer, ["@service_container"]]
+
+    jms_serializer.object_constructor:
+        alias: jms_serializer.doctrine_object_constructor
+        public: false
+
+    jms_serializer.unserialize_object_constructor:
+        class: AppBundle\Serializer\ObjectConstructor
