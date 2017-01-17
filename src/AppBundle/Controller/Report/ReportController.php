@@ -135,7 +135,9 @@ class ReportController extends RestController
                     if (!$debt instanceof EntityDir\Report\Debt) {
                         continue; //not clear when that might happen. kept similar to transaction below
                     }
-                    $debt->setAmountAndDetails($row['amount'], $row['more_details']);
+                    $amount = (isset($row['amount']))?$row['amount']:0;
+                    $moreDetails = (isset($row['more_details']))?$row['more_details']:'';
+                    $debt->setAmountAndDetails($amount, $moreDetails);
                     $this->getEntityManager()->flush($debt);
                 }
             }
