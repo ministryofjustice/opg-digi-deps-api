@@ -8,3 +8,4 @@ cd /app
 /sbin/setuser app php app/console doctrine:migrations:status-check
 /sbin/setuser app php app/console doctrine:migrations:migrate --no-interaction -vvv
 /sbin/setuser app php app/console digideps:fixtures
+/sbin/setuser app php app/console doctrine:fixtures:load --append
