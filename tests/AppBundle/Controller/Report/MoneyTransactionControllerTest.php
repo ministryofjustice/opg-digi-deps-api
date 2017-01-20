@@ -36,13 +36,13 @@ class MoneyTransactionControllerTest extends AbstractTestController
 
         // transactions
         $t1 = new MoneyTransaction(self::$report1);
-        $t1->setCategory('dividends')->setAmount(123.45)->setDescription('d1');
+        $t1->setCategory('dividends')->setAmount(123.45)->setDescription('d1')->setTransactionDate(new \DateTime('01/01/2017'));
         $t2 = new MoneyTransaction(self::$report1);
-        $t2->setCategory('dividends')->setAmount(789.12)->setDescription('d2');
+        $t2->setCategory('dividends')->setAmount(789.12)->setDescription('d2')->setTransactionDate(new \DateTime('01/01/2017'));
         $t3 = new MoneyTransaction(self::$report1);
-        $t3->setCategory('loans')->setAmount(5000.59)->setDescription('d3');
+        $t3->setCategory('loans')->setAmount(5000.59)->setDescription('d3')->setTransactionDate(new \DateTime('01/01/2017'));
         $t4 = new MoneyTransaction(self::$report2);
-        $t4->setCategory('loans')->setAmount(123)->setDescription('belongs to report2');
+        $t4->setCategory('loans')->setAmount(123)->setDescription('belongs to report2')->setTransactionDate(new \DateTime('01/01/2017'));
         self::fixtures()->persist($t1, $t2, $t3, $t4);
 
         self::fixtures()->flush()->clear();
@@ -83,6 +83,7 @@ class MoneyTransactionControllerTest extends AbstractTestController
         $this->assertArrayHasKey('id',  $data['transactions_in'][0]);
         $this->assertEquals('dividends', $data['transactions_in'][0]['category']);
         $this->assertEquals('123.45', $data['transactions_in'][0]['amount']);
+        $this->assertEquals('2017-01-01T00:00:00+0000', $data['transactions_in'][0]['transaction_date']);
         $this->assertArrayHasKey('id', $data['transactions_in'][1]);
         $this->assertEquals('dividends', $data['transactions_in'][1]['category']);
         $this->assertEquals('789.12', $data['transactions_in'][1]['amount']);

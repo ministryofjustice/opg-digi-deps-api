@@ -141,6 +141,16 @@ class MoneyTransaction
      */
     private $description;
 
+    /**
+     * @var \DateTime
+     *
+     * @JMS\Type("DateTime")
+     * @JMS\Groups({"transaction", "transactionsIn", "transactionsOut"})
+     *
+     * @ORM\Column(name="transaction_date", type="date", nullable=true)
+     */
+    private $transactionDate;
+
     public function __construct(Report $report)
     {
         $this->report = $report;
@@ -273,6 +283,26 @@ class MoneyTransaction
         }
 
         return null;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getTransactionDate()
+    {
+        return $this->transactionDate;
+    }
+
+    /**
+     * @param \DateTime $transactionDate
+     *
+     * @return $this
+     */
+    public function setTransactionDate($transactionDate)
+    {
+        $this->transactionDate = $transactionDate;
+
+        return $this;
     }
 
 }

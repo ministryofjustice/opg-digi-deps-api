@@ -32,6 +32,9 @@ class MoneyTransactionController extends RestController
         if (array_key_exists('description', $data)) {
             $t->setDescription($data['description']);
         }
+        if (array_key_exists('transaction_date', $data)) {
+            $t->setTransactionDate(new \DateTime($data['transaction_date']));
+        }
         $t->setReport($report);
         $this->getEntityManager()->persist($t);
         $this->getEntityManager()->flush($t);
@@ -64,6 +67,9 @@ class MoneyTransactionController extends RestController
         }
         if (isset($data['amount'])) {
             $t->setAmount($data['amount']);
+        }
+        if (isset($data['transaction_date'])) {
+            $t->setTransactionDate(new \DateTime($data['transaction_date']));
         }
 
         $this->getEntityManager()->flush();
