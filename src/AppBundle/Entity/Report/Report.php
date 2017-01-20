@@ -5,6 +5,7 @@ namespace AppBundle\Entity\Report;
 use AppBundle\Entity\Client;
 use AppBundle\Entity\CourtOrderType;
 use AppBundle\Entity\User;
+use AppBundle\Entity\Report\IncomeBenefitTypes;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -310,6 +311,33 @@ class Report
     private $metadata;
 
     /**
+     * @var IncomeBenefitType[]
+     *
+     * @JMS\Groups({"report-income-benefit-types"})
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Report\IncomeBenefitType", mappedBy="report")
+     * @ORM\OrderBy({"id" = "ASC"})
+     */
+    private $incomeBenefitTypes;
+
+    /**
+     * @var IncomeCategory[]
+     *
+     * @JMS\Groups({"report-income-categories"})
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Report\IncomeCategory", mappedBy="report")
+     * @ORM\OrderBy({"id" = "ASC"})
+     */
+    private $incomeCategories;
+
+    /**
+     * @var ExpenseCategory[]
+     *
+     * @JMS\Groups({"report-expense-categories"})
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Report\ExpenseCategory", mappedBy="report")
+     * @ORM\OrderBy({"id" = "ASC"})
+     */
+    private $expenseCategories;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -325,6 +353,9 @@ class Report
         $this->noAssetToAdd = null;
         $this->noTransfersToAdd = null;
         $this->reportSeen = true;
+        $this->incomeBenefitTypes = new ArrayCollection();
+        $this->incomeCategories = new ArrayCollection();
+        $this->expenseCategories = new ArrayCollection();
     }
 
     /**
@@ -1363,5 +1394,83 @@ class Report
             return false;
         }
         return $this->getEndDate()->add(new \DateInterval('P56D'));
+    }
+
+    /**
+     * @return IncomeBenefitType[]
+     */
+    public function getIncomeBenefitTypes()
+    {
+        return $this->incomeBenefitTypes;
+    }
+
+    /**
+     * @param IncomeBenefitType[] $incomeBenefitTypes
+     */
+    public function setIncomeBenefitTypes($incomeBenefitTypes)
+    {
+        $this->incomeBenefitTypes = $incomeBenefitTypes;
+    }
+
+    public function addIncomeBenefitTypes(IncomeBenefitType $incomeBenefitType)
+    {
+        $this->incomeBenefitTypes->add($incomeBenefitType);
+
+        return $this;
+    }
+
+    /**
+     * @return IncomeCategory[]
+     */
+    public function getIncomeCategories()
+    {
+        return $this->incomeCategories;
+    }
+
+    /**
+     * @param IncomeCategory[] $incomeCategories
+     * @return Report
+     */
+    public function setIncomeCategories($incomeCategories)
+    {
+        $this->incomeCategories = $incomeCategories;
+
+        return $this;
+    }
+
+    /**
+     * @param IncomeCategory $incomeCategory
+     * @return $this
+     */
+    public function addIncomeCategories(IncomeCategory $incomeCategory)
+    {
+        $this->incomeCategories->add($incomeCategory);
+
+        return $this;
+    }
+
+    /**
+     * @return ExpenseCategory[]
+     */
+    public function getExpenseCategories()
+    {
+        return $this->expenseCategories;
+    }
+
+    /**
+     * @param ExpenseCategory[] $expenseCategories
+     * @return Report
+     */
+    public function setExpenseCategories($expenseCategories)
+    {
+        $this->expenseCategories = $expenseCategories;
+        return $this;
+    }
+
+    public function addExpenseCategories(ExpenseCategory $expenseCategory)
+    {
+        $this->expenseCategories->add($expenseCategory);
+
+        return $this;
     }
 }

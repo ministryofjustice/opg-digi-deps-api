@@ -20,7 +20,12 @@ class DoctrineListener
 
         // add empty debts to report at creation time
         if ($entity instanceof EntityDir\Report\Report && !$entity->getId()) {
-            $entityManager->getRepository('AppBundle\Entity\Report\Report')->addDebtsToReportIfMissing($entity);
+            /** @var EntityDir\Report\ReportRepository $reportRepository */
+            $reportRepository = $entityManager->getRepository('AppBundle\Entity\Report\Report');
+            $reportRepository->addDebtsToReportIfMissing($entity);
+            $reportRepository->addIncomeCategoriesToReportIfMissing($entity);
+            $reportRepository->addBenefitTypesToReportIfMissing($entity);
+            $reportRepository->addExpenseCategoriesToReportIfMissing($entity);
         }
 
         // create ODR + debts and income one off when client gets created

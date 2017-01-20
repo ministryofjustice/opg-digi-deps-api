@@ -137,5 +137,51 @@ class ReportRepository extends EntityRepository
         return $oldReport->getType();
     }
 
+    public function addIncomeCategoriesToReportIfMissing(Report $report)
+    {
+        $ret = 0;
 
+        if (count($report->getIncomeCategories()) === 0) {
+            foreach (EntityDir\Report\IncomeCategory::$incomeCategoryKeys as $typeId => $hasMoreDetails) {
+                $incomeCategory = new EntityDir\Report\IncomeCategory($report, $typeId, $hasMoreDetails);
+                $this->_em->persist($incomeCategory);
+                $report->addIncomeCategories($incomeCategory);
+                ++$ret;
+            }
+        }
+
+        return $ret;
+    }
+
+    public function addBenefitTypesToReportIfMissing(Report $report)
+    {
+        $ret = 0;
+
+        if (count($report->getIncomeBenefitTypes()) === 0) {
+            foreach (EntityDir\Report\IncomeBenefitType::$benefitTypesKeys as $typeId => $hasMoreDetails) {
+                $incomeBenefit = new EntityDir\Report\IncomeBenefitType($report, $typeId, $hasMoreDetails);
+                $this->_em->persist($incomeBenefit);
+                $report->addIncomeBenefitTypes($incomeBenefit);
+                ++$ret;
+            }
+        }
+
+        return $ret;
+    }
+
+    public function addExpenseCategoriesToReportIfMissing(Report $report)
+    {
+        $ret = 0;
+
+        if (count($report->getExpenseCategories()) === 0) {
+            foreach (EntityDir\Report\ExpenseCategory::$expenseCategoryKeys as $typeId => $hasMoreDetails) {
+                $expenseCategory = new EntityDir\Report\ExpenseCategory($report, $typeId, $hasMoreDetails);
+                $this->_em->persist($expenseCategory);
+                $report->addExpenseCategories($expenseCategory);
+                ++$ret;
+            }
+        }
+
+        return $ret;
+    }
 }
