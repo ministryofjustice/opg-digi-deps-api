@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Entity\Report;
+namespace AppBundle\Repository\Report;
 
 use AppBundle\Entity as EntityDir;
 use Doctrine\ORM\EntityRepository;
@@ -73,7 +73,7 @@ class ReportRepository extends EntityRepository
      *
      * @return int changed records
      */
-    public function addTransactionsToReportIfMissing(Report $report)
+    public function addTransactionsToReportIfMissing(EntityDir\Report\Report $report)
     {
         $ret = 0;
 
@@ -85,7 +85,7 @@ class ReportRepository extends EntityRepository
             ->findBy([], ['displayOrder' => 'ASC']);
 
         foreach ($transactionTypes as $transactionType) {
-            $transaction = new Transaction($report, $transactionType, []);
+            $transaction = new EntityDir\Report\Transaction($report, $transactionType, []);
             $report->getTransactions()->add($transaction);
             $this->_em->persist($transaction);
             ++$ret;
@@ -102,7 +102,7 @@ class ReportRepository extends EntityRepository
      *
      * @return int changed records
      */
-    public function addDebtsToReportIfMissing(Report $report)
+    public function addDebtsToReportIfMissing(EntityDir\Report\Report $report)
     {
         $ret = 0;
 
@@ -111,8 +111,8 @@ class ReportRepository extends EntityRepository
             return $ret;
         }
 
-        foreach (Debt::$debtTypeIds as $row) {
-            $debt = new Debt($report, $row[0], $row[1], null);
+        foreach (EntityDir\Report\Debt::$debtTypeIds as $row) {
+            $debt = new EntityDir\Report\Debt($report, $row[0], $row[1], null);
             $this->_em->persist($debt);
             ++$ret;
         }
@@ -124,18 +124,22 @@ class ReportRepository extends EntityRepository
      * @param Report $oldReport
      * @return string
      */
-    private function getReportTypeBasedOnOldReport(Report $oldReport)
+    private function getReportTypeBasedOnOldReport(EntityDir\Report\Report $oldReport)
     {
-        if (in_array($oldReport->getType(), [Report::TYPE_102, Report::TYPE_103])) {
-            if ($oldReport->getAssetsTotalValue() <= Report::ASSETS_TOTAL_VALUE_103_THRESHOLD) {
-                return Report::TYPE_103;
+        if (in_array($oldReport->getType(), [EntityDir\Report\Report::TYPE_102, EntityDir\Report\Report::TYPE_103])) {
+            if ($oldReport->getAssetsTotalValue() <= EntityDir\Report\Report::ASSETS_TOTAL_VALUE_103_THRESHOLD) {
+                return EntityDir\Report\Report::TYPE_103;
             }
 
-            return Report::TYPE_102;
+            return EntityDir\Report\Report::TYPE_102;
         }
 
         return $oldReport->getType();
     }
 
-
+    public function save($entity)
+    {
+        $this->_em->persist($entity);
+        $this->_em->flush($entity);
+    }
 }

@@ -3,15 +3,29 @@
 namespace AppBundle\Controller\Report;
 
 use AppBundle\Controller\RestController;
+use AppBundle\Service\ReportService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity as EntityDir;
-use AppBundle\Entity\Report\Report;
+use AppBundle\Service\ClientService;
+use JMS\Serializer\Serializer;
 
+/**
+ * @Route(service="app.controller.report_controller")
+ */
 class ReportController extends RestController
 {
+
+    private $reportService;
+
+
+    public function __construct(ReportService $reportService)
+    {
+        $this->reportService = $reportService;
+    }
+
     /**
      * @Route("/report")
      * @Method({"POST"})
@@ -19,55 +33,11 @@ class ReportController extends RestController
     public function addAction(Request $request)
     {
         $this->denyAccessUnlessGranted(EntityDir\Role::LAY_DEPUTY);
+        $payload = $request->getContent();
+        $reportEntity = $this->reportService->create($payload);
+        $this->denyAccessIfClientDoesNotBelongToUser($reportEntity->getClient());
 
-        $reportData = $this->deserializeBodyContent($request);
-
-        // new report
-        if (empty($reportData['client']['id'])) {
-            throw new \InvalidArgumentException('Missing client.id');
-        }
-        $client = $this->findEntityBy('Client', $reportData['client']['id']);
-        $this->denyAccessIfClientDoesNotBelongToUser($client);
-
-        $report = new Report();
-        $report->setClient($client);
-
-        // the below will change when it's decide where COT will be moved
-        $courtOrderType = $this->findEntityBy('CourtOrderType', $reportData['court_order_type_id']);
-        $report->setCourtOrderType($courtOrderType);
-        if ($reportData['court_order_type_id'] == Report::PROPERTY_AND_AFFAIRS) {
-            /**
-             * Introduced by
-             * https://opgtransform.atlassian.net/browse/DDPB-757
-             * Remove when
-             * https://opgtransform.atlassian.net/browse/DDPB-758
-             * is implemented
-             */
-            if ($this->getUser()->getEmail() == 'laydeputy103@publicguardian.gsi.gov.uk') {
-                $report->setType(Report::TYPE_103);
-            } else {
-                $report->setType(Report::TYPE_102);
-            }
-
-        }
-        // disabled in the UX atm, but implemented for clarity
-        if ($reportData['court_order_type_id'] == Report::HEALTH_WELFARE) {
-            $report->setType(Report::TYPE_104);
-        }
-
-        $this->validateArray($reportData, [
-            'start_date' => 'notEmpty',
-            'end_date' => 'notEmpty',
-        ]);
-
-        // add other stuff
-        $report->setStartDate(new \DateTime($reportData['start_date']));
-        $report->setEndDate(new \DateTime($reportData['end_date']));
-        $report->setReportSeen(true);
-
-        $this->persistAndFlush($report);
-
-        return ['report' => $report->getId()];
+        return ['report' => $reportEntity->getId()];
     }
 
     /**
@@ -79,7 +49,6 @@ class ReportController extends RestController
     public function getById(Request $request, $id)
     {
         $this->denyAccessUnlessGranted(EntityDir\Role::LAY_DEPUTY);
-
         $groups = $request->query->has('groups')
             ? (array) $request->query->get('groups') : ['report'];
         $this->setJmsSerialiserGroups($groups);
@@ -166,7 +135,9 @@ class ReportController extends RestController
                     if (!$debt instanceof EntityDir\Report\Debt) {
                         continue; //not clear when that might happen. kept similar to transaction below
                     }
-                    $debt->setAmountAndDetails($row['amount'], $row['more_details']);
+                    $amount = (isset($row['amount']))?$row['amount']:0;
+                    $moreDetails = (isset($row['more_details']))?$row['more_details']:'';
+                    $debt->setAmountAndDetails($amount, $moreDetails);
                     $this->getEntityManager()->flush($debt);
                 }
             }

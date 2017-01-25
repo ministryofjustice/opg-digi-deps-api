@@ -20,13 +20,13 @@ class Version099 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $sql = 'SELECT 
-        t.id, 
-        t.report_id as report_id, 
+        $sql = 'SELECT
+        t.id,
+        t.report_id as report_id,
         t.more_details as description, t.amounts as amounts,
         tt.category as category,
         tt.id as transaction_type_id
-        FROM transaction t 
+        FROM transaction t
         LEFT JOIN transaction_type tt ON t.transaction_type_id = tt.id
         WHERE t.amounts is not null
         ';

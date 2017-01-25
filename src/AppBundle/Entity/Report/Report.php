@@ -14,7 +14,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Reports.
  *
  * @ORM\Table(name="report")
- * @ORM\Entity(repositoryClass="AppBundle\Entity\Report\ReportRepository")
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\Report\ReportRepository")
  */
 class Report
 {
@@ -155,7 +155,7 @@ class Report
     /**
      * @deprecated? Confirm with PO
      *
-     * @JMS\Exclude
+     * @JMS\Groups({"report"})
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\CourtOrderType")
      * @ORM\JoinColumn( name="court_order_type_id", referencedColumnName="id" )
      */
@@ -311,6 +311,34 @@ class Report
      * @ORM\Column(name="metadata", type="text", nullable=true)
      */
     private $metadata;
+
+//    /**
+//     * @var ReportType
+//     *
+//     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Report\ReportType", fetch="EAGER")
+//     * @ORM\JoinColumn(name="report_type_id", referencedColumnName="id")
+//     */
+//    private $reportType;
+//
+//    /**
+//     * @return ReportType
+//     */
+//    public function getReportType()
+//    {
+//        return $this->reportType;
+//    }
+//
+//    /**
+//     * @param ReportType $reportType
+//     *
+//     * @return Report
+//     */
+//    public function setReportType($reportType)
+//    {
+//        $this->reportType = $reportType;
+//
+//        return $this;
+//    }
 
     /**
      * Constructor.
