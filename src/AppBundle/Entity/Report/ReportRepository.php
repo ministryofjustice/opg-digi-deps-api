@@ -31,7 +31,6 @@ class ReportRepository extends EntityRepository
         $newReport->setType($newReportType);
         $newReport->setStartDate($report->getEndDate()->modify('+1 day'));
         $newReport->setEndDate($report->getEndDate()->modify('+12 months -1 day'));
-        $newReport->setReportSeen(false);
         $newReport->setNoAssetToAdd($report->getNoAssetToAdd());
 
         // clone assets

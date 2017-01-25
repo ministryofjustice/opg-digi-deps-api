@@ -63,7 +63,6 @@ class ReportController extends RestController
         // add other stuff
         $report->setStartDate(new \DateTime($reportData['start_date']));
         $report->setEndDate(new \DateTime($reportData['end_date']));
-        $report->setReportSeen(true);
 
         $this->persistAndFlush($report);
 
