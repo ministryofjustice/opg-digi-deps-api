@@ -122,7 +122,6 @@ class ReportControllerTest extends AbstractTestController
                 'AuthToken' => self::$tokenDeputy,
             ])['data'];
         $this->assertArrayHasKey('court_order_type_id', $data);
-        $this->assertArrayHasKey('report_seen', $data);
         $this->assertArrayNotHasKey('transactions', $data);
         $this->assertArrayNotHasKey('debts', $data);
         $this->assertEquals(self::$report1->getId(), $data['id']);

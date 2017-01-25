@@ -248,13 +248,6 @@ class Report
      */
     private $submitted;
 
-    /**
-     * @var bool
-     * @JMS\Groups({"report"})
-     * @JMS\Type("boolean")
-     * @ORM\Column(name="report_seen", type="boolean", options={"default": true})
-     */
-    private $reportSeen;
 
     /**
      * @var string
@@ -307,7 +300,6 @@ class Report
         $this->assets = new ArrayCollection();
         $this->noAssetToAdd = null;
         $this->noTransfersToAdd = null;
-        $this->reportSeen = true;
     }
 
     /**
@@ -869,30 +861,6 @@ class Report
     public function getCourtOrderTypeId()
     {
         return $this->getCourtOrderType()->getId();
-    }
-
-    /**
-     * Set reportSeen.
-     *
-     * @param bool $reportSeen
-     *
-     * @return Report
-     */
-    public function setReportSeen($reportSeen)
-    {
-        $this->reportSeen = $reportSeen;
-
-        return $this;
-    }
-
-    /**
-     * Get reportSeen.
-     *
-     * @return bool
-     */
-    public function getReportSeen()
-    {
-        return $this->reportSeen;
     }
 
     /**
