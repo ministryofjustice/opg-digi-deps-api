@@ -325,6 +325,89 @@ class Report
     private $metadata;
 
     /**
+     * @JMS\Type("array<AppBundle\Entity\IncomeCategory>")
+     * @JMS\Groups({"income"})
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\IncomeCategory", fetch="EAGER")
+     * @ORM\JoinTable(name="report_income_category",
+     *     joinColumns={@ORM\JoinColumn(name="report_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="income_category_id", referencedColumnName="id")}
+     *     )
+     */
+    private $incomeCategories;
+
+    /**
+     * @JMS\Type("array<AppBundle\Entity\ExpenseCategory>")
+     * @JMS\Groups({"expense"})
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\ExpenseCategory", fetch="EAGER")
+     * @ORM\JoinTable(name="report_expense_category",
+     *     joinColumns={@ORM\JoinColumn(name="report_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="expense_category_id", referencedColumnName="id")}
+     *     )
+     */
+    private $expenseCategories;
+
+    /**
+     * @JMS\Type("array<AppBundle\Entity\IncomeType>")
+     * @JMS\Groups({"income"})
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\IncomeType", fetch="EAGER")
+     * @ORM\JoinTable(name="report_benefit_type",
+     *     joinColumns={@ORM\JoinColumn(name="report_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="income_type_id", referencedColumnName="id")}
+     *     )
+     */
+    private $benefitTypes;
+
+    /**
+     * @JMS\Type("array<AppBundle\Entity\Income>")
+     * @JMS\Groups({"income"})
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\Income", fetch="EAGER")
+     * @ORM\JoinTable(name="report_income",
+     *     joinColumns={@ORM\JoinColumn(name="report_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="income_id", referencedColumnName="id")}
+     *     )
+     */
+    private $incomes;
+
+    /**
+     * @JMS\Type("array<AppBundle\Entity\IncomeType>")
+     * @JMS\Groups({"income"})
+     * @ORM\ManyToMany(targetEntity="AppBundle\Entity\IncomeType", fetch="EAGER")
+     * @ORM\JoinTable(name="report_expense",
+     *     joinColumns={@ORM\JoinColumn(name="report_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="income_id", referencedColumnName="id")}
+     *     )
+     */
+    private $expenses;
+
+//    /**
+//     * @var ReportType
+//     *
+//     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Report\ReportType", fetch="EAGER")
+//     * @ORM\JoinColumn(name="report_type_id", referencedColumnName="id")
+//     */
+//    private $reportType;
+//
+//    /**
+//     * @return ReportType
+//     */
+//    public function getReportType()
+//    {
+//        return $this->reportType;
+//    }
+//
+//    /**
+//     * @param ReportType $reportType
+//     *
+//     * @return Report
+//     */
+//    public function setReportType($reportType)
+//    {
+//        $this->reportType = $reportType;
+//
+//        return $this;
+//    }
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -337,6 +420,9 @@ class Report
         $this->debts = new ArrayCollection();
         $this->decisions = new ArrayCollection();
         $this->assets = new ArrayCollection();
+        $this->incomeCategories = new ArrayCollection();
+        $this->expenseCategories = new ArrayCollection();
+        $this->benefitTypes = new ArrayCollection();
         $this->noAssetToAdd = null;
         $this->noTransfersToAdd = null;
         $this->reportSeen = true;
@@ -1337,5 +1423,100 @@ class Report
             return false;
         }
         return $this->getEndDate()->add(new \DateInterval('P56D'));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIncomeCategories()
+    {
+        return $this->incomeCategories;
+    }
+
+    /**
+     * @param mixed $incomeCategories
+     * @return Report
+     */
+    public function setIncomeCategories($incomeCategories)
+    {
+        $this->incomeCategories = $incomeCategories;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpenseCategories()
+    {
+        return $this->expenseCategories;
+    }
+
+    /**
+     * @param mixed $expenseCategories
+     * @return Report
+     */
+    public function setExpenseCategories($expenseCategories)
+    {
+        $this->expenseCategories = $expenseCategories;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBenefitTypes()
+    {
+        return $this->benefitTypes;
+    }
+
+    /**
+     * @param mixed $benefitTypes
+     * @return Report
+     */
+    public function setBenefitTypes($benefitTypes)
+    {
+        $this->benefitTypes = $benefitTypes;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIncomes()
+    {
+        return $this->incomes;
+    }
+
+    /**
+     * @param mixed $incomes
+     * @return Report
+     */
+    public function setIncomes($incomes)
+    {
+        $this->incomes = $incomes;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getExpenses()
+    {
+        return $this->expenses;
+    }
+
+    /**
+     * @param mixed $expenses
+     * @return Report
+     */
+    public function setExpenses($expenses)
+    {
+        $this->expenses = $expenses;
+
+        return $this;
     }
 }
