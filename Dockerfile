@@ -1,4 +1,4 @@
-FROM registry.service.opg.digital/opguk/php-fpm:0.1.216
+FROM registry.service.opg.digital/opguk/php-fpm:0.1.217
 
 RUN  apt-get update && apt-get install -y \
      php-pear php5-curl php5-memcached php5-redis php5-pgsql \
@@ -43,4 +43,5 @@ RUN dos2unix /app/scripts/*
 ADD  docker/my_init.d /etc/my_init.d
 RUN  chmod a+x /etc/my_init.d/*
 
-ENV  OPG_SERVICE api
+ENV OPG_SERVICE api
+ENV OPG_NGINX_SSL_FORCE_REDIRECT True
