@@ -340,6 +340,8 @@ class UserController extends RestController
             throw new \RuntimeException($user->getRoleName() . ' user role not allowed from this client.', 403);
         }
 
+        $this->setJmsSerialiserGroups(['user']);
+
         return $user;
     }
 
