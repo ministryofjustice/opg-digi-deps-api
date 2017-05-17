@@ -1,7 +1,7 @@
-FROM registry.service.opg.digital/opguk/php-fpm:0.1.216
+FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.45-dev
 
-RUN  apt-get update && apt-get install -y \
-     php-pear php5-curl php5-memcached php5-redis php5-pgsql \
+RUN  apt update && apt install -y \
+     php-pear php-curl php-memcached php-redis  \
      nodejs dos2unix postgresql-client ruby && \
      apt-get clean && apt-get autoremove && \
      rm -rf /var/lib/cache/* /var/lib/log/* /tmp/* /var/tmp/*
