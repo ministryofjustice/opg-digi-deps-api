@@ -1,8 +1,7 @@
-FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.45-dev
+FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.46-dev
 
 RUN  apt update && apt install -y \
-     php-pear php-curl php-memcached php-redis  \
-     nodejs dos2unix postgresql-client ruby && \
+     nodejs dos2unix ruby && \
      apt-get clean && apt-get autoremove && \
      rm -rf /var/lib/cache/* /var/lib/log/* /tmp/* /var/tmp/*
 
@@ -11,7 +10,6 @@ RUN  cd /tmp && curl -sS https://getcomposer.org/installer | php && mv composer.
 RUN  gem install sass
 
 # build app dependencies
-RUN  composer self-update
 COPY composer.json /app/
 COPY composer.lock /app/
 WORKDIR /app
