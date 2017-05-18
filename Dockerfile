@@ -1,4 +1,4 @@
-FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.46-dev
+FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.48-dev
 
 RUN  apt update && apt install -y \
      nodejs dos2unix ruby && \
