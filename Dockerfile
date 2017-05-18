@@ -1,7 +1,7 @@
-FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.48-dev
+FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.50-dev
 
 RUN  apt update && apt install -y \
-     nodejs dos2unix ruby && \
+     nodejs ruby && \
      apt-get clean && apt-get autoremove && \
      rm -rf /var/lib/cache/* /var/lib/log/* /tmp/* /var/tmp/*
 
