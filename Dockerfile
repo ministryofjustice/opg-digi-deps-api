@@ -1,4 +1,4 @@
-FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.50-dev
+FROM registry.service.opg.digital/opguk/php-fpm0x644:0.0.51-dev
 
 RUN  apt update && apt install -y \
      nodejs ruby && \
