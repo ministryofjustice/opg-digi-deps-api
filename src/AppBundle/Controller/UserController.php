@@ -399,6 +399,10 @@ class UserController extends RestController
             $user->setRoleName($roleToSet);
         }
 
+        if ($this->isGranted(EntityDir\User::ROLE_AD) && array_key_exists('ad_managed', $data)) {
+            $user->setAdManaged($data['ad_managed']);
+        }
+
         return $user;
     }
 
