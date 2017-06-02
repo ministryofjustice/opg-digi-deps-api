@@ -3,7 +3,10 @@
 namespace AppBundle\Service;
 
 use AppBundle\Entity as EntityDir;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
+use Psr\Log\LoggerInterface;
 
 class PaService
 {
@@ -12,9 +15,36 @@ class PaService
      */
     protected $em;
 
-    public function __construct(EntityManager $em)
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+
+    /**
+     * @var array
+     */
+    protected $added = [];
+
+    /**
+     * @var array
+     */
+    protected $errors = [];
+
+    /**
+     * @var array
+     */
+    protected $warnings = [];
+
+    /**
+     * PaService constructor.
+     * @param EntityManager $em
+     * @param LoggerInterface $logger
+     */
+    public function __construct(EntityManager $em, LoggerInterface $logger)
     {
         $this->em = $em;
+        $this->logger = $logger;
         $this->userRepository = $em->getRepository(EntityDir\User::class);
         $this->reportRepository = $em->getRepository(EntityDir\Report\Report::class);
         $this->clientRepository = $em->getRepository(EntityDir\Client::class);
@@ -50,12 +80,14 @@ class PaService
      *
      * @return array
      */
-    public function addFromCasrecRows(array $rows)
+    public function addFromCasrecRows(array $data)
     {
+        $this->log('Received '.count($data).' records');
+
         $this->added = ['users' => [], 'clients' => [], 'reports' => []];
         $errors = [];
+        foreach ($data as $index => $row) {
 
-        foreach ($rows as $index => $row) {
             $row = array_map('trim', $row);
             try {
                 if ($row['Dep Type'] != 23) {
@@ -65,18 +97,21 @@ class PaService
                 $user = $this->createUser($row);
                 $client = $this->createClient($row, $user);
                 $this->createReport($row, $client, $user);
-            } catch (\RuntimeException $e) {
-                $errors[] = $e->getMessage() . ' in line ' . ($index + 2);
+            } catch (\Exception $e) {
+                $message = 'Error for Deputy No: ' . $row['Deputy No'] . ', case '.$row['Case'].': ' . $e->getMessage();
+                $errors[] = $message;
             }
-            // clean up for next iteration
-            $this->em->clear();
         }
 
         sort($this->added['users']);
         sort($this->added['clients']);
         sort($this->added['reports']);
 
-        return ['added' => $this->added, 'errors' => $errors];
+        return [
+            'added' => $this->added,
+            'errors' => $errors,
+            'warnings' => $this->warnings
+        ];
     }
 
     /**
@@ -86,54 +121,77 @@ class PaService
      */
     private function createUser(array $row)
     {
-        $email = $row['Email'];
-        $user = $this->userRepository->findOneBy(['email' => $email]);
+        $user = $this->userRepository->findOneBy(['deputyNo' => $row['Deputy No']]);
+        $userEmail = strtolower($row['Email']);
+
         if (!$user) {
-            $user = new EntityDir\User();
-            $user
-                ->setRegistrationDate(new \DateTime())
-                ->setDeputyNo($row['Deputy No'])
-                ->setEmail($email)
-                ->setFirstname($row['Dep Forename'])
-                ->setLastname($row['Dep Surname'])
-                ->setRoleName(EntityDir\User::ROLE_PA);
+            $this->log('Creating user');
+            // check for duplicate email address
+            $user = $this->userRepository->findOneBy(['email' => $userEmail]);
+            if ($user) {
+                $this->warnings[] = 'Deputy ' . $row['Deputy No'] .
+                    ' cannot be added with email ' . $user->getEmail() .
+                    '. Email already taken by Deputy No: ' . $user->getDeputyNo();
+            } else {
 
-            // create team (if not already existing)
-            if ($user->getTeams()->isEmpty()) {
-                $team = new EntityDir\Team(null);
+                $user = new EntityDir\User();
+                $user
+                    ->setRegistrationDate(new \DateTime())
+                    ->setDeputyNo($row['Deputy No'])
+                    ->setEmail($row['Email'])
+                    ->setFirstname($row['Dep Forename'])
+                    ->setLastname($row['Dep Surname'])
+                    ->setRoleName(EntityDir\User::ROLE_PA);
 
-                // Address from upload is the team's address, not the user's
-                if (!empty($row['Dep Adrs1'])) {
-                    $team->setAddress1($row['Dep Adrs1']);
+                // create team (if not already existing)
+                if ($user->getTeams()->isEmpty()) {
+                    $team = new EntityDir\Team(null);
+
+                    // Address from upload is the team's address, not the user's
+                    if (!empty($row['Dep Adrs1'])) {
+                        $team->setAddress1($row['Dep Adrs1']);
+                    }
+
+                    if (!empty($row['Dep Adrs2'])) {
+                        $team->setAddress2($row['Dep Adrs2']);
+                    }
+
+                    if (!empty($row['Dep Adrs3'])) {
+                        $team->setAddress3($row['Dep Adrs3']);
+                    }
+
+                    if (!empty($row['Dep Postcode'])) {
+                        $team->setAddressPostcode($row['Dep Postcode']);
+                        $team->setAddressCountry('GB'); //postcode given means a UK address is given
+                    }
+
+                    $user->addTeam($team);
+                    $this->em->persist($team);
+                    $this->em->flush($team);
                 }
 
-                if (!empty($row['Dep Adrs2'])) {
-                    $team->setAddress2($row['Dep Adrs2']);
-                }
-
-                if (!empty($row['Dep Adrs3'])) {
-                    $team->setAddress3($row['Dep Adrs3']);
-                }
-
-                if (!empty($row['Dep Postcode'])) {
-                    $team->setAddressPostcode($row['Dep Postcode']);
-                    $team->setAddressCountry('GB'); //postcode given means a UK address is given
-                }
-
-                $user->addTeam($team);
-                $this->em->persist($team);
-                $this->em->flush($team);
+                $this->userRepository->hardDeleteExistingUser($user);
+                $this->em->persist($user);
+                $this->em->flush($user);
+                $this->added['users'][] = $row['Email'];
             }
-
-            $this->added['users'][] = $email;
-            $this->em->persist($user);
-            $this->em->flush($user);
+        } else {
+            // Notify email change
+            if ($user->getEmail() !== $userEmail) {
+                $this->warnings[] = 'Deputy ' . $user->getDeputyNo() .
+                    ' previously with email ' . $user->getEmail() .
+                    ' has changed email to ' . $userEmail;
+            }
         }
 
         return $user;
     }
 
     /**
+     * //TODO subsquents uploads removes all the clients, and re-add them from the team.
+     * Slow and a code smell that the db structure needs a change and connect clients to the team, or
+     * a more general "deputyship" new entity, used by both Teams of PA, and Lay
+     *
      * @param array          $row
      * @param EntityDir\User $user
      *
@@ -149,6 +207,7 @@ class PaService
                 $client->getUsers()->removeElement($cu);
             }
         } else {
+            $this->log('Creating client');
             $client = new EntityDir\Client();
             $client
                 ->setCaseNumber($caseNumber)
@@ -208,32 +267,31 @@ class PaService
         }
         $reportEndDate = clone $reportDueDate;
         $reportEndDate->sub(new \DateInterval('P56D')); //Eight weeks behind due date
+        $reportType = EntityDir\CasRec::getTypeBasedOnTypeofRepAndCorref($row['Typeofrep'], $row['Corref']);
         $report = $client->getReportByDueDate($reportEndDate);
-        if (!$report) {
-            $report = new EntityDir\Report\Report();
-            $client->addReport($report);
+        if ($report) {
+            if ($report->getType() != $reportType) {
+                $this->log('Changing report type');
+                $report->setType($reportType);
+                $this->em->persist($report);
+                $this->em->flush();
+            }
+        } else {
+            $this->log('Creating report');
+            $report = new EntityDir\Report\Report($client);
+            $client->addReport($report);   //double link for testing reasons
             $reportStartDate = clone $reportEndDate;
             $reportStartDate->sub(new \DateInterval('P1Y')); //One year behind end date
             $report
                 ->setStartDate($reportStartDate)
-                ->setEndDate($reportEndDate);
-
-            //Set type based on casrec. Has to be done this way due to data cleansing logic in CasRec constructor
-            $casrec = new EntityDir\CasRec(
-                $client->getCaseNumber(),
-                $client->getLastname(),
-                $user->getDeputyNo(),
-                $user->getLastname(),
-                $user->getAddressPostcode(),
-                $row['Typeofrep'],
-                $row['Corref']
-            );
-            $report->setTypeBasedOnCasrecRecord($casrec);
+                ->setEndDate($reportEndDate)
+                ->setType($reportType);
 
             $this->added['reports'][] = $client->getCaseNumber() . '-' . $reportDueDate->format('Y-m-d');
             $this->em->persist($report);
             $this->em->flush();
         }
+
 
         return $report;
     }
@@ -254,5 +312,13 @@ class PaService
         }
 
         return $ret;
+    }
+
+    /**
+     * @param $message
+     */
+    private function log($message)
+    {
+        $this->logger->debug(__CLASS__.':'.$message);
     }
 }
