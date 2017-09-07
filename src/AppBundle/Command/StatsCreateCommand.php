@@ -9,12 +9,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @codeCoverageIgnore
  */
-class StatsCommand extends \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand
+class StatsCreateCommand extends \Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('digideps:stats.csv')
+            ->setName('digideps:stats-create')
             ->addArgument('file')
             ->setDescription('Get CSV of stats ')
         ;
