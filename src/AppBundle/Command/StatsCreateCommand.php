@@ -22,6 +22,8 @@ class StatsCreateCommand extends \Symfony\Bundle\FrameworkBundle\Command\Contain
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // avoid being executed concurrently on multiple API boxes and stress the db too much
+        sleep(rand(1, 300));
         $statsService = $this->getContainer()->get('stats_service'); /* @var $statsService StatsService */
 
         $file = $input->getArgument('file');
