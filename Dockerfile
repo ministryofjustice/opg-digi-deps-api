@@ -15,7 +15,7 @@ COPY composer.lock /app/
 WORKDIR /app
 USER app
 ENV  HOME /app
-RUN  composer install --prefer-source --no-interaction --no-scripts
+RUN  composer install --prefer-source --no-interaction --no-scripts -o
 
 # install remaining parts of app
 ADD  . /app
@@ -27,7 +27,6 @@ RUN chmod 0744 /etc/cron.d/digideps
 USER app
 ENV  HOME /app
 RUN  composer run-script post-install-cmd --no-interaction
-RUN  composer dump-autoload --optimize
 
 # cleanup
 RUN  rm /app/app/config/parameters.yml
