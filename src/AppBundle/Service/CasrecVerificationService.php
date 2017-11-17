@@ -37,8 +37,8 @@ class CasrecVerificationService
     public function validate($caseNumber, $clientSurname, $deputySurname, $deputyPostcode)
     {
         $crMatches = $this->casRecRepo->findBy( [ 'caseNumber'     => $this->normaliseCaseNumber($caseNumber)
-                                                , 'clientLastname' => $this->normaliseSurname($clientSurname)
-                                                , 'deputySurname'  => $this->normaliseSurname($deputySurname)
+                                                , 'clientLastname' => $this->normaliseName($clientSurname)
+                                                , 'deputySurname'  => $this->normaliseName($deputySurname)
                                                 ]);
 
         $this->lastMatchedCasrecUsers = $this->applyPostcodeFilter($crMatches, $deputyPostcode);
@@ -46,9 +46,35 @@ class CasrecVerificationService
         if (count($this->lastMatchedCasrecUsers) == 0) {
             throw new \RuntimeException('User registration: no matching record in casrec. Matched: ' . count($crMatches) .' Looking up:' .
             ' Case Number: ' . $this->normaliseCaseNumber($caseNumber) .
-            ' Client Last name: ' . $this->normaliseSurname($clientSurname) .
-            ' Deputy surname:' . $this->normaliseSurname($deputySurname) .
+            ' Client Last name: ' . $this->normaliseName($clientSurname) .
+            ' Deputy surname:' . $this->normaliseName($deputySurname) .
             ' Filtered by deputy postcode: ' . $deputyPostcode, 400);
+        }
+
+        return true;
+    }
+
+    /**
+     * CASREC checks against deputy basic detail only. Called when users added via admin
+     *
+     * Throw error 400 if casrec has no record matching case number,
+     * client surname, deputy surname, and postcode (if set)
+     *
+     * @param string $deputySurname
+     * @param string $deputyPostcode
+     * @return bool
+     */
+    public function validateDeputyOnly($deputySurname, $deputyPostcode)
+    {
+        $crMatches = $this->casRecRepo->findBy( [
+            'deputySurname'  => $this->normaliseName($deputySurname),
+            'deputyPostcode' => $deputyPostcode,
+        ]);
+
+        if (count($crMatches) == 0) {
+            throw new \RuntimeException('User registration: no matching record in casrec. Matched: ' . count($crMatches) .' Looking up:' .
+                ' Deputy surname:' . $this->normaliseName($deputySurname) .
+                ' Deputy postcode: ' . $deputyPostcode, 400);
         }
 
         return true;
@@ -138,7 +164,7 @@ class CasrecVerificationService
      * @param $value
      * @return mixed|string
      */
-    private function normaliseSurname($value)
+    private function normaliseName($value)
     {
         $value = trim($value);
         $value = strtolower($value);
@@ -160,4 +186,6 @@ class CasrecVerificationService
 
         return $value;
     }
+    
+    
 }
