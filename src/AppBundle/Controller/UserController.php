@@ -56,7 +56,7 @@ class UserController extends RestController
         $data = $this->deserializeBodyContent($request, [
             'role_name' => 'notEmpty',
             'email' => 'notEmpty',
-            'addressPostcode' => 'mustExist',
+            'address_postcode' => 'mustExist',
             'firstname' => 'mustExist',
             'lastname' => 'mustExist',
         ]);
@@ -67,7 +67,7 @@ class UserController extends RestController
         $user = $this->populateUser($user, $data);
 
         $userService = $this->get('opg_digideps.user_service');
-        $userService->addCasrecUser($loggedInUser, $user, $data);
+        $userService->addCasrecUser($loggedInUser, $user);
 
         $groups = $request->query->has('groups') ?
             $request->query->get('groups') : ['user'];

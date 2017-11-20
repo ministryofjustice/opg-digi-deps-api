@@ -63,18 +63,17 @@ class UserService
      * @param User $userToAdd
      * @param $data
      */
-    public function addCasrecUser(User $loggedInUser, User $userToAdd, $data)
+    public function addCasrecUser(User $loggedInUser, User $userToAdd)
     {
         $this->checkUserEmail($userToAdd);
 
         // Check the user doesn't already exist
-        $existingUser = $this->em->getRepository('AppBundle\Entity\User')->findOneByEmail($userToAdd->getEmail());
+        $existingUser = $this->userRepository->findOneByEmail($userToAdd->getEmail());
         if ($existingUser) {
             throw new \RuntimeException("User with email {$existingUser->getEmail()} already exists.", 422);
         }
 
         $this->casrecService->validateDeputyOnly(
-            $userToAdd->getFirstname(),
             $userToAdd->getLastname(),
             $userToAdd->getAddressPostcode()
         );
