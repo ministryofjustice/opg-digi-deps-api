@@ -74,11 +74,11 @@ class UserService
         }
 
         $this->casrecService->validateDeputyOnly(
-            $userToAdd->getLastname(),
-            $userToAdd->getAddressPostcode()
+            strtolower($userToAdd->getLastname()),
+            strtolower($userToAdd->getAddressPostcode())
         );
 
-        //$userToAdd->setDeputyNo(implode(',', $this->casrecService->getLastMatchedDeputyNumbers()));
+        $userToAdd->setDeputyNo(implode(',', $this->casrecService->getLastMatchedDeputyNumbers()));
 
         $userToAdd->setRegistrationDate(new \DateTime());
 
