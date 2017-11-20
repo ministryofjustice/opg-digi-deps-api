@@ -68,7 +68,7 @@ class CasrecVerificationService
     {
         $crMatches = $this->casRecRepo->findBy( [
             'deputySurname'  => $this->normaliseName($deputySurname),
-            'deputyPostCode' => $deputyPostcode,
+            'deputyPostCode' => $this->normalisePostcode($deputyPostcode),
         ]);
 
         $this->lastMatchedCasrecUsers = $this->applyPostcodeFilter($crMatches, $deputyPostcode);
