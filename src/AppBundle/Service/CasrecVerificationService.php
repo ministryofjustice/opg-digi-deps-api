@@ -71,8 +71,9 @@ class CasrecVerificationService
             'deputyPostCode' => $deputyPostcode,
         ]);
 
-        // if we dont find exactly 1 match, throw exception
-        if (count($crMatches) == 0) {
+        $this->lastMatchedCasrecUsers = $this->applyPostcodeFilter($crMatches, $deputyPostcode);
+
+        if (count($this->lastMatchedCasrecUsers) == 0) {
             throw new \RuntimeException('User registration: Casrec mismatch. Matched: ' . count($crMatches) .' There must be a CASREC entry match for:' .
                 ' Surname: ' . $this->normaliseName($deputySurname) .
                 ' and postcode: ' . $deputyPostcode, 400);
