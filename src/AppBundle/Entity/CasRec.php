@@ -172,6 +172,15 @@ class CasRec
 
     /**
      * Filled from cron
+     * @var \DateTime
+     * @JMS\Type("DateTime<'Y-m-d H:i:s'>")
+     *
+     * @ORM\Column(name="last_report_submitted_at", type="datetime", nullable=true)
+     */
+    private $lastReportSubmittedAt;
+
+    /**
+     * Filled from cron
      * @var int
      *
      * @JMS\Type("string")
@@ -349,6 +358,19 @@ class CasRec
         return unserialize($this->otherColumns) ?: [];
     }
 
+    /**
+     * @param $key
+     *
+     * @return mixed|null
+     */
+    public function getColumn($key)
+    {
+        $row = unserialize($this->otherColumns) ?: [];
+
+        return isset($row[$key]) ? $row[$key] : null;
+    }
+
+
     public function toArray()
     {
         $dateFormat = function($date, $default) {
@@ -361,6 +383,7 @@ class CasRec
             "Deputy registration date" => $dateFormat($this->registrationDate, 'n.a.'),
             "Deputy last logged in" => $dateFormat($this->lastLoggedIn, 'n.a.'),
             "Reports submitted" =>  $this->nOfReportsSubmitted ?: 'n.a.',
+            "Last report submitted at" =>  $dateFormat($this->lastReportSubmittedAt, 'n.a.'),
             "Reports active" =>  $this->nOfReportsActive ?: 'n.a.'
         ] + $this->getOtherColumns();
     }
@@ -391,7 +414,7 @@ class CasRec
      * @param \DateTime $lastLoggedIn
      * @return CasRec
      */
-    public function setLastLoggedIn($lastLoggedIn)
+    public function setLastLoggedIn(\DateTime $lastLoggedIn = null)
     {
         $this->lastLoggedIn = $lastLoggedIn;
 
@@ -405,6 +428,17 @@ class CasRec
     public function setNOfReportsSubmitted($nOfReportsSubmitted)
     {
         $this->nOfReportsSubmitted = $nOfReportsSubmitted;
+
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $lastReportSubmittedAt
+     * @return CasRec
+     */
+    public function setLastReportSubmittedAt(\DateTime $lastReportSubmittedAt = null)
+    {
+        $this->lastReportSubmittedAt = $lastReportSubmittedAt;
 
         return $this;
     }
