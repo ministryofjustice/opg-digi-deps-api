@@ -16,13 +16,18 @@ class UserService
     /** @var EntityRepository */
     protected $teamRepository;
 
+    /** @var  CasrecVerificationService */
+    private $casrecService;
+
     public function __construct(
         UserRepository $userRepository,
         TeamRepository $teamRepository,
+        CasrecVerificationService $casrecVerificationService,
         EntityManager $em
     ) {
         $this->userRepository = $userRepository;
         $this->teamRepository = $teamRepository;
+        $this->casrecService = $casrecVerificationService;
         $this->_em = $em;
     }
 
@@ -40,6 +45,40 @@ class UserService
         if ($loggedInUser->isPaAdministrator()) {
             $this->addPaUser($loggedInUser, $userToAdd, $data);
         }
+
+        $userToAdd->setRegistrationDate(new \DateTime());
+
+        $userToAdd->recreateRegistrationToken();
+
+        $this->userRepository->hardDeleteExistingUser($userToAdd);
+
+        $this->_em->persist($userToAdd);
+        $this->_em->flush();
+    }
+
+    /**
+     * Adds a new user to the database, validated against casrec
+     *
+     * @param User $loggedInUser
+     * @param User $userToAdd
+     * @param $data
+     */
+    public function addCasrecUser(User $loggedInUser, User $userToAdd)
+    {
+        $this->checkUserEmail($userToAdd);
+
+        // Check the user doesn't already exist
+        $existingUser = $this->userRepository->findOneByEmail($userToAdd->getEmail());
+        if ($existingUser) {
+            throw new \RuntimeException("User with email {$existingUser->getEmail()} already exists.", 422);
+        }
+
+        $this->casrecService->validateDeputyOnly(
+            strtolower($userToAdd->getLastname()),
+            strtolower($userToAdd->getAddressPostcode())
+        );
+
+        $userToAdd->setDeputyNo(implode(',', $this->casrecService->getLastMatchedDeputyNumbers()));
 
         $userToAdd->setRegistrationDate(new \DateTime());
 

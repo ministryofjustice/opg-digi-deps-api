@@ -28,6 +28,7 @@ services:
         arguments:
           - "@opg_digideps.user_repository"
           - "@opg_digideps.team_repository"
+          - "@opg_digideps.casrec_verification_service"
           - "@em"
 
     monolog.processor.add_request_id:

@@ -46,6 +46,37 @@ class UserController extends RestController
     }
 
     /**
+     * @Route("/casrec")
+     * @Method({"POST"})
+     */
+    public function addCasrecUser(Request $request)
+    {
+        $this->denyAccessUnlessGranted([EntityDir\User::ROLE_ADMIN]);
+
+        $data = $this->deserializeBodyContent($request, [
+            'role_name' => 'notEmpty',
+            'email' => 'notEmpty',
+            'address_postcode' => 'mustExist',
+            'firstname' => 'mustExist',
+            'lastname' => 'mustExist',
+        ]);
+
+        $loggedInUser = $this->getUser();
+        $user = new EntityDir\User();
+
+        $user = $this->populateUser($user, $data);
+
+        $userService = $this->get('opg_digideps.user_service');
+        $userService->addCasrecUser($loggedInUser, $user);
+
+        $groups = $request->query->has('groups') ?
+            $request->query->get('groups') : ['user'];
+        $this->setJmsSerialiserGroups($groups);
+
+        return $user;
+    }
+
+    /**
      * @Route("/{id}")
      * @Method({"PUT"})
      */
