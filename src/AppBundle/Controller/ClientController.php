@@ -60,14 +60,15 @@ class ClientController extends RestController
             $client->setDateOfBirth($dob);
         }
 
-        $this->persistAndFlush($client);
-
         //add ODR if not added yet
         // TODO move to listener or service
         if (!$client->getOdr()) {
-            $odr = new EntityDir\Odr\Odr($client);
-            $this->persistAndFlush($odr);
+            $client->setOdr(new EntityDir\Odr\Odr($client));
         }
+
+        $this->persistAndFlush($client);
+
+
 
         return ['id' => $client->getId()];
     }
