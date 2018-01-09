@@ -24,13 +24,13 @@ class AccountControllerTest extends AbstractTestController
         $client1 = self::fixtures()->createClient(self::$deputy1);
         self::fixtures()->flush();
 
-        self::$odr1 = self::fixtures()->createOdr($client1);
+        self::$odr1 = $client1->getOdr();
         self::$account1 = self::fixtures()->createOdrAccount(self::$odr1, ['setBank' => 'bank1']);
 
         // deputy 2
         self::$deputy2 = self::fixtures()->createUser();
         $client2 = self::fixtures()->createClient(self::$deputy2);
-        self::$odr2 = self::fixtures()->createOdr($client2);
+        self::$odr2 = $client2->getOdr();
         self::$account2 = self::fixtures()->createOdrAccount(self::$odr2, ['setBank' => 'bank2']);
 
         self::fixtures()->flush()->clear();

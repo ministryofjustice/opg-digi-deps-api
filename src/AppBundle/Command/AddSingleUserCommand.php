@@ -135,12 +135,6 @@ class AddSingleUserCommand extends ContainerAwareCommand
 
             $em->persist($client);
             $user->addClient($client);
-
-            if (!$client->getOdr()) {
-                $odr = new Odr($client);
-                $em->persist($odr);
-            }
-
         }
 
         

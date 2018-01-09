@@ -72,25 +72,6 @@ class Fixtures
         return $client;
     }
 
-    /**
-     * @param EntityDir\Client $client
-     * @param array            $settersMap
-     *
-     * @return EntityDir\Odr\Odr
-     */
-    public function createOdr(EntityDir\Client $client, array $settersMap = [])
-    {
-        $odr = new EntityDir\Odr\Odr($client);
-
-        foreach ($settersMap as $k => $v) {
-            $odr->$k($v);
-        }
-
-        $this->em->persist($odr);
-
-        return $odr;
-    }
-
     public function createReport(
         EntityDir\Client $client,
         array $settersMap = []

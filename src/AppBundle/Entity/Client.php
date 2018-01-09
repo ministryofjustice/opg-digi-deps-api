@@ -2,7 +2,6 @@
 
 namespace AppBundle\Entity;
 
-use AppBundle\Entity\Odr\Odr;
 use AppBundle\Entity\Report\Report;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -212,6 +211,7 @@ class Client
         $this->reports = new ArrayCollection();
         $this->notes = new ArrayCollection();
         $this->clientContacts = new ArrayCollection();
+        $this->odr = new Odr\Odr($this);
     }
 
     /**
@@ -607,7 +607,7 @@ class Client
     }
 
     /**
-     * @return Odr
+     * @return Odr\Odr
      */
     public function getOdr()
     {
@@ -617,7 +617,7 @@ class Client
     /**
      * @param mixed $odr
      */
-    public function setOdr(Odr $odr = null)
+    public function setOdr(Odr\Odr $odr = null)
     {
         $this->odr = $odr;
     }
