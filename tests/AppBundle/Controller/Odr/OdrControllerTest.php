@@ -22,12 +22,12 @@ class OdrControllerTest extends AbstractTestController
         //deputy1
         self::$deputy1 = self::fixtures()->getRepo('User')->findOneByEmail('deputy@example.org');
         self::$client1 = self::fixtures()->createClient(self::$deputy1, ['setFirstname' => 'c1']);
-        self::$odr1 = self::fixtures()->createOdr(self::$client1);
+        self::$odr1 = self::$client1->getOdr();
 
         // deputy 2
         self::$deputy2 = self::fixtures()->createUser();
         self::$client2 = self::fixtures()->createClient(self::$deputy2);
-        self::$odr2 = self::fixtures()->createOdr(self::$client2);
+        self::$odr2 = self::$client2->getOdr();
 
         self::fixtures()->flush()->clear();
     }
