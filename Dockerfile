@@ -1,4 +1,4 @@
-FROM registry.service.opg.digital/opguk/digi-deps-api-base:nightly
+FROM registry.service.opg.digital/opg-php-fpm-71-ppa-1604
 
 # build app dependencies
 WORKDIR /app
