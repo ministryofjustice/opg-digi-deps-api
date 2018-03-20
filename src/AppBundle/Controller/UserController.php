@@ -398,11 +398,16 @@ class UserController extends RestController
             if (array_key_exists('co_deputy_client_confirmed', $data)) {
                 $casrecVerificationService = $this->get('opg_digideps.casrec_verification_service');
 
-                if ($casrecVerificationService->isMultiDeputyCase($user->getClients()[0]->getCaseNumber()) ) {
-                    $user->setCoDeputyClientConfirmed($data['co_deputy_client_confirmed']);
+                if (true == $data['co_deputy_client_confirmed']) {
+                    if ($casrecVerificationService->isMultiDeputyCase($user->getClients()[0]->getCaseNumber())) {
+                        $user->setCoDeputyClientConfirmed(true);
+                    } else {
+                        throw new \RuntimeException('User cannot be made a co deputy. No Casrec entries found.', 403);
+                    }
+                } else {
+                    $user->setCoDeputyClientConfirmed(false);
                 }
             }
-
         }
 
         if (array_key_exists('last_logged_in', $data)) {
