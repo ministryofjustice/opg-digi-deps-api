@@ -169,6 +169,12 @@ class MoneyTransaction implements MoneyTransactionInterface
                 'anything-else-paid-out' => ['config' => ['hasDetails' => true, 'type' => 'out']],
             ],
             'config' => ['hasDetails' => false, 'type' => 'out']
+        ],
+        'moneyout-other' => [
+            'categories' => [
+                'anything-else-paid-out'=> ['config' => ['hasDetails' => true, 'type' => 'out']],
+            ],
+            'config' => ['hasDetails' => false, 'type' => 'out']
         ]
     ];
 
