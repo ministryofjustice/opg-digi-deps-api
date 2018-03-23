@@ -122,7 +122,7 @@ class MoneyTransaction implements MoneyTransactionInterface
             ],
             'config' => ['hasDetails' => false, 'type' => 'out']
         ],
-        'clioent-expenses' => [
+        'client-expenses' => [
             'categories' => [
                 'client-transport-bus-train-taxi-fares' => ['config' => ['hasDetails' => false, 'type' => 'out']],
                 'clothes' => ['config' => ['hasDetails' => false, 'type' => 'out']],
