@@ -162,13 +162,13 @@ class MoneyTransaction implements MoneyTransactionInterface
             ],
             'config' => ['hasDetails' => false, 'type' => 'out']
         ],
-        'moving-money' => [
-            'categories' => [
-                'cash-withdrawn' => ['config' => ['hasDetails' => true, 'type' => 'out']],
-                'transfers-out-to-other-accounts' => ['config' => ['hasDetails' => true, 'type' => 'out']],
-                'anything-else-paid-out' => ['config' => ['hasDetails' => true, 'type' => 'out']],
-            ],
-            'config' => ['hasDetails' => false, 'type' => 'out']
+        'cash-withdrawn' => [
+            'categories' => [],
+            'config' => ['hasDetails' => true, 'type' => 'out']
+        ],
+        'transfers-out-to-other-accounts' => [
+            'categories' => [],
+            'config' => ['hasDetails' => true, 'type' => 'out']
         ],
         'moneyout-other' => [
             'categories' => [
