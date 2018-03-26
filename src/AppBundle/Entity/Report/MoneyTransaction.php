@@ -24,7 +24,6 @@ class MoneyTransaction implements MoneyTransactionInterface
      */
     public static $categories = [
         // group => categories[] => category => config['hasMoreDetails', 'type']
-
         // Money In
         'salary-or-wages' => [
             'categories' => [],
@@ -80,10 +79,8 @@ class MoneyTransaction implements MoneyTransactionInterface
             'config' => ['hasDetails' => false, 'type' => 'in']
         ],
         'moneyin-other' => [
-            'categories' => [
-                'anything-else' => ['config' => ['hasDetails' => true, 'type' => 'in']]
-            ],
-            'config' => ['hasDetails' => false, 'type' => 'in']
+            'categories' => [],
+            'config' => ['hasDetails' => true, 'type' => 'in']
         ],
 
         // Money Out
@@ -171,10 +168,8 @@ class MoneyTransaction implements MoneyTransactionInterface
             'config' => ['hasDetails' => true, 'type' => 'out']
         ],
         'moneyout-other' => [
-            'categories' => [
-                'anything-else-paid-out'=> ['config' => ['hasDetails' => true, 'type' => 'out']],
-            ],
-            'config' => ['hasDetails' => false, 'type' => 'out']
+            'categories' => [],
+            'config' => ['hasDetails' => true, 'type' => 'out']
         ]
     ];
 
