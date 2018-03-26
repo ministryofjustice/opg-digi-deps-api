@@ -61,11 +61,9 @@ class MoneyTransaction implements MoneyTransactionInterface
             ],
             'config' => ['hasDetails' => false, 'type' => 'in']
         ],
-        'damages' => [
-            'categories' => [
-                'compensation-or-damages-award' => ['config' => ['hasDetails' => true, 'type' => 'in']]
-            ],
-            'config' => ['hasDetails' => false, 'type' => 'in']
+        'compensation-or-damages-award' => [
+            'categories' => [],
+            'config' => ['hasDetails' => true, 'type' => 'in']
         ],
         'one-off' => [
             'categories' => [
