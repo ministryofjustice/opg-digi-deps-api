@@ -278,7 +278,7 @@ class MoneyTransaction implements MoneyTransactionInterface
      */
     public function setCategory($category)
     {
-        if ($this->isValidCategory($category)) {
+        if (MoneyTransaction::isValidCategory($category)) {
             $this->category = $category;
         }
         
@@ -375,10 +375,11 @@ class MoneyTransaction implements MoneyTransactionInterface
      * @param $category
      * @return bool
      */
-    private function isValidCategory($category)
+    public static function isValidCategory($category = '')
     {
         foreach (self::$categories as $group => $catArray) {
-            if ($group === strtolower($category) || array_key_exists($category, $catArray['categories'])) {
+            if (($group === strtolower($category) && empty($catArray['categories'])) ||
+                array_key_exists($category, $catArray['categories'])) {
                 return true;
             }
         }
