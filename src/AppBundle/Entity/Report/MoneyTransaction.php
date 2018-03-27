@@ -278,8 +278,10 @@ class MoneyTransaction implements MoneyTransactionInterface
      */
     public function setCategory($category)
     {
-        $this->category = $category;
-
+        if ($this->isValidCategory($category)) {
+            $this->category = $category;
+        }
+        
         return $this;
     }
 
@@ -365,5 +367,22 @@ class MoneyTransaction implements MoneyTransactionInterface
         }
 
         return $type;
+    }
+
+    /**
+     * Validates that the category chosen exists to prevent users manipulating url and storing categories we dont support
+     *
+     * @param $category
+     * @return bool
+     */
+    private function isValidCategory($category)
+    {
+        foreach (self::$categories as $group => $catArray) {
+            if ($group === strtolower($category) || array_key_exists($category, $catArray['categories'])) {
+                return true;
+            }
+        }
+
+        throw new \RuntimeException('Invalid money transaction category: ' . $category);
     }
 }
