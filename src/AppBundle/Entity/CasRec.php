@@ -19,12 +19,17 @@ class CasRec
      * Holds the mapping rules to define the report type based on the CSV file (CASREC)
      * Used by both PA and Lay
      *
+     * Keep values lowercase
+     *
+     * Keep in sync with
+     * https://opgtransform.atlassian.net/wiki/spaces/DEPDS/pages/135266255/Report+variations
+     *
      * @var array
      */
     private static $csvToReportTypeMap = [
         // Lay
-        [true, User::ROLE_LAY_DEPUTY, ['l3', 'l3g', 'a3'], 'opg103', Report::TYPE_103],
-        [true, User::ROLE_LAY_DEPUTY, ['l3', 'l3g', 'a3'], 'opg102', Report::TYPE_102],
+        [true, User::ROLE_LAY_DEPUTY, ['p3', 'p3g', 'l3', 'l3g', 'a3'], 'opg103', Report::TYPE_103],
+        [true, User::ROLE_LAY_DEPUTY, ['p2', 'p2a', 'l2a', 'l2'], 'opg102', Report::TYPE_102],
         [true, User::ROLE_LAY_DEPUTY, ['hw'], '', Report::TYPE_104],
         [true, User::ROLE_LAY_DEPUTY, ['hw'], 'opg103', Report::TYPE_103_4],
         [true, User::ROLE_LAY_DEPUTY, ['hw'], 'opg102', Report::TYPE_102_4],
@@ -35,8 +40,8 @@ class CasRec
         [true, User::ROLE_PA_NAMED, ['hw'], 'opg103', Report::TYPE_103_4_6],
         [true, User::ROLE_PA_NAMED, ['hw'], 'opg102', Report::TYPE_102_4_6],
         // Prof
-        [true, User::ROLE_PROF_NAMED, ['l3', 'l3g', 'a3'], 'opg103', Report::TYPE_103_5],
-        [true, User::ROLE_PROF_NAMED, ['l3', 'l3g', 'a3'], 'opg102', Report::TYPE_102_5],
+        [true, User::ROLE_PROF_NAMED, ['p3', 'p3g'], 'opg103', Report::TYPE_103_5],
+        [true, User::ROLE_PROF_NAMED, ['p2', 'p2a'], 'opg102', Report::TYPE_102_5],
         [true, User::ROLE_PROF_NAMED, ['hw'], '', Report::TYPE_104_5],
         [true, User::ROLE_PROF_NAMED, ['hw'], 'opg103', Report::TYPE_103_4_5],
         [true, User::ROLE_PROF_NAMED, ['hw'], 'opg102', Report::TYPE_102_4_5],
