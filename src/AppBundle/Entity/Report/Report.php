@@ -495,6 +495,7 @@ class Report implements ReportInterface
 
         $diffSections = array_diff($oldSections, $newSections);
 
+        // clean up each sections not present in the new report type
         foreach ($diffSections as $sectionId) {
             if ($sectionId == self::SECTION_MONEY_TRANSFERS) {
                 $this->getMoneyTransfers()->clear();
