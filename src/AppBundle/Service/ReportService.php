@@ -159,7 +159,8 @@ class ReportService
                 $casRecReportType = CasRec::getTypeBasedOnTypeofRepAndCorref($casRec->getTypeOfReport(), $casRec->getCorref(), $userRoleName);
 
                 if ($report->getType() != $casRecReportType) {
-                    $report->setType($casRecReportType);
+                    // Change the report type and clean up any old data we no longer need
+                    $report->changeReportType($casRecReportType);
                     $this->_em->persist($report);
                 }
             }
