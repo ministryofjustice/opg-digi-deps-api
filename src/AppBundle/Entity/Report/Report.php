@@ -497,7 +497,7 @@ class Report implements ReportInterface
 
         // clean up each sections not present in the new report type
         foreach ($diffSections as $sectionId) {
-            if ($sectionId == self::SECTION_MONEY_TRANSFERS) {
+            if (!empty($this->getId()) && ($sectionId == self::SECTION_MONEY_TRANSFERS)) {
                 $this->getMoneyTransfers()->clear();
             }
         }
