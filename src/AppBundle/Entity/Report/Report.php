@@ -481,6 +481,31 @@ class Report implements ReportInterface
     }
 
     /**
+     * Same as setType but changing also performs a clean up based on section data that is no longer relevent to the
+     * new report type
+     *
+     * @param $newType
+     * @return $this
+     */
+    public function changeReportType($newType)
+    {
+        $oldSections = $this->getAvailableSections();
+        $this->setType($newType);
+        $newSections = $this->getAvailableSections();
+
+        $diffSections = array_diff($oldSections, $newSections);
+
+        // clean up each sections not present in the new report type
+        foreach ($diffSections as $sectionId) {
+            if (!empty($this->getId()) && ($sectionId == self::SECTION_MONEY_TRANSFERS)) {
+                $this->getMoneyTransfers()->clear();
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Get sections based on the report type
      *
      * @JMS\VirtualProperty

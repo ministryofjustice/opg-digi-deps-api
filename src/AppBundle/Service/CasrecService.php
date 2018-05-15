@@ -144,9 +144,9 @@ class CasrecService
 
         // replace file instantly
         if (file_exists($filePath)) {
-            unlink($filePath);
+            @unlink($filePath);
         }
-        rename($filePathTmp, $filePath);
+        @rename($filePathTmp, $filePath);
 
         return $linesWritten;
     }
