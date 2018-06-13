@@ -13,5 +13,6 @@ RUN  composer self-update
 WORKDIR /app
 USER app
 ENV  HOME /app
-RUN  composer global require hirak/prestissimo
+# not sure is worth it
+#RUN  composer global require hirak/prestissimo
 
