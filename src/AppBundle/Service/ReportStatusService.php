@@ -633,7 +633,7 @@ class ReportStatusService
 
     /**
      * Calculate status using report info
-     * Note: a cached/redundant value is hold in report.sectionStatusesCached
+     * Note: a cached/redundant value is hold in report.reportStatusCached
      * This should not be used from the client, as expensive to calculate each time
      *
      * TODO rewrite API and client to ALWAYS ignore the isDue. Othercase its caching is difficult
@@ -647,21 +647,6 @@ class ReportStatusService
      * @return string notStarted|readyToSubmit|notFinished
      */
     public function getStatus()
-    {
-        if (!$this->hasStarted()) {
-            return 'notStarted';
-        }
-
-        return $this->report->isDue() && $this->isReadyToSubmit() ? 'readyToSubmit' : 'notFinished';
-    }
-
-    /**
-     * Used to fill report.reportStatusCached
-     * Ignored the due date. Returns readyTosubmit if sections are completed, even if not due
-     *
-     * @return string notStarted|readyToSubmit|notFinished
-     */
-    public function getStatusIgnoringDueDate()
     {
         if (!$this->hasStarted()) {
             return 'notStarted';
