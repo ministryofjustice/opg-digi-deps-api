@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity\Report\Traits;
 
+use AppBundle\Entity\Report\ProfDeputyEstimateCost;
 use AppBundle\Entity\Report\ProfDeputyOtherCost;
 use AppBundle\Entity\Report\ProfDeputyInterimCost;
 use JMS\Serializer\Annotation as JMS;
@@ -411,6 +412,22 @@ trait ReportProfDeputyCostsTrait
 
         foreach ($this->getProfDeputyOtherCosts() as $oc) {
             $total += (float) $oc->getAmount();
+        }
+
+        return $total;
+    }
+
+    /**
+     * @return float
+     * @JMS\VirtualProperty()
+     * @JMS\Groups({"report-prof-deputy-costs"})
+     */
+    public function getProfDeputyTotalCostsTakenFromClient()
+    {
+        $total = $this->getProfDeputyTotalCosts();
+
+        foreach ($this->getProfDeputyPreviousCosts() as $previousCost) {
+            $total -= (float) $previousCost->getAmount();
         }
 
         return $total;
