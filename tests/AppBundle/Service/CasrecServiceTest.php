@@ -152,4 +152,89 @@ class CasrecServiceTest extends WebTestCase
     {
         m::close();
     }
+
+    public function testAddBulkThrowsExceptionIfGivenEmptyData()
+    {
+
+    }
+
+    public function testAddBulkThrowsExceptionIfGivenRowCountExceedsMaxCount()
+    {
+
+    }
+
+    public function testAddBulkIgnoresRowsWithInvalidColumnValues()
+    {
+
+    }
+
+    public function testAddBulkCreatesAnewCasRecEntityForEachRow()
+    {
+
+    }
+
+    public function testAddBulkCopiesMetaDataIntoCasRecEntityFromMatchingDeputyIfAlreadyExists()
+    {
+
+    }
+
+    public function testAddBulkCopiesReportMetaDataIntoCasRecEntityFromMatchingClientIfAlreadyExists()
+    {
+
+    }
+
+    public function testAddBulkSetsUpdatedTimestampOnEachCasRecEntity()
+    {
+
+    }
+
+    public function testAddBulkPersistsEachNewCasRecEntityBeforeMovingToNextRow()
+    {
+
+    }
+
+    public function testAddBulkFlushesInBatches()
+    {
+
+    }
+
+    public function testAddBulkUpdatesReportTypesOnAnyMismatchesWithExistingReports()
+    {
+
+    }
+
+    public function testAddBulkCatchesExceptionsWhenProcessingEachRowAndReturnsGracefully()
+    {
+
+    }
+
+    public function testAddBulkReturnsArrayOfSummaryData()
+    {
+
+    }
+
+    public function testSaveCsvConvertsEachRowInCasrecTableToCsvFormat()
+    {
+
+    }
+
+    public function testSaveCsvAddsAcsvHeaderToFile()
+    {
+
+    }
+
+    public function testSaveCsvRemovesExistingFile()
+    {
+
+    }
+
+    public function testSaveCsvWritesFileToDirectory()
+    {
+
+    }
+
+    public function testSaveCsvReturnsNumberOfLinesWritten()
+    {
+
+    }
 }

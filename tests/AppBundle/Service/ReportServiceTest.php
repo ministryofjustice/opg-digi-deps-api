@@ -202,4 +202,14 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
     {
         m::close();
     }
+
+    public function testUpdateCurrentReportTypesUpdatesAllActiveReportsBelongingToGivenCasesIfTypeNotMatchingNewlyDerivedType()
+    {
+
+    }
+
+    public function testUpdateCurrentReportTypesFlushesOnFinish()
+    {
+
+    }
 }
