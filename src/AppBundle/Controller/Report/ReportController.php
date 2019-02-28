@@ -6,6 +6,7 @@ use AppBundle\Controller\RestController;
 use AppBundle\Entity as EntityDir;
 use AppBundle\Entity\Report\Report;
 use AppBundle\Service\ReportService;
+use AppBundle\Service\RestHandler\Report\DeputyCostsEstimateReportUpdateHandler;
 use Doctrine\ORM\AbstractQuery;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -18,6 +19,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends RestController
 {
+    /** @var array */
+    private $updateHandlers;
+
+    /**
+     * @param array $updateHandlers
+     */
+    public function __construct(array $updateHandlers)
+    {
+        $this->updateHandlers = $updateHandlers;
+    }
+
     /**
      * Add a report
      * Currently only used by Lay deputy during registration steps
@@ -525,6 +537,10 @@ class ReportController extends RestController
             $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
         }
 
+        foreach ($this->updateHandlers as $updateHandler) {
+            $updateHandler->handle($report, $data);
+        }
+
         $this->getEntityManager()->flush();
 
         return ['id' => $report->getId()];
@@ -795,6 +811,9 @@ class ReportController extends RestController
             'future_significant_decisions' => 'setFutureSignificantDecisions',
             'has_deputy_raised_concerns' => 'setHasDeputyRaisedConcerns',
             'case_worker_satisified' => 'setCaseWorkerSatisified',
+            'payments_match_cost_certificate' => 'setPaymentsMatchCostCertificate',
+            'prof_costs_reasonable_and_proportionate' => 'setProfCostsReasonableAndProportionate',
+            'has_deputy_overcharged_from_previous_estimates' => 'setHasDeputyOverchargedFromPreviousEstimates',
             'lodging_summary' => 'setLodgingSummary',
             'final_decision' => 'setFinalDecision',
             'button_clicked' => 'setButtonClicked'
