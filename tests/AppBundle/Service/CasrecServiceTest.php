@@ -5,12 +5,16 @@ namespace Tests\AppBundle\Service;
 use AppBundle\Entity\CasRec;
 use AppBundle\Service\CasrecService;
 use AppBundle\Service\ReportService;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Fixtures;
 use Mockery as m;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CasrecServiceTest extends WebTestCase
 {
@@ -35,6 +39,27 @@ class CasrecServiceTest extends WebTestCase
      */
     private $object = null;
 
+    /** @var CasrecService */
+    private $sut;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $entityManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $logger;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $reportService;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $validator;
+
+    /** @var mixed */
+    private $result;
+
+    /** @var array */
+    private $input = [];
+
     public static function setUpBeforeClass()
     {
         self::$frameworkBundleClient = static::createClient(['environment' => 'test',
@@ -54,6 +79,28 @@ class CasrecServiceTest extends WebTestCase
         $this->object = new CasrecService(self::$em, $this->logger, $this->reportService, $this->validator);
         Fixtures::deleteReportsData(['document', 'casrec', 'deputy_case', 'report_submission', 'report', 'odr', 'dd_team', 'dd_user', 'client', 'report']);
         self::$em->clear();
+
+        $this->entityManager = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
+        $this->logger = $this->getMock(LoggerInterface::class);
+        $this->reportService = $this->getMockBuilder(ReportService::class)->disableOriginalConstructor()->getMock();
+        $this->validator = $this->getMock(ValidatorInterface::class);
+
+        $this->initQueryObjectChaining();
+
+        $this->sut = new CasrecService($this->entityManager, $this->logger, $this->reportService, $this->validator);
+    }
+
+    private function initQueryObjectChaining()
+    {
+        $query = $this->getMockBuilder(AbstractQuery::class)->disableOriginalConstructor()->getMock();
+        $this
+            ->entityManager
+            ->method('createQuery')
+            ->willReturn($query);
+
+        $query
+            ->method('setParameter')
+            ->willReturnSelf();
     }
 
     public function testAddBulkAndCsv()
@@ -153,65 +200,151 @@ class CasrecServiceTest extends WebTestCase
         m::close();
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testAddBulkThrowsExceptionIfGivenEmptyData()
     {
-
+        $this->ensureInputIsEmpty();
+        $this->invokeAddBulkTest();
     }
 
+    private function ensureInputIsEmpty()
+    {
+        $this->input = [];
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testAddBulkThrowsExceptionIfGivenRowCountExceedsMaxCount()
     {
-
+        $this->ensureInputContainsMoreThanAllowed();
+        $this->invokeAddBulkTest();
     }
 
-    public function testAddBulkIgnoresRowsWithInvalidColumnValues()
+    private function ensureInputContainsMoreThanAllowed()
     {
-
+        for ($i = 1; $i <= CasrecService::MAX_RECORDS_ALLOWED_IN_BULK +1; $i++) {
+            $this->input[] = $i;
+        }
     }
 
-    public function testAddBulkCreatesAnewCasRecEntityForEachRow()
+    public function testAddBulkCatchesExceptionsEncounteredOnAnInputEntryAndExitsGracefully()
     {
-
+        $this->ensureInputContains(['alpha-row'], ['beta-row'], ['charlie-row']);
+        $this->ensureExceptionWillBeThrownAtInputEntry(2);
+        $this->invokeAddBulkTest();
+        $this->assertReturnValueContainsSummaryDataEqualTo(['added' => 1, 'errors' => 1]);
     }
 
-    public function testAddBulkCopiesMetaDataIntoCasRecEntityFromMatchingDeputyIfAlreadyExists()
+    private function ensureExceptionWillBeThrownAtInputEntry($throwAt)
     {
-
+        $this
+            ->validator
+            ->expects($this->at($throwAt - 1))
+            ->method('validate')
+            ->willThrowException(new \Exception('error'));
     }
 
-    public function testAddBulkCopiesReportMetaDataIntoCasRecEntityFromMatchingClientIfAlreadyExists()
+    public function testAddBulkCreatesAndPersistsAnewEntityForEachValidInputEntry()
     {
-
+        $this->ensureInputContains(['invalid-row'], ['valid-row']);
+        $this->assertEntitiesWillOnlyCreatedFromValidRows();
+        $this->assertEachEntityWillBePersisted();
+        $this->assertEntitesWillBeFlushedNtimes(1);
+        $this->invokeAddBulkTest();
+        $this->assertReturnValueContainsSummaryDataEqualTo(['added' => 1, 'errors' => 1]);
     }
 
-    public function testAddBulkSetsUpdatedTimestampOnEachCasRecEntity()
+    /**
+     * @dataProvider getInputCountBoundaryVariations
+     * @param $inputCount
+     * @param $expectedFlushCount
+     */
+    public function testAddBulkFlushesEntitiesInBatches($inputCount, $expectedFlushCount)
     {
-
+        $this->ensureInputContainingNentries($inputCount);
+        $this->assertEntitesWillBeFlushedNtimes($expectedFlushCount);
+        $this->invokeAddBulkTest();
+        $this->assertReturnValueContainsSummaryDataEqualTo(['added' => $inputCount, 'errors' => 0]);
     }
 
-    public function testAddBulkPersistsEachNewCasRecEntityBeforeMovingToNextRow()
+    public function getInputCountBoundaryVariations()
     {
-
+        return [
+            ['inputCount' => 1, 'expectedFlushCount' => 1],
+            ['inputCount' => CasrecService::PERSIST_EVERY, 'expectedFlushCount' => 2],
+            ['inputCount' => CasrecService::PERSIST_EVERY + 1, 'expectedFlushCount' => 2],
+            ['inputCount' => CasrecService::PERSIST_EVERY * 2 - 1, 'expectedFlushCount' => 2],
+            ['inputCount' => CasrecService::PERSIST_EVERY * 2, 'expectedFlushCount' => 3],
+        ];
     }
 
-    public function testAddBulkFlushesInBatches()
+    private function ensureInputContains()
     {
-
+        foreach (func_get_args() as $singleUploadItem) {
+            $this->input[] = $singleUploadItem;
+        }
     }
 
-    public function testAddBulkUpdatesReportTypesOnAnyMismatchesWithExistingReports()
+    /**
+     * @param $numEntries
+     */
+    private function ensureInputContainingNentries($numEntries)
     {
-
+        for ($i = 1; $i <= $numEntries; $i++) {
+            $this->input[] = ['entry'];
+        }
     }
 
-    public function testAddBulkCatchesExceptionsWhenProcessingEachRowAndReturnsGracefully()
+    private function assertEntitiesWillOnlyCreatedFromValidRows()
     {
+        $mockError = $this->getMockBuilder(ConstraintViolation::class)->disableOriginalConstructor()->getMock();
 
+        $this
+            ->validator
+            ->expects($this->exactly(2))
+            ->method('validate')
+            ->willReturnOnConsecutiveCalls(
+                new ConstraintViolationList([$mockError]),
+                new ConstraintViolationList
+            );
+
+        $this
+            ->entityManager
+            ->expects($this->exactly(1))
+            ->method('persist');
     }
 
-    public function testAddBulkReturnsArrayOfSummaryData()
+    private function assertEachEntityWillBePersisted()
     {
-
+        $this
+            ->entityManager
+            ->expects($this->exactly(1))
+            ->method('persist');
     }
+
+    private function assertEntitesWillBeFlushedNtimes($expectedTimes)
+    {
+        $this
+            ->entityManager
+            ->expects($this->exactly($expectedTimes))
+            ->method('flush');
+    }
+
+    private function invokeAddBulkTest()
+    {
+        $this->result = $this->sut->addBulk($this->input);
+    }
+
+    public function assertReturnValueContainsSummaryDataEqualTo(array $expected)
+    {
+        $this->assertInternalType('array', $this->result);
+        $this->assertEquals($expected['added'], $this->result['added']);
+        $this->assertEquals($expected['errors'], count($this->result['errors']));
+    }
+
 
     public function testSaveCsvConvertsEachRowInCasrecTableToCsvFormat()
     {

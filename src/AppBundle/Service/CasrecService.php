@@ -34,6 +34,12 @@ class CasrecService
      */
     private $validator;
 
+    /** @var int */
+    const MAX_RECORDS_ALLOWED_IN_BULK = 10000;
+
+    /** @var int */
+    const PERSIST_EVERY = 5000;
+
     /**
      * CasrecService constructor.
      *
@@ -59,7 +65,6 @@ class CasrecService
     private function updateCasrecStatsSingle(CasRec $casrec)
     {
         // add user info, by matching DeputyNo
-        // TEST identifies existing Deputy and copies meta data from first matching Deputy to CasRec if found.
         $deputyNo = $casrec->getDeputyNo();
         $results = $this->em->createQuery('SELECT u FROM ' . User::class . ' u WHERE u.deputyNo = :d1 OR u.deputyNo = :d2')
             ->setParameter('d1', strtoupper($deputyNo))
@@ -70,7 +75,6 @@ class CasrecService
         }
 
         // add report info, by matching case number
-        // TEST identifies existing Clients and copies meta data from first matching Client (and their Reports) to CasRec if found.
         $caseNumber = $casrec->getCaseNumber();
         $results = $this->em->createQuery('SELECT c FROM ' . Client::class . ' c WHERE c.caseNumber = :c1 OR c.caseNumber = :c2')
             ->setParameter('c1', strtoupper($caseNumber))
@@ -89,7 +93,6 @@ class CasrecService
                 ->setNOfReportsActive(count($results[0]->getUnsubmittedReports()));
         }
 
-        // TEST sets updated timestamp on CasRec.
         $casrec->setUpdatedAt(new \DateTime());
     }
 
@@ -166,20 +169,8 @@ class CasrecService
      */
     public function addBulk(array $data)
     {
-        $maxRecords = 10000; // memory failure above this limit
-        $persistEvery = 5000; //optimised for performances
-
-        $count = count($data);
-
-        // TEST exception is thrown if given empty data.
-        if (!$count) {
-            throw new \RuntimeException('No record received from the API');
-        }
-
-        // TEST exception is thrown if count of rows exceeds maz count.
-        if ($count > $maxRecords) {
-            throw new \RuntimeException("Max $maxRecords records allowed in a single bulk insert");
-        }
+        $this->throwExceptionIfGivenEmptyData($data);
+        $this->throwExceptionIfGivenDataExceedsMaxAmountAllowed($data);
 
         $this->logger->notice(__METHOD__ . ': Received ' . count($data) . ' records');
 
@@ -210,7 +201,7 @@ class CasrecService
                     $this->em->persist($casRecEntity);
 
                     // TEST flushes in batches
-                    if (($added++ % $persistEvery) === 0) {
+                    if (($added++ % self::PERSIST_EVERY) === 0) {
                         $this->em->flush();
                         $this->em->clear();
                     }
@@ -234,5 +225,28 @@ class CasrecService
 
         // TEST returns array with added and errors counts.
         return ['added' => $added - 1, 'errors' => $retErrors];
+    }
+
+    /**
+     * @param array $data
+     */
+    private function throwExceptionIfGivenEmptyData(array $data)
+    {
+        if (empty($data)) {
+            throw new \RuntimeException('No record received from the API');
+        }
+    }
+
+    /**
+     * @param array $data
+     */
+    private function throwExceptionIfGivenDataExceedsMaxAmountAllowed(array $data)
+    {
+        if (count($data) > self::MAX_RECORDS_ALLOWED_IN_BULK) {
+            throw new \RuntimeException(sprintf(
+                "Given count of records exceeds max allowed of %s",
+                self::MAX_RECORDS_ALLOWED_IN_BULK
+            ));
+        }
     }
 }
