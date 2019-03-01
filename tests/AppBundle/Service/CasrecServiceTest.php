@@ -250,7 +250,7 @@ class CasrecServiceTest extends WebTestCase
     public function testAddBulkCreatesAndPersistsAnewEntityForEachValidInputEntry()
     {
         $this->ensureInputContains(['invalid-row'], ['valid-row']);
-        $this->assertEntitiesWillOnlyCreatedFromValidRows();
+        $this->assertEntitiesWillOnlyBeCreatedFromValidRows();
         $this->assertEachEntityWillBePersisted();
         $this->assertEntitesWillBeFlushedNtimes(1);
         $this->invokeAddBulkTest();
@@ -264,7 +264,7 @@ class CasrecServiceTest extends WebTestCase
      */
     public function testAddBulkFlushesEntitiesInBatches($inputCount, $expectedFlushCount)
     {
-        $this->ensureInputContainingNentries($inputCount);
+        $this->ensureInputContainsNentries($inputCount);
         $this->assertEntitesWillBeFlushedNtimes($expectedFlushCount);
         $this->invokeAddBulkTest();
         $this->assertReturnValueContainsSummaryDataEqualTo(['added' => $inputCount, 'errors' => 0]);
@@ -291,14 +291,14 @@ class CasrecServiceTest extends WebTestCase
     /**
      * @param $numEntries
      */
-    private function ensureInputContainingNentries($numEntries)
+    private function ensureInputContainsNentries($numEntries)
     {
         for ($i = 1; $i <= $numEntries; $i++) {
             $this->input[] = ['entry'];
         }
     }
 
-    private function assertEntitiesWillOnlyCreatedFromValidRows()
+    private function assertEntitiesWillOnlyBeCreatedFromValidRows()
     {
         $mockError = $this->getMockBuilder(ConstraintViolation::class)->disableOriginalConstructor()->getMock();
 
