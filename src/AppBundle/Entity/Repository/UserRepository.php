@@ -2,6 +2,8 @@
 
 namespace AppBundle\Entity\Repository;
 
+use AppBundle\DTO\DeputyDto;
+
 /**
  * UserRepository.
  *
@@ -10,4 +12,12 @@ namespace AppBundle\Entity\Repository;
  */
 class UserRepository extends AbstractEntityRepository
 {
+    public function getDtoById($id)
+    {
+        $em = $this->getEntityManager();
+        $query = $em->createQuery('SELECT NEW AppBundle\DTO\DeputyDto(d.id, d.firstname, d.lastname, d.email, d.roleName, d.addressPostcode, d.ndrEnabled) FROM AppBundle\Entity\User d WHERE d.id=?1');
+        $query->setParameter(1, $id);
+
+        return $query->getSingleResult();
+    }
 }

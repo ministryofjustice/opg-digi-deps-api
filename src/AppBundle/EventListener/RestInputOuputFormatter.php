@@ -145,6 +145,10 @@ class RestInputOuputFormatter
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
+        //$this->logger->error($event->getRequest()->getPathInfo());
+//        if (strpos($event->getRequest()->getPathInfo(), 'get-one-by') !== false) {
+//            return;
+//        }
         $data = [
             'success' => true,
             'data' => $event->getControllerResult(),

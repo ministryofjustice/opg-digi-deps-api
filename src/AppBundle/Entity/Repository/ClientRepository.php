@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity\Repository;
 
+use AppBundle\DTO\ClientDto;
 use AppBundle\Entity\Client;
 use AppBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
@@ -95,5 +96,39 @@ class ClientRepository extends EntityRepository
             'INSERT INTO user_team (user_id, team_id) VALUES (?, ?) ON CONFLICT DO NOTHING',
             [$user->getId(), $teamId]
         );
+    }
+
+    public function getDtoCollectionByDeputy($deputyId)
+    {
+        $sql = 'select c.id, c.case_number, c.firstname, c.lastname, c.email, count(report.id) as report_count, odr.id as ndr_id 
+from client c join deputy_case on deputy_case.client_id = c.id 
+left join odr on odr.client_id = c.id
+join report on report.client_id = c.id
+where deputy_case.user_id = :deputyId
+group by c.id, c.case_number, c.firstname, c.lastname, c.email, odr.id';
+        //$sql = 'select c.id, c.case_number, c.firstname, c.lastname, c.email, 322 as report_count, 32 as ndr_id from client c  where c.id = :deputyId';
+        $params = ['deputyId' => $deputyId];
+
+        $stmt = $this->getEntityManager()->getConnection()->prepare($sql);
+        $stmt->execute($params);
+
+        $results = $stmt->fetchAll();
+
+        //var_dump($results); exit;
+        
+        $dtos = [];
+        foreach ($results as $result) {
+            $dtos[] = new ClientDto($result['id'], $result['case_number'], $result['firstname'], $result['lastname'], $result['email'], $result['report_count'], $result['ndr_id']);
+        }
+
+        return $dtos;
+//
+//
+//
+//        $em = $this->getEntityManager();
+//        $query = $em->createQuery('SELECT NEW AppBundle\DTO\ClientDto(c.id, c.caseNumber, c.firstname, c.lastname, c.email, 321, 21) FROM AppBundle\Entity\Client c JOIN  WHERE c.id=?1');
+//        $query->setParameter(1, 80);
+//
+//        return $query->getResult();
     }
 }
