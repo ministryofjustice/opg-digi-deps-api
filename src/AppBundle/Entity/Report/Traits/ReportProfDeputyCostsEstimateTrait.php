@@ -43,6 +43,13 @@ trait ReportProfDeputyCostsEstimateTrait
     private $profDeputyCostsEstimateMoreInfoDetails;
 
     /**
+     * @var float
+     * @JMS\Groups({"prof-deputy-estimate-costs"})
+     * @ORM\Column(name="prof_dc_estimate_management_cost", type="float", precision=14, scale=2, nullable=true)
+     */
+    private $generalManagementCostAmount;
+
+    /**
      * Hold prof deputy estimate costs type
      * 1st value = id, 2nd value = hasMoreInformation.
      *
@@ -192,5 +199,25 @@ trait ReportProfDeputyCostsEstimateTrait
         }
 
         return $total;
+    }
+
+    /**
+     * @return float
+     */
+    public function getGeneralManagementCostAmount()
+    {
+        return $this->generalManagementCostAmount;
+    }
+
+    /**
+     * @param float $generalManagementCostAmount
+     * @return ReportProfDeputyCostsEstimateTrait
+
+     */
+    public function setGeneralManagementCostAmount($generalManagementCostAmount)
+    {
+        $this->generalManagementCostAmount = $generalManagementCostAmount;
+
+        return $this;
     }
 }
