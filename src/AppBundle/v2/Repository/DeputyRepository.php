@@ -61,6 +61,7 @@ class DeputyRepository
             LEFT JOIN report on report.client_id = c.id
             WHERE deputy_case.user_id = :deputyId
             GROUP BY u.id, c.id, odr.id
+            ORDER BY c.id DESC
 QUERY;
 
         $stmt = $this->entityManager->getConnection()->prepare($sql);

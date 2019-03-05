@@ -15,29 +15,27 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class DeputyController
 {
     /** @var DeputyRepository  */
-    private $deputyRepository;
+    private $repository;
 
     /**
-     * @param DeputyRepository $deputyRepository
+     * @param DeputyRepository $repository
      */
-    public function __construct(DeputyRepository $deputyRepository)
+    public function __construct(DeputyRepository $repository)
     {
-        $this->deputyRepository = $deputyRepository;
+        $this->repository = $repository;
     }
 
     /**
      * @Route("/{id}", requirements={"id":"\d+"})
      * @Method({"GET"})
+     *
+     * @param $id
+     * @return JsonResponse
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function getByIdAction($id)
     {
-        try {
-            $deputyDto = $this->deputyRepository->getDtoById($id);
-
-            return $this->buildSuccessResponse($deputyDto);
-        } catch (\Exception $e) {
-            return $this->buildErrorResponse($e);
-        }
+        return $this->buildSuccessResponse($this->repository->getDtoById($id));
     }
 
     /**
@@ -50,18 +48,6 @@ class DeputyController
             'success' => true,
             'data' => $dto->jsonSerialize(),
             'message' => ''
-        ]);
-    }
-
-    /**
-     * @param \Exception $e
-     * @return JsonResponse
-     */
-    private function buildErrorResponse(\Exception $e)
-    {
-        return new JsonResponse([
-            'success' => false,
-            'message' => $e->getMessage()
         ]);
     }
 }
