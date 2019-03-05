@@ -20,8 +20,8 @@ class ClientAssembler
             $data['firstname'],
             $data['lastname'],
             $data['email'],
-            $data['reportcount'],
-            $data['ndrid']
+            $data['report_count'],
+            $data['ndr_id']
         );
     }
 
@@ -47,7 +47,7 @@ class ClientAssembler
             array_key_exists('firstname', $data) &&
             array_key_exists('lastname', $data) &&
             array_key_exists('email', $data) &&
-            array_key_exists('reportcount', $data) &&
-            array_key_exists('ndrid', $data);
+            array_key_exists('report_count', $data) &&
+            array_key_exists('ndr_id', $data);
     }
 }

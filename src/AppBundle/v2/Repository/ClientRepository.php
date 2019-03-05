@@ -33,7 +33,7 @@ class ClientRepository
     public function getDtoDataArrayByDeputy($deputyId)
     {
         $sql = <<<QUERY
-          SELECT c.id,c.firstname,c.lastname,c.email,c.case_number,count(report.id) as reportcount,odr.id as ndrId
+          SELECT c.id,c.firstname,c.lastname,c.email,c.case_number,count(report.id) as report_count,odr.id as ndr_id
           FROM client c 
           JOIN deputy_case on deputy_case.client_id = c.id
           LEFT JOIN odr on odr.client_id = c.id

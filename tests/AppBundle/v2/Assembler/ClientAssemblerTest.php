@@ -57,8 +57,8 @@ class ClientAssemblerTest extends TestCase
             ['fieldToEnsureIsMissing' => 'firstname'],
             ['fieldToEnsureIsMissing' => 'lastname'],
             ['fieldToEnsureIsMissing' => 'email'],
-            ['fieldToEnsureIsMissing' => 'reportcount'],
-            ['fieldToEnsureIsMissing' => 'ndrid']
+            ['fieldToEnsureIsMissing' => 'report_count'],
+            ['fieldToEnsureIsMissing' => 'ndr_id']
         ];
     }
 
@@ -73,8 +73,8 @@ class ClientAssemblerTest extends TestCase
             'firstname' => 'Bruce',
             'lastname' => 'Wayne',
             'email' => 'email@test.com',
-            'reportcount' => 21,
-            'ndrid' => 456
+            'report_count' => 21,
+            'ndr_id' => 456
         ];
 
         return $this;

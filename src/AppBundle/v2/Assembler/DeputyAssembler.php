@@ -25,22 +25,8 @@ class DeputyAssembler
     {
         $this->throwExceptionIfMissingRequiredData($data);
 
-        $deputy = $data;
-        $dto = new DeputyDto(
-            $deputy['id'],
-            $deputy['firstname'],
-            $deputy['lastname'],
-            $deputy['email'],
-            $deputy['role_name'],
-            $deputy['address_postcode'],
-            $deputy['odr_enabled']
-        );
-
-        $clients = [];
-        foreach ($data['clients'] as $client) {
-            $clients[] = $this->clientDtoAssembler->assembleFromArray($client);
-        }
-
+        $clients = $this->buildClientDtos($data['clients']);
+        $dto = $this->buildDeputyDto($data);
         $dto->setClients($clients);
 
         return $dto;
@@ -71,5 +57,34 @@ class DeputyAssembler
             array_key_exists('address_postcode', $data) &&
             array_key_exists('odr_enabled', $data) &&
             array_key_exists('clients', $data);
+    }
+
+    /**
+     * @param $deputy
+     * @return DeputyDto
+     */
+    private function buildDeputyDto($deputy)
+    {
+        $dto = new DeputyDto(
+            $deputy['id'],
+            $deputy['firstname'],
+            $deputy['lastname'],
+            $deputy['email'],
+            $deputy['role_name'],
+            $deputy['address_postcode'],
+            $deputy['odr_enabled']
+        );
+        return $dto;
+    }
+
+    /**
+     * @param array $clients
+     * @return array
+     */
+    private function buildClientDtos(array $clients)
+    {
+        return array_map(function ($client) {
+            return $this->clientDtoAssembler->assembleFromArray($client);
+        }, $clients);
     }
 }
