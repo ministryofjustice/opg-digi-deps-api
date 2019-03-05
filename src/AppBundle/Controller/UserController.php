@@ -2,13 +2,10 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\DTO\ClientDto;
-use AppBundle\DTO\DeputyClientsDto;
 use AppBundle\Entity as EntityDir;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 //TODO
@@ -147,25 +144,7 @@ class UserController extends RestController
      */
     public function getOneById(Request $request, $id)
     {
-        $user = $this->getRepository(EntityDir\User::class)->find($id);
-        if (!$user) {
-            throw new \RuntimeException('User not found', 419);
-        }
-
-        $requestedUserIsLogged = $this->getUser()->getId() == $user->getId();
-
-        $groups = $request->query->has('groups') ?
-            $request->query->get('groups') : ['user'];
-        $this->setJmsSerialiserGroups($groups);
-
-        // only allow admins and case managers to access any user, otherwise the user can only see himself
-        if (!$this->isGranted(EntityDir\User::ROLE_CASE_MANAGER)
-            && !$this->isGranted(EntityDir\User::ROLE_AD)
-            && !$requestedUserIsLogged) {
-            throw $this->createAccessDeniedException("Not authorised to see other user's data");
-        }
-
-        return $user;
+        return $this->getOneByFilter($request, 'user_id', $id);
     }
 
     /**
@@ -176,22 +155,6 @@ class UserController extends RestController
      */
     public function getOneByFilter(Request $request, $what, $filter)
     {
-        $clientAlpha = new ClientDto(3, '123', 'Jude', 'Eves', 'j@test.com', 4, 21);
-        $clientBeta = new ClientDto(4, '456', 'Tatum', 'Laing', 't@test.com', 0, null);
-
-        $depDto = $this->getRepository(EntityDir\User::class)->getDtoById($filter);
-        $clientDtos = $this->getRepository(EntityDir\Client::class)->getDtoCollectionByDeputy($filter);
-
-        $deputyClientDto = new DeputyClientsDto($depDto, $clientDtos);
-
-        $response = [
-            'success' => true,
-            'data' => $deputyClientDto->jsonSerialize()
-        ];
-
-        return new JsonResponse($response);
-
-
         if ($what == 'email') {
             $user = $this->getRepository(EntityDir\User::class)->findOneBy(['email' => $filter]);
             if (!$user) {

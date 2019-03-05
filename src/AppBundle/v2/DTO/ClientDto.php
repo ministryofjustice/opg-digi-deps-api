@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\DTO;
+namespace AppBundle\v2\DTO;
 
 class ClientDto implements \JsonSerializable
 {
@@ -39,11 +39,11 @@ class ClientDto implements \JsonSerializable
     {
         return [
             'id' => $this->id,
-            'caseNumber' => $this->caseNumber,
+            'case_number' => $this->caseNumber,
             'firstname' => $this->firstName,
             'lastname' => $this->lastName,
             'email' => $this->email,
-            'reportCount' => $this->reportCount,
+            'total_report_count' => $this->reportCount,
             'ndrId' => $this->ndrId
         ];
     }
