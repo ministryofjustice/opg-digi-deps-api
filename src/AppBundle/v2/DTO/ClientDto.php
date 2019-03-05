@@ -47,4 +47,60 @@ class ClientDto implements \JsonSerializable
             'ndrId' => $this->ndrId
         ];
     }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCaseNumber()
+    {
+        return $this->caseNumber;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getReportCount()
+    {
+        return $this->reportCount;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNdrId()
+    {
+        return $this->ndrId;
+    }
 }

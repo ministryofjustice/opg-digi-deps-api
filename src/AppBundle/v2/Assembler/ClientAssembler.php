@@ -4,7 +4,7 @@ namespace AppBundle\v2\Assembler;
 
 use AppBundle\v2\DTO\ClientDto;
 
-class ClientAssembler implements AssemblerInterface
+class ClientAssembler
 {
     /**
      * @param array $data
@@ -12,14 +12,42 @@ class ClientAssembler implements AssemblerInterface
      */
     public function assembleFromArray(array $data)
     {
+        $this->throwExceptionIfMissingRequiredData($data);
+
         return new ClientDto(
-            $data['c_id'],
-            $data['c_casenumber'],
-            $data['c_firstname'],
-            $data['c_lastname'],
-            $data['c_email'],
-            $data['c_reportcount'],
-            $data['c_ndrid']
+            $data['id'],
+            $data['case_number'],
+            $data['firstname'],
+            $data['lastname'],
+            $data['email'],
+            $data['reportcount'],
+            $data['ndrid']
         );
+    }
+
+    /**
+     * @param array $data
+     */
+    private function throwExceptionIfMissingRequiredData(array $data)
+    {
+        if (!$this->dataIsValid($data)) {
+            throw new \InvalidArgumentException(__CLASS__ . ': Missing all data required to build DTO');
+        }
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    private function dataIsValid(array $data)
+    {
+        return
+            array_key_exists('id', $data) &&
+            array_key_exists('case_number', $data) &&
+            array_key_exists('firstname', $data) &&
+            array_key_exists('lastname', $data) &&
+            array_key_exists('email', $data) &&
+            array_key_exists('reportcount', $data) &&
+            array_key_exists('ndrid', $data);
     }
 }

@@ -1,4 +1,16 @@
 services:
+  ClientRepository:
+    class: AppBundle\Entity\Client
+    factory: ["@doctrine.orm.entity_manager", getRepository]
+    arguments:
+    - AppBundle\Entity\Client
+
+  AppBundle\v2\Repository\ClientRepository:
+    class: AppBundle\v2\Repository\ClientRepository
+    arguments:
+    - '@doctrine.orm.entity_manager'
+    - '@UserRepository'
+
   UserRepository:
     class: AppBundle\Entity\User
     factory: ["@doctrine.orm.entity_manager", getRepository]
@@ -10,4 +22,5 @@ services:
     arguments:
       - '@doctrine.orm.entity_manager'
       - '@UserRepository'
+      - '@AppBundle\v2\Repository\ClientRepository'
       - '@AppBundle\v2\Assembler\DeputyAssembler'
