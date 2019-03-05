@@ -65,83 +65,11 @@ class DeputyDto implements \JsonSerializable
     }
 
     /**
-     * @param mixed $id
-     * @return DeputyDto
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @param mixed $firstName
-     * @return DeputyDto
-     */
-    public function setFirstName($firstName)
-    {
-        $this->firstName = $firstName;
-        return $this;
-    }
-
-    /**
-     * @param mixed $lastName
-     * @return DeputyDto
-     */
-    public function setLastName($lastName)
-    {
-        $this->lastName = $lastName;
-        return $this;
-    }
-
-    /**
-     * @param mixed $email
-     * @return DeputyDto
-     */
-    public function setEmail($email)
-    {
-        $this->email = $email;
-        return $this;
-    }
-
-    /**
-     * @param mixed $roleName
-     * @return DeputyDto
-     */
-    public function setRoleName($roleName)
-    {
-        $this->roleName = $roleName;
-        return $this;
-    }
-
-    /**
-     * @param mixed $postcode
-     * @return DeputyDto
-     */
-    public function setPostcode($postcode)
-    {
-        $this->postcode = $postcode;
-        return $this;
-    }
-
-    /**
-     * @param mixed $ndrEnabled
-     * @return DeputyDto
-     */
-    public function setNdrEnabled($ndrEnabled)
-    {
-        $this->ndrEnabled = $ndrEnabled;
-        return $this;
-    }
-
-    /**
      * @param mixed $clients
-     * @return DeputyDto
      */
     public function setClients($clients)
     {
         $this->clients = $clients;
-        return $this;
     }
 }
 
