@@ -29,9 +29,23 @@ class DeputyCostsEstimateReportUpdateHandler implements ReportUpdateHandlerInter
         $this
             ->updateHowCharged($report, $data)
             ->updateBreakdownEstimates($report, $data)
-            ->updateMoreInfo($report, $data);
+            ->updateMoreInfo($report, $data)
+            ->updateManagementCost($report, $data)
+        ;
 
         $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS_ESTIMATE]);
+    }
+
+    private function updateManagementCost(Report $report, array $data) {
+        if (array_key_exists('prof_deputy_management_cost_amount', $data)) {
+            $report->setProfDeputyManagementCostAmount($data['prof_deputy_management_cost_amount']);
+
+            $report->updateSectionsStatusCache([
+                Report::SECTION_PROF_DEPUTY_COSTS_ESTIMATE
+            ]);
+
+            $this->em->flush();
+        }
     }
 
     /**
