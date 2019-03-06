@@ -44,7 +44,8 @@ trait ReportProfDeputyCostsEstimateTrait
 
     /**
      * @var float
-     * @JMS\Groups({"prof-deputy-estimate-costs"})
+     * @JMS\Type("double")
+     * @JMS\Groups({"prof-deputy-estimate-management-costs"})
      * @ORM\Column(name="prof_dc_estimate_management_cost", type="float", precision=14, scale=2, nullable=true)
      */
     private $profDeputyCostsEstimateManagementCostAmount;
