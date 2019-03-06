@@ -39,13 +39,16 @@ class DeputyCostsEstimateReportUpdateHandlerTest extends TestCase
         $this->sut = new DeputyCostsEstimateReportUpdateHandler($this->em);
     }
 
-    public function testUpdatesHowCharged()
+    /** @dataProvider costEstimateDataProvider
+     * @param $field
+     * @param $data
+     * @param $expected
+     */
+    public function testUpdatesSingularFields($field, $data, $expected)
     {
-        $data['prof_deputy_costs_estimate_how_charged'] = 'new-value';
-
         $this->ensureSectionStatusCacheWillBeUpdated();
         $this->invokeHandler($data);
-        $this->assertReportFieldValueIsEqualTo('profDeputyCostsEstimateHowCharged', 'new-value');
+        $this->assertReportFieldValueIsEqualTo($field, $expected);
     }
 
     public function testResetsAssessedAnswersWhenFixedCostIsSet()
@@ -55,13 +58,15 @@ class DeputyCostsEstimateReportUpdateHandlerTest extends TestCase
         $this->report
             ->setProfDeputyCostsEstimateHasMoreInfo('yes')
             ->setProfDeputyCostsEstimateMoreInfoDetails('more info')
-            ->setProfDeputyEstimateCosts(new ArrayCollection([new ProfDeputyEstimateCost()]));
+            ->setProfDeputyEstimateCosts(new ArrayCollection([new ProfDeputyEstimateCost()]))
+            ->setProfDeputyCostsEstimateManagementCostAmount(100.00);
 
         $this->ensureSectionStatusCacheWillBeUpdated();
         $this->invokeHandler($data);
         $this->assertReportFieldValueIsEqualTo('profDeputyCostsEstimateHowCharged', 'fixed');
         $this->assertReportFieldValueIsEqualTo('profDeputyCostsEstimateHasMoreInfo', null);
         $this->assertReportFieldValueIsEqualTo('profDeputyCostsEstimateMoreInfoDetails', null);
+        $this->assertReportFieldValueIsEqualTo('profDeputyCostsEstimateManagementCostAmount', null);
         $this->assertTrue($this->report->getProfDeputyEstimateCosts()->isEmpty());
     }
 
@@ -227,5 +232,13 @@ class DeputyCostsEstimateReportUpdateHandlerTest extends TestCase
         $this->assertEquals('30.32', $profDeputyEstimateCost->getAmount());
         $this->assertEquals(false, $profDeputyEstimateCost->getHasMoreDetails());
         $this->assertEquals(null, $profDeputyEstimateCost->getMoreDetails());
+    }
+
+    public function costEstimateDataProvider()
+    {
+        return [
+            ['profDeputyCostsEstimateHowCharged', ['prof_deputy_costs_estimate_how_charged' => 'new-value'], 'new-value'],
+            ['profDeputyCostsEstimateManagementCostAmount', ['prof_deputy_management_cost_amount' => 100.00], 100.00],
+        ];
     }
 }

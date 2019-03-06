@@ -70,7 +70,8 @@ class DeputyCostsEstimateReportUpdateHandler implements ReportUpdateHandlerInter
 
             $report
                 ->setProfDeputyCostsEstimateHasMoreInfo(null)
-                ->setProfDeputyCostsEstimateMoreInfoDetails(null);
+                ->setProfDeputyCostsEstimateMoreInfoDetails(null)
+                ->setProfDeputyCostsEstimateManagementCostAmount(null);
 
             if (!$report->getProfDeputyEstimateCosts()->isEmpty()) {
                 foreach ($report->getProfDeputyEstimateCosts() as $profDeputyEstimateCost) {
