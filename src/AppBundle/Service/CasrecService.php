@@ -138,10 +138,8 @@ class CasrecService
         $it = $this->em->createQuery('SELECT c FROM ' . CasRec::class . ' c')->iterate();
 
         $f = fopen($filePathTmp, 'w');
-        // TEST converts every row in casrec table to CSV
         foreach ($it as $itRow) {
             $row = $itRow[0]->toArray();
-            // TEST adds header to CSV
             if ($it->key() === 0) { // write header (only for first row)
                 fputcsv($f, array_keys($row));
             }
@@ -151,14 +149,11 @@ class CasrecService
         fclose($f);
 
         // replace file instantly
-        // TEST removes existing file if exists
         if (file_exists($filePath)) {
             unlink($filePath);
         }
-        // TEST saves file
         rename($filePathTmp, $filePath);
 
-        // TEST return number of lines written
         return $linesWritten;
     }
 
@@ -184,23 +179,19 @@ class CasrecService
 
             foreach ($data as $dataIndex => $row) {
                 //  Create a CasRec entity from the data and add it to the array of entities
-                // TEST creates a new CasRec for each row in CSV.
                 $casRecEntities[] = $casRecEntity = new CasRec($row);
 
                 //  Validate the entity before adding it the entity manager to persist
                 $errors = $this->validator->validate($casRecEntity);
 
-                // TEST ignores CSV rows with invalid column values.
                 if (count($errors) > 0) {
                     $retErrors[] = 'ERROR IN LINE ' . ($dataIndex + 2) . ' :' . str_replace('Object(AppBundle\Entity\CasRec).', '', (string) $errors);
                     unset($casRecEntity);
                 } else {
                     $this->updateCasrecStatsSingle($casRecEntity);
 
-                    // TEST persists each CasRec before moving to next row in CSV.
                     $this->em->persist($casRecEntity);
 
-                    // TEST flushes in batches
                     if (($added++ % self::PERSIST_EVERY) === 0) {
                         $this->em->flush();
                         $this->em->clear();
@@ -212,18 +203,15 @@ class CasrecService
             $this->logger->notice(__METHOD__ . ': flushed');
 
             //  Before committing the CasRec entities use the report service to update any report types if necessary
-            // TEST updates Report types on any mismatches with existing Reports.
             $this->reportService->updateCurrentReportTypes($casRecEntities, User::ROLE_LAY_DEPUTY);
             $this->logger->notice(__METHOD__ . ': report types updated');
 
             $this->em->commit();
             $this->em->clear();
         } catch (\Exception $e) {
-            // TEST exceptions are caught and returned in array format.
             return ['added' => $added - 1, 'errors' => [$e->getMessage()]];
         }
 
-        // TEST returns array with added and errors counts.
         return ['added' => $added - 1, 'errors' => $retErrors];
     }
 

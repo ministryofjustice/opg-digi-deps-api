@@ -47,7 +47,6 @@ class CasRecController extends RestController
 
         $ret = $casrecService->addBulk($data);
 
-        // TEST writes casrec data to csv.
         $casrecService->saveCsv(EntityDir\CasRec::STATS_FILE_PATH);
 
         return $ret;

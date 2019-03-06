@@ -344,30 +344,4 @@ class CasrecServiceTest extends WebTestCase
         $this->assertEquals($expected['added'], $this->result['added']);
         $this->assertEquals($expected['errors'], count($this->result['errors']));
     }
-
-
-    public function testSaveCsvConvertsEachRowInCasrecTableToCsvFormat()
-    {
-
-    }
-
-    public function testSaveCsvAddsAcsvHeaderToFile()
-    {
-
-    }
-
-    public function testSaveCsvRemovesExistingFile()
-    {
-
-    }
-
-    public function testSaveCsvWritesFileToDirectory()
-    {
-
-    }
-
-    public function testSaveCsvReturnsNumberOfLinesWritten()
-    {
-
-    }
 }

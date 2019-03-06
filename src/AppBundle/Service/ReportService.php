@@ -147,7 +147,6 @@ class ReportService
         $casRecEntitiesWithKey = [];
 
         foreach ($casRecEntities as $CasRec) {
-            // TEST throws exception if given non CasRec data type
             if (!$CasRec instanceof CasRec) {
                 throw new \Exception('Invalid casrec entity encountered. AppBundle\Entity\CasRec expected');
             }
@@ -155,7 +154,6 @@ class ReportService
             $casRecEntitiesWithKey[$CasRec->getCaseNumber()] = $CasRec;
         }
 
-        // TEST updates all active Reports belonging to given cases if type not matching newly derived type.
         //  Create a case numbers string from the keys
         $caseNumbersString = '\'' . implode('\',\'', array_keys($casRecEntitiesWithKey)) . '\'';
 
@@ -184,7 +182,6 @@ class ReportService
             }
         }
 
-        // TEST flushes all Reports.
         $this->_em->flush();
     }
 

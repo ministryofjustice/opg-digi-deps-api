@@ -115,11 +115,6 @@ class CasRecControllerTest extends AbstractTestController
         $this->assertEquals(1, $ret['added'], print_r($ret, 1));
     }
 
-    public function testAddBulkWritesCasRecDataToCsv()
-    {
-
-    }
-
     public function testCount()
     {
         $url = '/casrec/count';
