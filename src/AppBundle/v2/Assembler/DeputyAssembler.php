@@ -9,6 +9,9 @@ class DeputyAssembler
     /** @var ClientAssembler  */
     private $clientDtoAssembler;
 
+    /** @var DeputyDto */
+    private $deputyDto;
+
     /**
      * @param ClientAssembler $clientDtoAssembler
      */
@@ -23,23 +26,24 @@ class DeputyAssembler
      */
     public function assembleFromArray(array $data)
     {
-        $this->throwExceptionIfMissingRequiredData($data);
-
-        $clients = $this->buildClientDtos($data['clients']);
-        $dto = $this->buildDeputyDto($data);
-        $dto->setClients($clients);
-
-        return $dto;
+        return $this
+            ->throwExceptionIfMissingRequiredData($data)
+            ->buildDeputyDtoFromArray($data)
+            ->buildAndAttachClientDtosFromArray($data['clients'])
+            ->getDeputyDto();
     }
 
     /**
      * @param array $data
+     * @return DeputyAssembler
      */
     private function throwExceptionIfMissingRequiredData(array $data)
     {
         if (!$this->dataIsValid($data)) {
             throw new \InvalidArgumentException(__CLASS__ . ': Missing all data required to build DTO');
         }
+
+        return $this;
     }
 
     /**
@@ -61,11 +65,11 @@ class DeputyAssembler
 
     /**
      * @param $deputy
-     * @return DeputyDto
+     * @return DeputyAssembler
      */
-    private function buildDeputyDto($deputy)
+    private function buildDeputyDtoFromArray($deputy)
     {
-        $dto = new DeputyDto(
+        $this->deputyDto = new DeputyDto(
             $deputy['id'],
             $deputy['firstname'],
             $deputy['lastname'],
@@ -74,17 +78,30 @@ class DeputyAssembler
             $deputy['address_postcode'],
             $deputy['odr_enabled']
         );
-        return $dto;
+
+        return $this;
     }
 
     /**
      * @param array $clients
-     * @return array
+     * @return DeputyAssembler
      */
-    private function buildClientDtos(array $clients)
+    private function buildAndAttachClientDtosFromArray(array $clients)
     {
-        return array_map(function ($client) {
+        $clients =  array_map(function ($client) {
             return $this->clientDtoAssembler->assembleFromArray($client);
         }, $clients);
+
+        $this->deputyDto->setClients($clients);
+
+        return $this;
+    }
+
+    /**
+     * @return DeputyDto
+     */
+    private function getDeputyDto()
+    {
+        return $this->deputyDto;
     }
 }

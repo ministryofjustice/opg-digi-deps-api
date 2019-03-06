@@ -73,8 +73,8 @@ class DeputyRepositoryTest extends KernelTestCase
 
         $this
             ->flushDatabase()
-            ->ensureClientsWillBeAttached($deputy->getId())
-            ->assertDeputyDtoWillBeReturned($deputy->getId())
+            ->ensureClientsWillBeAttachedToDeputy($deputy)
+            ->ensureDeputyAssemblerWillBuildDto($deputy)
             ->invokeRepositoryMethod('getDtoById', $deputy->getId())
             ->assertDeputyDtoIsReturned();
     }
@@ -86,34 +86,33 @@ class DeputyRepositoryTest extends KernelTestCase
     {
         $this->fixtures->flush();
 
-
         return $this;
     }
 
     /**
-     * @param $id
+     * @param User $deputy
      * @return $this
      */
-    private function ensureClientsWillBeAttached($id)
+    private function ensureClientsWillBeAttachedToDeputy(User $deputy)
     {
         $this
             ->clientRepository
             ->expects($this->once())
             ->method('getDtoDataArrayByDeputy')
-            ->with($id)
+            ->with($deputy->getId())
             ->willReturn([['Alpha' => 'Client']]);
 
         return $this;
     }
 
     /**
-     * @param $id
+     * @param User $deputy
      * @return $this
      */
-    private function assertDeputyDtoWillBeReturned($id)
+    private function ensureDeputyAssemblerWillBuildDto(User $deputy)
     {
         $this->expectedDto = new DeputyDto(
-            $id,
+            $deputy->getId(),
             'Deputy',
             'User',
             'deputy@test.com',
@@ -127,7 +126,7 @@ class DeputyRepositoryTest extends KernelTestCase
             ->expects($this->once())
             ->method('assembleFromArray')
             ->with([
-                'id' => $id,
+                'id' => $deputy->getId(),
                 'firstname' => 'Deputy',
                 'lastname' => 'User',
                 'email' => 'deputy@test.com',
