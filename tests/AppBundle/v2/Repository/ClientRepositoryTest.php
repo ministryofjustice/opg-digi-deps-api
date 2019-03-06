@@ -60,12 +60,10 @@ class ClientRepositoryTest extends KernelTestCase
     {
         $client = $this->createClientForDeputy($deputy, ['Alpha', 'Client', 'alpha@test.com', 'alphacasenum']);
 
-        $this
+        return $this
             ->createReportFor($client)
             ->createReportFor($client)
             ->createNdrFor($client);
-
-        return $this;
     }
 
     /**
@@ -76,10 +74,7 @@ class ClientRepositoryTest extends KernelTestCase
     {
         $client = $this->createClientForDeputy($deputy, ['Beta', 'Client', 'beta@test.com', 'betacasenum']);
 
-        $this
-            ->createNdrFor($client);
-
-        return $this;
+        return $this->createNdrFor($client);
     }
 
     /**
@@ -90,10 +85,7 @@ class ClientRepositoryTest extends KernelTestCase
     {
         $client = $this->createClientForDeputy($deputy, ['Charlie', 'Client', 'charlie@test.com', 'charliecasenum']);
 
-        $this
-            ->createReportFor($client);
-
-        return $this;
+        return $this->createReportFor($client);
     }
 
     /**
