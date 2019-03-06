@@ -51,6 +51,14 @@ class DeputyCostsEstimateReportUpdateHandlerTest extends TestCase
         $this->assertReportFieldValueIsEqualTo($field, $expected);
     }
 
+    public function costEstimateDataProvider()
+    {
+        return [
+            ['profDeputyCostsEstimateHowCharged', ['prof_deputy_costs_estimate_how_charged' => 'new-value'], 'new-value'],
+            ['profDeputyCostsEstimateManagementCostAmount', ['prof_deputy_management_cost_amount' => 100.00], 100.00],
+        ];
+    }
+
     public function testResetsAssessedAnswersWhenFixedCostIsSet()
     {
         $data['prof_deputy_costs_estimate_how_charged'] = 'fixed';
@@ -232,13 +240,5 @@ class DeputyCostsEstimateReportUpdateHandlerTest extends TestCase
         $this->assertEquals('30.32', $profDeputyEstimateCost->getAmount());
         $this->assertEquals(false, $profDeputyEstimateCost->getHasMoreDetails());
         $this->assertEquals(null, $profDeputyEstimateCost->getMoreDetails());
-    }
-
-    public function costEstimateDataProvider()
-    {
-        return [
-            ['profDeputyCostsEstimateHowCharged', ['prof_deputy_costs_estimate_how_charged' => 'new-value'], 'new-value'],
-            ['profDeputyCostsEstimateManagementCostAmount', ['prof_deputy_management_cost_amount' => 100.00], 100.00],
-        ];
     }
 }
