@@ -6,7 +6,7 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
- * CAdding general management costs to report table
+ * Adding general management costs to report table
  */
 class Version208 extends AbstractMigration
 {
@@ -17,7 +17,7 @@ class Version208 extends AbstractMigration
     {
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('ALTER TABLE report ADD prof_dc_estimate_management_cost DOUBLE PRECISION DEFAULT NULL');
+        $this->addSql('ALTER TABLE report ADD prof_dc_estimate_management_cost NUMERIC(14, 2) DEFAULT NULL');
     }
 
     /**

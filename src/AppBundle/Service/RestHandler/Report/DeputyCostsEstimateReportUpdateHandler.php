@@ -39,23 +39,6 @@ class DeputyCostsEstimateReportUpdateHandler implements ReportUpdateHandlerInter
     /**
      * @param Report $report
      * @param array $data
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    private function updateManagementCost(Report $report, array $data) {
-        if (array_key_exists('prof_deputy_management_cost_amount', $data)) {
-            $report->setProfDeputyCostsEstimateManagementCostAmount($data['prof_deputy_management_cost_amount']);
-
-            $report->updateSectionsStatusCache([
-                Report::SECTION_PROF_DEPUTY_COSTS_ESTIMATE
-            ]);
-
-            $this->em->flush();
-        }
-    }
-
-    /**
-     * @param Report $report
-     * @param array $data
      * @return $this
      * @throws \Doctrine\ORM\OptimisticLockException
      */
@@ -196,5 +179,17 @@ class DeputyCostsEstimateReportUpdateHandler implements ReportUpdateHandlerInter
         }
 
         return $this;
+    }
+
+    /**
+     * @param Report $report
+     * @param array $data
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function updateManagementCost(Report $report, array $data) {
+        if (array_key_exists('prof_deputy_management_cost_amount', $data)) {
+            $report->setProfDeputyCostsEstimateManagementCostAmount($data['prof_deputy_management_cost_amount']);
+            $this->em->flush();
+        }
     }
 }

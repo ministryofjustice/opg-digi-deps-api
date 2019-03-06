@@ -7,8 +7,6 @@ use AppBundle\Entity\Report\Report;
 interface ReportUpdateHandlerInterface
 {
     /**
-     * Handles form updates to persist changes throughout the flow.
-     *
      * @param Report $report
      * @param array $data
      * @return mixed
