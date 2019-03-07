@@ -55,10 +55,16 @@ class DeputyDto implements \JsonSerializable
      */
     private function serializeClients()
     {
+        if (empty($this->clients)) {
+            return [];
+        }
+
         $serializedClients = [];
 
         foreach ($this->clients as $client) {
-            $serializedClients[] = $client->jsonSerialize();
+            if ($client instanceof ClientDto) {
+                $serializedClients[] = $client->jsonSerialize();
+            }
         }
 
         return $serializedClients;
