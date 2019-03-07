@@ -358,7 +358,6 @@ trait ReportProfDeputyCostsTrait
 
         //TODO move to method
         $onlyFixedTicked = $this->getProfDeputyCostsHowChargedFixed()
-            && ! $this->getProfDeputyCostsHowChargedAgreed()
             && ! $this->getProfDeputyCostsHowChargedAssessed();
 
         // return null if data incomplete

@@ -462,7 +462,6 @@ class ReportController extends RestController
         // update depending data depending on the selection on the "how charged" checkboxes
         if (array_key_exists('prof_deputy_costs_how_charged_fixed', $data)
             || array_key_exists('prof_deputy_costs_how_charged_assessed', $data)
-            || array_key_exists('prof_deputy_costs_how_charged_agreed', $data)
         ) {
             if ($report->hasProfDeputyCostsHowChargedFixedOnly()) {
                 $report->setProfDeputyCostsHasInterim(null);
