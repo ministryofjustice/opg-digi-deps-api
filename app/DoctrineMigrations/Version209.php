@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 /**
  * Adding general management costs to report table
  */
-class Version208 extends AbstractMigration
+class Version209 extends AbstractMigration
 {
     /**
      * @param Schema $schema
