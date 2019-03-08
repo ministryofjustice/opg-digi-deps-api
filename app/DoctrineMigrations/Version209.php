@@ -6,19 +6,18 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Adding general management costs to report table
  */
-class Version208 extends AbstractMigration
+class Version209 extends AbstractMigration
 {
     /**
      * @param Schema $schema
      */
     public function up(Schema $schema)
     {
-        // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('ALTER TABLE report DROP prof_dc_hc_agreed');
+        $this->addSql('ALTER TABLE report ADD prof_dc_estimate_management_cost NUMERIC(14, 2) DEFAULT NULL');
     }
 
     /**
@@ -26,10 +25,8 @@ class Version208 extends AbstractMigration
      */
     public function down(Schema $schema)
     {
-        // this down() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() != 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('CREATE SCHEMA public');
-        $this->addSql('ALTER TABLE report ADD prof_dc_hc_agreed BOOLEAN DEFAULT NULL');
+        $this->addSql('ALTER TABLE report DROP prof_dc_estimate_management_cost');
     }
 }
