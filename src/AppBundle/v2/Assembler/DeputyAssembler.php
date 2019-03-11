@@ -9,9 +9,6 @@ class DeputyAssembler
     /** @var ClientAssembler  */
     private $clientDtoAssembler;
 
-    /** @var DeputyDto */
-    private $deputyDto;
-
     /**
      * @param ClientAssembler $clientDtoAssembler
      */
@@ -26,82 +23,55 @@ class DeputyAssembler
      */
     public function assembleFromArray(array $data)
     {
-        return $this
-            ->throwExceptionIfMissingRequiredData($data)
-            ->buildDeputyDtoFromArray($data)
-            ->buildAndAttachClientDtosFromArray($data['clients'])
-            ->getDeputyDto();
-    }
+        $dto = new DeputyDto();
 
-    /**
-     * @param array $data
-     * @return DeputyAssembler
-     */
-    private function throwExceptionIfMissingRequiredData(array $data)
-    {
-        if (!$this->dataIsValid($data)) {
-            throw new \InvalidArgumentException(__CLASS__ . ': Missing all data required to build DTO');
+        if (isset($data['id'])) {
+            $dto->setId($data['id']);
         }
 
-        return $this;
-    }
+        if (isset($data['firstname'])) {
+            $dto->setFirstName($data['firstname']);
+        }
 
-    /**
-     * @param array $data
-     * @return bool
-     */
-    private function dataIsValid(array $data)
-    {
-        return
-            array_key_exists('id', $data) &&
-            array_key_exists('firstname', $data) &&
-            array_key_exists('lastname', $data) &&
-            array_key_exists('email', $data) &&
-            array_key_exists('role_name', $data) &&
-            array_key_exists('address_postcode', $data) &&
-            array_key_exists('odr_enabled', $data) &&
-            array_key_exists('clients', $data);
-    }
+        if (isset($data['lastname'])) {
+            $dto->setLastName($data['lastname']);
+        }
 
-    /**
-     * @param $deputy
-     * @return DeputyAssembler
-     */
-    private function buildDeputyDtoFromArray($deputy)
-    {
-        $this->deputyDto = new DeputyDto(
-            $deputy['id'],
-            $deputy['firstname'],
-            $deputy['lastname'],
-            $deputy['email'],
-            $deputy['role_name'],
-            $deputy['address_postcode'],
-            $deputy['odr_enabled']
-        );
+        if (isset($data['email'])) {
+            $dto->setEmail($data['email']);
+        }
 
-        return $this;
+        if (isset($data['roleName'])) {
+            $dto->setRoleName($data['roleName']);
+        }
+
+        if (isset($data['addressPostcode'])) {
+            $dto->setPostcode($data['addressPostcode']);
+        }
+
+        if (isset($data['ndrEnabled'])) {
+            $dto->setNdrEnabled($data['ndrEnabled']);
+        }
+
+        if (isset($data['clients'])  && is_array($data['clients'])) {
+            $dto->setClients($this->assembleClientDtos($data['clients']));
+        }
+
+        return $dto;
     }
 
     /**
      * @param array $clients
-     * @return DeputyAssembler
+     * @return array
      */
-    private function buildAndAttachClientDtosFromArray(array $clients)
+    private function assembleClientDtos(array $clients)
     {
-        $clients =  array_map(function ($client) {
-            return $this->clientDtoAssembler->assembleFromArray($client);
-        }, $clients);
+        $dtos = [];
 
-        $this->deputyDto->setClients($clients);
+        foreach ($clients as $client) {
+            $dtos[] = $this->clientDtoAssembler->assembleFromArray($client);
+        }
 
-        return $this;
-    }
-
-    /**
-     * @return DeputyDto
-     */
-    private function getDeputyDto()
-    {
-        return $this->deputyDto;
+        return $dtos;
     }
 }

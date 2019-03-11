@@ -2,54 +2,34 @@
 
 namespace AppBundle\v2\DTO;
 
-class ClientDto implements \JsonSerializable
+class ClientDto
 {
+    /** @var int */
     private $id;
+
+    /** @var string */
     private $caseNumber;
+
+    /** @var string */
     private $firstName;
+
+    /** @var string */
     private $lastName;
+
+    /** @var string */
     private $email;
-    private $reportCount;
-    private $ndrId;
+
+    /** @var int */
+    private $reportCount = 0;
+
+    /** @var NdrDto */
+    private $ndr;
+
+    /** @var array */
+    private $reports;
 
     /**
-     * @param $id
-     * @param $caseNumber
-     * @param $firstName
-     * @param $lastName
-     * @param $email
-     * @param $reportCount
-     * @param $ndrId
-     */
-    public function __construct($id, $caseNumber, $firstName, $lastName, $email, $reportCount, $ndrId)
-    {
-        $this->id = $id;
-        $this->caseNumber = $caseNumber;
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->email = $email;
-        $this->reportCount = $reportCount;
-        $this->ndrId = $ndrId;
-    }
-
-    /**
-     * @return array|mixed
-     */
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->id,
-            'case_number' => $this->caseNumber,
-            'firstname' => $this->firstName,
-            'lastname' => $this->lastName,
-            'email' => $this->email,
-            'total_report_count' => $this->reportCount,
-            'ndrId' => $this->ndrId
-        ];
-    }
-
-    /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
@@ -57,7 +37,7 @@ class ClientDto implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getCaseNumber()
     {
@@ -65,7 +45,7 @@ class ClientDto implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getFirstName()
     {
@@ -73,7 +53,7 @@ class ClientDto implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getLastName()
     {
@@ -81,7 +61,7 @@ class ClientDto implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getEmail()
     {
@@ -89,7 +69,7 @@ class ClientDto implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getReportCount()
     {
@@ -97,10 +77,98 @@ class ClientDto implements \JsonSerializable
     }
 
     /**
-     * @return mixed
+     * @return NdrDto
      */
-    public function getNdrId()
+    public function getNdr()
     {
-        return $this->ndrId;
+        return $this->ndr;
+    }
+
+    /**
+     * @return array
+     */
+    public function getReports()
+    {
+        return $this->reports;
+    }
+
+    /**
+     * @param int $id
+     * @return ClientDto
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    /**
+     * @param string $caseNumber
+     * @return ClientDto
+     */
+    public function setCaseNumber($caseNumber)
+    {
+        $this->caseNumber = $caseNumber;
+        return $this;
+    }
+
+    /**
+     * @param string $firstName
+     * @return ClientDto
+     */
+    public function setFirstName($firstName)
+    {
+        $this->firstName = $firstName;
+        return $this;
+    }
+
+    /**
+     * @param string $lastName
+     * @return ClientDto
+     */
+    public function setLastName($lastName)
+    {
+        $this->lastName = $lastName;
+        return $this;
+    }
+
+    /**
+     * @param string $email
+     * @return ClientDto
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @param int $reportCount
+     * @return ClientDto
+     */
+    public function setReportCount($reportCount)
+    {
+        $this->reportCount = $reportCount;
+        return $this;
+    }
+
+    /**
+     * @param NdrDto $ndr
+     * @return ClientDto
+     */
+    public function setNdr(NdrDto $ndr)
+    {
+        $this->ndr = $ndr;
+        return $this;
+    }
+
+    /**
+     * @param array $reports
+     * @return ClientDto
+     */
+    public function setReports(array $reports)
+    {
+        $this->reports = $reports;
+        return $this;
     }
 }
