@@ -51,12 +51,16 @@ class ClientAssembler
             $dto->setEmail($data['email']);
         }
 
+        if (isset($data['archivedAt'])) {
+            $dto->setArchivedAt($data['archivedAt']);
+        }
+
         if (isset($data['ndr']) && is_array($data['ndr'])) {
-            $dto->setNdr($this->assembleNdrDto($data['ndr']));
+            $dto->setNdr($this->assembleClientNdr($data['ndr']));
         }
 
         if (isset($data['reports'])  && is_array($data['reports'])) {
-            $dto->setReports($this->assembleReportDtos($data['reports']));
+            $dto->setReports($this->assembleClientReports($data['reports']));
             $dto->setReportCount(count($data['reports']));
         }
 
@@ -67,7 +71,7 @@ class ClientAssembler
      * @param array $reports
      * @return array
      */
-    private function assembleReportDtos(array $reports)
+    private function assembleClientReports(array $reports)
     {
         $dtos = [];
 
@@ -82,7 +86,7 @@ class ClientAssembler
      * @param array $ndr
      * @return
      */
-    private function assembleNdrDto(array $ndr)
+    private function assembleClientNdr(array $ndr)
     {
         return $this->ndrDtoAssembler->assembleFromArray($ndr);
     }

@@ -50,7 +50,6 @@ class DeputyController
             throw new NotFoundHttpException(sprintf('Deputy id %s not found', $id));
         }
 
-
         $dto = $this->assembler->assembleFromArray($data);
         $transformedDto = $this->transformer->transform($dto);
 

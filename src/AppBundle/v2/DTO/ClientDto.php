@@ -19,6 +19,9 @@ class ClientDto
     /** @var string */
     private $email;
 
+    /** @var \DateTime */
+    private $archivedAt;
+
     /** @var int */
     private $reportCount = 0;
 
@@ -66,6 +69,14 @@ class ClientDto
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getArchivedAt()
+    {
+        return $this->archivedAt;
     }
 
     /**
@@ -139,6 +150,16 @@ class ClientDto
     public function setEmail($email)
     {
         $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @param \DateTime $archivedAt
+     * @return ClientDto
+     */
+    public function setArchivedAt($archivedAt)
+    {
+        $this->archivedAt = $archivedAt;
         return $this;
     }
 

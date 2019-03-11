@@ -54,7 +54,7 @@ class DeputyAssembler
         }
 
         if (isset($data['clients'])  && is_array($data['clients'])) {
-            $dto->setClients($this->assembleClientDtos($data['clients']));
+            $dto->setClients($this->assembleDeputyClients($data['clients']));
         }
 
         return $dto;
@@ -64,7 +64,7 @@ class DeputyAssembler
      * @param array $clients
      * @return array
      */
-    private function assembleClientDtos(array $clients)
+    private function assembleDeputyClients(array $clients)
     {
         $dtos = [];
 

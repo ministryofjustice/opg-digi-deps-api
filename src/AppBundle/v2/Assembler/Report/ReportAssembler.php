@@ -42,8 +42,6 @@ class ReportAssembler implements ReportAssemblerInterface
             $dto->setEndDate($data['endDate']);
         }
 
-        $dto->setAvailableSections(['profCurrentFees']);
-
         return $dto;
     }
 }

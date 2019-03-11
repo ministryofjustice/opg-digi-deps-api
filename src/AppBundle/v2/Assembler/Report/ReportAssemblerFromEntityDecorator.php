@@ -49,7 +49,7 @@ class ReportAssemblerFromEntityDecorator implements ReportAssemblerInterface
             return $reportDto;
         }
 
-        $reportDto->setStatus( $this->assembleStatusDto($reportEntity));
+        $reportDto->setStatus( $this->assembleReportStatus($reportEntity));
         $reportDto->setAvailableSections($reportEntity->getAvailableSections());
 
         return $reportDto;
@@ -59,7 +59,7 @@ class ReportAssemblerFromEntityDecorator implements ReportAssemblerInterface
      * @param Report $report
      * @return StatusDto
      */
-    public function assembleStatusDto(Report $report)
+    public function assembleReportStatus(Report $report)
     {
         return $this->statusDtoAssembler->assembleFromReport($report);
     }

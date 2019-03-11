@@ -38,6 +38,7 @@ class ClientTransformer
             'firstname' => $dto->getFirstName(),
             'lastname' => $dto->getLastName(),
             'email' => $dto->getEmail(),
+            'archived_at' => $dto->getArchivedAt()->format('Y-m-d\TH:i:sP'),
             'total_report_count' => $dto->getReportCount()
         ];
 
