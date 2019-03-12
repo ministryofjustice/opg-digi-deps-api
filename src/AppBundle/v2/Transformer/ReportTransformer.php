@@ -27,11 +27,11 @@ class ReportTransformer
         $transformed = [
             'id' => $dto->getId(),
             'submitted' => $dto->getSubmitted(),
-            'due_date' => $this->transformDate($dto, 'dueDate'),
-            'submit_date' => $this->transformDate($dto, 'submitDate'),
-            'un_submit_date' => $this->transformDate($dto, 'unSubmitDate'),
-            'start_date' => $this->transformDate($dto, 'startDate'),
-            'end_date' => $this->transformDate($dto, 'endDate')
+            'due_date' => $this->transformDate($dto, 'dueDate', 'Y-m-d'),
+            'submit_date' => $this->transformDate($dto, 'submitDate', 'Y-m-d\TH:i:sP'),
+            'un_submit_date' => $this->transformDate($dto, 'unSubmitDate', 'Y-m-d'),
+            'start_date' => $this->transformDate($dto, 'startDate', 'Y-m-d'),
+            'end_date' => $this->transformDate($dto, 'endDate', 'Y-m-d')
         ];
 
         if (null !== $dto->getAvailableSections()) {
@@ -50,10 +50,10 @@ class ReportTransformer
      * @param $property
      * @return null
      */
-    private function transformDate(ReportDto $dto, $property)
+    private function transformDate(ReportDto $dto, $property, $format)
     {
         $getter = sprintf('get%s', ucfirst($property));
 
-        return $dto->{$getter}() instanceof \DateTime ? $dto->{$getter}()->format('Y-m-d\TH:i:sP') : null;
+        return $dto->{$getter}() instanceof \DateTime ? $dto->{$getter}()->format($format) : null;
     }
 }

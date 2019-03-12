@@ -38,7 +38,7 @@ class ClientTransformer
             'firstname' => $dto->getFirstName(),
             'lastname' => $dto->getLastName(),
             'email' => $dto->getEmail(),
-            'archived_at' => $dto->getArchivedAt()->format('Y-m-d\TH:i:sP'),
+            'archived_at' => $this->transformArchivedAt($dto),
             'total_report_count' => $dto->getReportCount()
         ];
 
@@ -51,6 +51,15 @@ class ClientTransformer
         }
 
         return $transformed;
+    }
+
+    /**
+     * @param ClientDto $dto
+     * @return null|string
+     */
+    private function transformArchivedAt(ClientDto $dto)
+    {
+        return $dto->getArchivedAt() instanceof \DateTime ? $dto->getArchivedAt()->format('Y-m-d\TH:i:sP') : null;
     }
 
     /**
