@@ -17,7 +17,7 @@ class ReportDto
     private $submitDate;
 
     /** @var \DateTime */
-    private $unsubmitDate;
+    private $unSubmitDate;
 
     /** @var \DateTime */
     private $startDate;
@@ -66,9 +66,9 @@ class ReportDto
     /**
      * @return \DateTime
      */
-    public function getUnsubmitDate()
+    public function getUnSubmitDate()
     {
-        return $this->unsubmitDate;
+        return $this->unSubmitDate;
     }
 
     /**
@@ -144,12 +144,12 @@ class ReportDto
     }
 
     /**
-     * @param \DateTime $unsubmitDate
+     * @param \DateTime $unSubmitDate
      * @return ReportDto
      */
-    public function setUnsubmitDate(\DateTime $unsubmitDate)
+    public function setUnSubmitDate(\DateTime $unSubmitDate)
     {
-        $this->unsubmitDate = $unsubmitDate;
+        $this->unSubmitDate = $unSubmitDate;
         return $this;
     }
 

@@ -20,7 +20,7 @@ class DeputyDto
     private $roleName;
 
     /** @var string */
-    private $postcode;
+    private $addressPostcode;
 
     /** @var bool */
     private $ndrEnabled;
@@ -71,9 +71,9 @@ class DeputyDto
     /**
      * @return string
      */
-    public function getPostcode()
+    public function getAddressPostcode()
     {
-        return $this->postcode;
+        return $this->addressPostcode;
     }
 
     /**
@@ -143,12 +143,12 @@ class DeputyDto
     }
 
     /**
-     * @param string $postcode
+     * @param string $addressPostcode
      * @return DeputyDto
      */
-    public function setPostcode($postcode)
+    public function setAddressPostcode($addressPostcode)
     {
-        $this->postcode = $postcode;
+        $this->addressPostcode = $addressPostcode;
         return $this;
     }
 

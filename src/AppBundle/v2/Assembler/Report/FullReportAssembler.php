@@ -7,10 +7,10 @@ use AppBundle\Entity\Repository\ReportRepository;
 use AppBundle\v2\Assembler\StatusAssembler;
 use AppBundle\v2\DTO\StatusDto;
 
-class ReportAssemblerFromEntityDecorator implements ReportAssemblerInterface
+class FullReportAssembler implements ReportAssemblerInterface
 {
     /** @var ReportAssemblerInterface  */
-    private $decorated;
+    private $reportSummaryAssembler;
 
     /** @var StatusAssembler  */
     private $statusDtoAssembler;
@@ -19,16 +19,16 @@ class ReportAssemblerFromEntityDecorator implements ReportAssemblerInterface
     private $reportRepository;
 
     /**
-     * @param ReportAssemblerInterface $decorated
+     * @param ReportAssemblerInterface $reportSummaryAssembler
      * @param StatusAssembler $statusDtoAssembler
      * @param ReportRepository $reportRepository
      */
     public function __construct(
-        ReportAssemblerInterface $decorated,
+        ReportAssemblerInterface $reportSummaryAssembler,
         StatusAssembler $statusDtoAssembler,
         ReportRepository $reportRepository
     ) {
-        $this->decorated = $decorated;
+        $this->reportSummaryAssembler = $reportSummaryAssembler;
         $this->statusDtoAssembler = $statusDtoAssembler;
         $this->reportRepository = $reportRepository;
     }
@@ -39,7 +39,7 @@ class ReportAssemblerFromEntityDecorator implements ReportAssemblerInterface
      */
     public function assembleFromArray(array $data)
     {
-        $reportDto = $this->decorated->assembleFromArray($data);
+        $reportDto = $this->reportSummaryAssembler->assembleFromArray($data);
 
         if (null === $reportDto->getId()) {
             return $reportDto;

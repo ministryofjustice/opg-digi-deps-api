@@ -3,9 +3,12 @@
 namespace AppBundle\v2\Assembler;
 
 use AppBundle\v2\DTO\DeputyDto;
+use AppBundle\v2\DTO\DtoPropertySetterTrait;
 
 class DeputyAssembler
 {
+    use DtoPropertySetterTrait;
+
     /** @var ClientAssembler  */
     private $clientDtoAssembler;
 
@@ -25,33 +28,7 @@ class DeputyAssembler
     {
         $dto = new DeputyDto();
 
-        if (isset($data['id'])) {
-            $dto->setId($data['id']);
-        }
-
-        if (isset($data['firstname'])) {
-            $dto->setFirstName($data['firstname']);
-        }
-
-        if (isset($data['lastname'])) {
-            $dto->setLastName($data['lastname']);
-        }
-
-        if (isset($data['email'])) {
-            $dto->setEmail($data['email']);
-        }
-
-        if (isset($data['roleName'])) {
-            $dto->setRoleName($data['roleName']);
-        }
-
-        if (isset($data['addressPostcode'])) {
-            $dto->setPostcode($data['addressPostcode']);
-        }
-
-        if (isset($data['ndrEnabled'])) {
-            $dto->setNdrEnabled($data['ndrEnabled']);
-        }
+        $this->setPropertiesFromData($dto, $data);
 
         if (isset($data['clients'])  && is_array($data['clients'])) {
             $dto->setClients($this->assembleDeputyClients($data['clients']));

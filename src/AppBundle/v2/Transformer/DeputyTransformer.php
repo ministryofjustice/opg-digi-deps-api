@@ -31,7 +31,7 @@ class DeputyTransformer
             'lastname' => $dto->getLastName(),
             'email' => $dto->getEmail(),
             'role_name' => $dto->getRoleName(),
-            'address_postcode' => $dto->getPostcode(),
+            'address_postcode' => $dto->getAddressPostcode(),
             'ndr_enabled' => $dto->getNdrEnabled()
         ];
 

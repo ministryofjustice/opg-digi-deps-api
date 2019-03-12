@@ -1,21 +1,21 @@
 <?php
 
-namespace AppBundle\v2\Assembler;
+namespace AppBundle\v2\Assembler\Report;
 
 use AppBundle\v2\DTO\DtoPropertySetterTrait;
-use AppBundle\v2\DTO\NdrDto;
+use AppBundle\v2\DTO\ReportDto;
 
-class NdrAssembler
+class ReportSummaryAssembler implements ReportAssemblerInterface
 {
     use DtoPropertySetterTrait;
 
     /**
      * @param array $data
-     * @return NdrDto
+     * @return ReportDto
      */
     public function assembleFromArray(array $data)
     {
-        $dto = new NdrDto();
+        $dto = new ReportDto();
 
         $this->setPropertiesFromData($dto, $data);
 

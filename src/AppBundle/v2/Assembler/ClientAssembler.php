@@ -4,9 +4,12 @@ namespace AppBundle\v2\Assembler;
 
 use AppBundle\v2\Assembler\Report\ReportAssemblerInterface;
 use AppBundle\v2\DTO\ClientDto;
+use AppBundle\v2\DTO\DtoPropertySetterTrait;
 
 class ClientAssembler
 {
+    use DtoPropertySetterTrait;
+
     /** @var ReportAssemblerInterface  */
     private $reportDtoAssembler;
 
@@ -31,29 +34,8 @@ class ClientAssembler
     {
         $dto = new ClientDto();
 
-        if (isset($data['id'])) {
-            $dto->setId($data['id']);
-        }
-
-        if (isset($data['caseNumber'])) {
-            $dto->setCaseNumber($data['caseNumber']);
-        }
-
-        if (isset($data['firstname'])) {
-            $dto->setFirstName($data['firstname']);
-        }
-
-        if (isset($data['lastname'])) {
-            $dto->setLastName($data['lastname']);
-        }
-
-        if (isset($data['email'])) {
-            $dto->setEmail($data['email']);
-        }
-
-        if (isset($data['archivedAt'])) {
-            $dto->setArchivedAt($data['archivedAt']);
-        }
+        $exclude = ['ndr', 'reports'];
+        $this->setPropertiesFromData($dto, $data, $exclude);
 
         if (isset($data['ndr']) && is_array($data['ndr'])) {
             $dto->setNdr($this->assembleClientNdr($data['ndr']));

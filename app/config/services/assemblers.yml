@@ -7,26 +7,26 @@ services:
   AppBundle\v2\Assembler\NdrAssembler:
     class: AppBundle\v2\Assembler\NdrAssembler
 
-  AppBundle\v2\Assembler\Report\ReportAssembler:
-    class: AppBundle\v2\Assembler\Report\ReportAssembler
+  AppBundle\v2\Assembler\Report\ReportSummaryAssembler:
+    class: AppBundle\v2\Assembler\Report\ReportSummaryAssembler
 
-  AppBundle\v2\Assembler\Report\ReportAssemblerFromEntityDecorator:
-    class: AppBundle\v2\Assembler\Report\ReportAssemblerFromEntityDecorator
+  AppBundle\v2\Assembler\Report\FullReportAssembler:
+    class: AppBundle\v2\Assembler\Report\FullReportAssembler
     arguments:
-      - '@AppBundle\v2\Assembler\Report\ReportAssembler'
+      - '@AppBundle\v2\Assembler\Report\ReportSummaryAssembler'
       - '@AppBundle\v2\Assembler\StatusAssembler'
       - '@AppBundle\Entity\Repository\ReportRepository'
 
   AppBundle\v2\Assembler\ClientAssembler:
     class: AppBundle\v2\Assembler\ClientAssembler
     arguments:
-      - '@AppBundle\v2\Assembler\Report\ReportAssembler'
+      - '@AppBundle\v2\Assembler\Report\ReportSummaryAssembler'
       - '@AppBundle\v2\Assembler\NdrAssembler'
 
   ClientAssemblerFromReportEntity:
     class: AppBundle\v2\Assembler\ClientAssembler
     arguments:
-      - '@AppBundle\v2\Assembler\Report\ReportAssemblerFromEntityDecorator'
+      - '@AppBundle\v2\Assembler\Report\FullReportAssembler'
       - '@AppBundle\v2\Assembler\NdrAssembler'
 
   AppBundle\v2\Assembler\DeputyAssembler:

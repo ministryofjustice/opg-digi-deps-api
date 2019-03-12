@@ -59,7 +59,7 @@ class ClientTransformer
      */
     private function transformArchivedAt(ClientDto $dto)
     {
-        return $dto->getArchivedAt() instanceof \DateTime ? $dto->getArchivedAt()->format('Y-m-d\TH:i:sP') : null;
+        return $dto->getArchivedAt() instanceof \DateTime ? $dto->getArchivedAt()->format('Y-m-d H:i:s') : null;
     }
 
     /**
