@@ -2,6 +2,7 @@
 
 namespace AppBundle\Entity\Report\Traits;
 
+use AppBundle\Entity\Report\ProfDeputyEstimateCost;
 use AppBundle\Entity\Report\ProfDeputyOtherCost;
 use AppBundle\Entity\Report\ProfDeputyInterimCost;
 use JMS\Serializer\Annotation as JMS;
@@ -24,14 +25,6 @@ trait ReportProfDeputyCostsTrait
      * @ORM\Column(name="prof_dc_hc_assessed", type="boolean", nullable=true)
      */
     private $profDeputyCostsHowChargedAssessed;
-
-    /**
-     * @JMS\Type("boolean")
-     * @JMS\Groups({"prof-deputy-costs-how-charged"})
-     * @ORM\Column(name="prof_dc_hc_agreed", type="boolean", nullable=true)
-     */
-    private $profDeputyCostsHowChargedAgreed;
-
 
     /**
      * @var string yes/no
@@ -176,24 +169,6 @@ trait ReportProfDeputyCostsTrait
     public function setProfDeputyCostsHowChargedAssessed($profDeputyCostsHowChargedAssessed)
     {
         $this->profDeputyCostsHowChargedAssessed = $profDeputyCostsHowChargedAssessed;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getProfDeputyCostsHowChargedAgreed()
-    {
-        return $this->profDeputyCostsHowChargedAgreed;
-    }
-
-    /**
-     * @param string $profDeputyCostsHowChargedAgreed
-     * @return ReportProfDeputyCostsTrait
-     */
-    public function setProfDeputyCostsHowChargedAgreed($profDeputyCostsHowChargedAgreed)
-    {
-        $this->profDeputyCostsHowChargedAgreed = $profDeputyCostsHowChargedAgreed;
         return $this;
     }
 
@@ -383,7 +358,6 @@ trait ReportProfDeputyCostsTrait
 
         //TODO move to method
         $onlyFixedTicked = $this->getProfDeputyCostsHowChargedFixed()
-            && ! $this->getProfDeputyCostsHowChargedAgreed()
             && ! $this->getProfDeputyCostsHowChargedAssessed();
 
         // return null if data incomplete
@@ -417,12 +391,27 @@ trait ReportProfDeputyCostsTrait
     }
 
     /**
+     * @return float
+     * @JMS\VirtualProperty()
+     * @JMS\Groups({"report-prof-deputy-costs"})
+     */
+    public function getProfDeputyTotalCostsTakenFromClient()
+    {
+        $total = $this->getProfDeputyTotalCosts();
+
+        foreach ($this->getProfDeputyPreviousCosts() as $previousCost) {
+            $total -= (float) $previousCost->getAmount();
+        }
+
+        return $total;
+    }
+
+    /**
      * @return boolean
      */
     public function hasProfDeputyCostsHowChargedFixedOnly()
     {
         return $this->profDeputyCostsHowChargedFixed
-            && !$this->profDeputyCostsHowChargedAssessed
-            && !$this->profDeputyCostsHowChargedAgreed;
+            && !$this->profDeputyCostsHowChargedAssessed;
     }
 }
