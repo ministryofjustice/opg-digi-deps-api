@@ -6,6 +6,7 @@ use AppBundle\Controller\RestController;
 use AppBundle\Entity as EntityDir;
 use AppBundle\Entity\Report\Report;
 use AppBundle\Service\ReportService;
+use AppBundle\Service\RestHandler\Report\DeputyCostsEstimateReportUpdateHandler;
 use Doctrine\ORM\AbstractQuery;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -18,6 +19,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends RestController
 {
+    /** @var array */
+    private $updateHandlers;
+
+    /**
+     * @param array $updateHandlers
+     */
+    public function __construct(array $updateHandlers)
+    {
+        $this->updateHandlers = $updateHandlers;
+    }
+
     /**
      * Add a report
      * Currently only used by Lay deputy during registration steps
@@ -447,15 +459,9 @@ class ReportController extends RestController
             $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
         }
 
-        if (array_key_exists('prof_deputy_costs_how_charged_agreed', $data)) {
-            $report->setProfDeputyCostsHowChargedAgreed($data['prof_deputy_costs_how_charged_agreed']);
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
         // update depending data depending on the selection on the "how charged" checkboxes
         if (array_key_exists('prof_deputy_costs_how_charged_fixed', $data)
             || array_key_exists('prof_deputy_costs_how_charged_assessed', $data)
-            || array_key_exists('prof_deputy_costs_how_charged_agreed', $data)
         ) {
             if ($report->hasProfDeputyCostsHowChargedFixedOnly()) {
                 $report->setProfDeputyCostsHasInterim(null);
@@ -523,6 +529,10 @@ class ReportController extends RestController
         if (array_key_exists('prof_deputy_costs_reason_beyond_estimate', $data)) {
             $report->setProfDeputyCostsReasonBeyondEstimate($data['prof_deputy_costs_reason_beyond_estimate']);
             $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
+        }
+
+        foreach ($this->updateHandlers as $updateHandler) {
+            $updateHandler->handle($report, $data);
         }
 
         $this->getEntityManager()->flush();
@@ -795,6 +805,10 @@ class ReportController extends RestController
             'future_significant_decisions' => 'setFutureSignificantDecisions',
             'has_deputy_raised_concerns' => 'setHasDeputyRaisedConcerns',
             'case_worker_satisified' => 'setCaseWorkerSatisified',
+            'payments_match_cost_certificate' => 'setPaymentsMatchCostCertificate',
+            'prof_costs_reasonable_and_proportionate' => 'setProfCostsReasonableAndProportionate',
+            'has_deputy_overcharged_from_previous_estimates' => 'setHasDeputyOverchargedFromPreviousEstimates',
+            'next_billing_estimates_satisfactory' => 'setNextBillingEstimatesSatisfactory',
             'lodging_summary' => 'setLodgingSummary',
             'final_decision' => 'setFinalDecision',
             'button_clicked' => 'setButtonClicked'
