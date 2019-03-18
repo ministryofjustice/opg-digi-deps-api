@@ -5,7 +5,9 @@ namespace AppBundle\Command;
 use AppBundle\Entity\CasRec;
 use AppBundle\Entity\Client;
 use AppBundle\Entity\Ndr\Ndr;
+use AppBundle\Entity\Report\Report;
 use AppBundle\Entity\Role;
+use AppBundle\Entity\Team;
 use AppBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -62,6 +64,7 @@ class AddSingleUserCommand extends ContainerAwareCommand
     {
         $em = $this->getContainer()->get('em'); /* @var $em \Doctrine\ORM\EntityManager */
         $userRepo = $em->getRepository('AppBundle\Entity\User');
+        $teamRepo = $em->getRepository('AppBundle\Entity\Team');
         $email = $data['email'];
 
         $output->write("User $email: ");
@@ -139,6 +142,32 @@ class AddSingleUserCommand extends ContainerAwareCommand
             }
         }
 
+        /**
+         * Prof/PA team members:
+         * Assign to team (creating team if necessary)
+        */
+        if (isset($data['teamName'])) {
+            $team = $teamRepo->findOneBy(['teamName' => $data['teamName']]);
+
+            if (!$team) {
+                $team = new Team($data['teamName']);
+                $em->persist($team);
+            }
+
+            $user->addTeam($team);
+        }
+
+        /**
+         * Create report
+         */
+        if (in_array($user->getRoleName(), [User::ROLE_PROF_NAMED, User::ROLE_PA_NAMED])) {
+            $type = CasRec::getTypeBasedOnTypeofRepAndCorref($data['typeOfReport'], $data['corref'], $user->getRoleName());
+            $startDate = \DateTime::createFromFormat('d/m/Y', '01/11/2018');
+            $endDate = \DateTime::createFromFormat('d/m/Y', '01/11/2019');
+
+            $report = new Report($client, $type, $startDate, $endDate);
+            $em->persist($report);
+        }
 
         if ($options['flush']) {
             $em->flush();
