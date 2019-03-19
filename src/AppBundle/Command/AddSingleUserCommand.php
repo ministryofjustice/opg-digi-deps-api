@@ -165,15 +165,17 @@ class AddSingleUserCommand extends ContainerAwareCommand
         /**
          * Create report
          */
-        if (in_array($user->getRoleName(), [User::ROLE_PROF_NAMED, User::ROLE_PROF_ADMIN, User::ROLE_PA_NAMED, User::ROLE_PA_ADMIN])) {
-            if (in_array($user->getRoleName(), [User::ROLE_PROF_NAMED, User::ROLE_PA_NAMED])) {
+        $hierarchy = $this->getContainer()->getParameter('security.role_hierarchy.roles');
+        $roles = isset($hierarchy[$user->getRoleName()]) ? $hierarchy[$user->getRoleName()] : [$user->getRoleName()];
+        if ((in_array(User::ROLE_PROF, $roles) || in_array(User::ROLE_PA, $roles)) && isset($data['typeOfReport'])) {
+            try {
                 $type = CasRec::getTypeBasedOnTypeofRepAndCorref($data['typeOfReport'], $data['corref'], $user->getRoleName());
-            } else if ($user->getRoleName() === User::ROLE_PROF_ADMIN) {
-                $type = $data['typeOfReport'] === 'OPG102' ? Report::TYPE_102_5 : Report::TYPE_103_5;
-            } else if ($user->getRoleName() === User::ROLE_PA_ADMIN) {
-                $type = $data['typeOfReport'] === 'OPG102' ? Report::TYPE_102_6 : Report::TYPE_103_6;
-            } else {
-                throw new \RuntimeException('Could not determine report type');
+            } catch (\Exception $e) {
+                if (in_array(User::ROLE_PROF, $roles)) {
+                    $type = $data['typeOfReport'] === 'OPG102' ? Report::TYPE_102_5 : Report::TYPE_103_5;
+                } else if (in_array(User::ROLE_PA, $roles)) {
+                    $type = $data['typeOfReport'] === 'OPG102' ? Report::TYPE_102_6 : Report::TYPE_103_6;
+                }
             }
 
             $startDate = $client->getExpectedReportStartDate();
