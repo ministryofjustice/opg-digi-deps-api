@@ -176,8 +176,8 @@ class AddSingleUserCommand extends ContainerAwareCommand
                 throw new \RuntimeException('Could not determine report type');
             }
 
-            $startDate = \DateTime::createFromFormat('d/m/Y', '01/11/2018');
-            $endDate = \DateTime::createFromFormat('d/m/Y', '01/11/2019');
+            $startDate = $client->getExpectedReportStartDate();
+            $endDate = $client->getExpectedReportEndDate();
 
             $report = new Report($client, $type, $startDate, $endDate);
             $em->persist($report);
