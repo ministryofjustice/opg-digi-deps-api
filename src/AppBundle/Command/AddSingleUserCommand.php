@@ -160,8 +160,17 @@ class AddSingleUserCommand extends ContainerAwareCommand
         /**
          * Create report
          */
-        if (in_array($user->getRoleName(), [User::ROLE_PROF_NAMED, User::ROLE_PA_NAMED])) {
-            $type = CasRec::getTypeBasedOnTypeofRepAndCorref($data['typeOfReport'], $data['corref'], $user->getRoleName());
+        if (in_array($user->getRoleName(), [User::ROLE_PROF_NAMED, User::ROLE_PROF_ADMIN, User::ROLE_PA_NAMED, User::ROLE_PA_ADMIN])) {
+            if (in_array($user->getRoleName(), [User::ROLE_PROF_NAMED, User::ROLE_PA_NAMED])) {
+                $type = CasRec::getTypeBasedOnTypeofRepAndCorref($data['typeOfReport'], $data['corref'], $user->getRoleName());
+            } else if ($user->getRoleName() === User::ROLE_PROF_ADMIN) {
+                $type = $data['typeOfReport'] === 'OPG102' ? Report::TYPE_102_5 : Report::TYPE_103_5;
+            } else if ($user->getRoleName() === User::ROLE_PA_ADMIN) {
+                $type = $data['typeOfReport'] === 'OPG102' ? Report::TYPE_102_6 : Report::TYPE_103_6;
+            } else {
+                throw new \RuntimeException('Could not determine report type');
+            }
+
             $startDate = \DateTime::createFromFormat('d/m/Y', '01/11/2018');
             $endDate = \DateTime::createFromFormat('d/m/Y', '01/11/2019');
 
