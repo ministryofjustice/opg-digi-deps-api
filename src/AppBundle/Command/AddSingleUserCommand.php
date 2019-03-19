@@ -65,6 +65,7 @@ class AddSingleUserCommand extends ContainerAwareCommand
         $em = $this->getContainer()->get('em'); /* @var $em \Doctrine\ORM\EntityManager */
         $userRepo = $em->getRepository('AppBundle\Entity\User');
         $teamRepo = $em->getRepository('AppBundle\Entity\Team');
+        $clientRepo = $em->getRepository('AppBundle\Entity\Client');
         $email = $data['email'];
 
         $output->write("User $email: ");
@@ -119,7 +120,7 @@ class AddSingleUserCommand extends ContainerAwareCommand
          * Deputy user::
          * Add CASREC entry + Client
          */
-        if (!in_array($data['roleName'], [User::ROLE_ADMIN, User::ROLE_AD, User::ROLE_CASE_MANAGER])) {
+        if (!in_array($data['roleName'], [User::ROLE_ADMIN, User::ROLE_AD, User::ROLE_CASE_MANAGER]) && isset($data['clientSurname'])) {
             $casRecEntity = $casRecEntity = new CasRec($this->extractDataToRow($data));
             $em->persist($casRecEntity);
 
@@ -140,6 +141,10 @@ class AddSingleUserCommand extends ContainerAwareCommand
                 $ndr = new Ndr($client);
                 $em->persist($ndr);
             }
+        } else if (isset($data['caseNumber'])) {
+            // If client already exists, just assign user
+            $client = $clientRepo->findOneBy(['caseNumber' => CasRec::normaliseCaseNumber($data['caseNumber'])]);
+            $user->addClient($client);
         }
 
         /**
