@@ -66,6 +66,12 @@ class AddSingleUserCommand extends ContainerAwareCommand
 
         $output->write("User $email: ");
 
+        // Ignore emails starting 'behat' because we don't support them yet
+        if (strpos($data['email'], 'behat') === 0) {
+            $output->writeln('ignored.');
+            return;
+        }
+
         /**
          * create User entity
          */
