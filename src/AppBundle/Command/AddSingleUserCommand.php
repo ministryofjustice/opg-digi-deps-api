@@ -144,7 +144,9 @@ class AddSingleUserCommand extends ContainerAwareCommand
         } else if (isset($data['caseNumber'])) {
             // If client already exists, just assign user
             $client = $clientRepo->findOneBy(['caseNumber' => CasRec::normaliseCaseNumber($data['caseNumber'])]);
-            $user->addClient($client);
+            if ($client instanceof Client) {
+                $user->addClient($client);
+            }
         }
 
         /**
