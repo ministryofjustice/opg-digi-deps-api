@@ -24,9 +24,11 @@ class ClientController extends RestController
     public function upsertAction(Request $request)
     {
         $data = $this->deserializeBodyContent($request);
+        /** @var EntityDir\User $user */
+        $user = $this->getUser();
+        $em = $this->getEntityManager();
 
         if ($request->getMethod() == 'POST') {
-            $user = $this->getUser();
             $client = new EntityDir\Client();
             $client->addUser($user);
         } else {
@@ -48,7 +50,12 @@ class ClientController extends RestController
             'email'       => 'setEmail',
         ]);
 
-        if ($this->getUser()->isLayDeputy()) {
+        if ($user && $user->isLayDeputy()) {
+            if (array_key_exists('ndr_enabled', $data) && $data['ndr_enabled'] && !$client->getNdr()) {
+                $ndr = new EntityDir\Ndr\Ndr($client);
+                $em->persist($ndr);
+            }
+
             $client->setCourtDate(new \DateTime($data['court_date']));
             $this->hydrateEntityWithArrayData($client, $data, [
                 'case_number' => 'setCaseNumber',
@@ -60,14 +67,8 @@ class ClientController extends RestController
             $client->setDateOfBirth($dob);
         }
 
-        $this->persistAndFlush($client);
-
-        //add NDR if not added yet
-        // TODO move to listener or service
-        if (!$client->getNdr()) {
-            $ndr = new EntityDir\Ndr\Ndr($client);
-            $this->persistAndFlush($ndr);
-        }
+        $em->persist($client);
+        $em->flush();
 
         return ['id' => $client->getId()];
     }
