@@ -742,7 +742,7 @@ class ReportStatusService
      * Used to fill report.reportStatusCached
      * Ignored the due date. Returns readyTosubmit if sections are completed, even if not due
      *
-     * @return string notStarted|readyToSubmit|notFinished
+     * @return string notStarted|readyToSubmit|notFinished|changesNeeded
      */
     public function getStatusIgnoringDueDate()
     {
