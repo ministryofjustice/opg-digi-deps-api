@@ -659,7 +659,6 @@ class ReportController extends RestController
                     'status' => $rs->adjustReportStatus($reportArray['reportStatusCached'], $reportArray['endDate'])
                 ],
                 'due_date' => $reportArray['dueDate']->format('Y-m-d'),
-                'un_submit_date' => $reportArray['unSubmitDate'] ? $reportArray['unSubmitDate']->format('Y-m-d') : null,
                 'client' => [
                     'id' => $reportArray['client']['id'],
                     'firstname' => $reportArray['client']['firstname'],
