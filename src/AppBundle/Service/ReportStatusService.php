@@ -282,7 +282,7 @@ class ReportStatusService
      */
     public function isReadyToSubmit()
     {
-        return count($this->getRemainingSections()) === 0 && $this->report->isDue();
+        return count($this->getRemainingSections()) === 0;
     }
 
     /**
@@ -687,7 +687,7 @@ class ReportStatusService
     public function getSubmitState()
     {
         return [
-            'state'  => $this->isReadyToSubmit()
+            'state'  => $this->isReadyToSubmit() && $this->report->isDue()
                 ? self::STATE_DONE
                 : self::STATE_NOT_STARTED,
             'nOfRecords' => 0,
@@ -723,7 +723,7 @@ class ReportStatusService
      * @JMS\Type("string")
      * @JMS\Groups({"status", "report-status"})
      *
-     * @return string notStarted|readyToSubmit|notFinished|changesNeeded
+     * @return string notStarted|readyToSubmit|notFinished
      */
     public function getStatus()
     {
@@ -731,18 +731,14 @@ class ReportStatusService
             return Report::STATUS_NOT_STARTED;
         }
 
-        if ($this->isUnsubmitted()) {
-            return Report::STATUS_CHANGES_NEEDED;
-        }
-
-        return $this->isReadyToSubmit() ? Report::STATUS_READY_TO_SUBMIT : Report::STATUS_NOT_FINISHED;
+        return $this->report->isDue() && $this->isReadyToSubmit() ? Report::STATUS_READY_TO_SUBMIT : Report::STATUS_NOT_FINISHED;
     }
 
     /**
      * Used to fill report.reportStatusCached
      * Ignored the due date. Returns readyTosubmit if sections are completed, even if not due
      *
-     * @return string notStarted|readyToSubmit|notFinished|changesNeeded
+     * @return string notStarted|readyToSubmit|notFinished
      */
     public function getStatusIgnoringDueDate()
     {
@@ -750,16 +746,7 @@ class ReportStatusService
             return Report::STATUS_NOT_STARTED;
         }
 
-        if ($this->isUnsubmitted()) {
-            return Report::STATUS_CHANGES_NEEDED;
-        }
-
-        return count($this->getRemainingSections()) === 0 ? Report::STATUS_READY_TO_SUBMIT : Report::STATUS_NOT_FINISHED;
-    }
-
-    private function isUnsubmitted()
-    {
-        return $this->report->getUnSubmitDate() && !$this->report->getSubmitted();
+        return $this->isReadyToSubmit() ? Report::STATUS_READY_TO_SUBMIT : Report::STATUS_NOT_FINISHED;
     }
 
 }

@@ -757,23 +757,6 @@ class ReportStatusServiceTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(Report::STATUS_NOT_FINISHED, $status);
     }
 
-    public function testGetStatus_changes_needed()
-    {
-        $report = $this->prophesize(Report::class);
-
-        $report->getAvailableSections()->shouldBeCalled()->willReturn([Report::SECTION_GIFTS]);
-        $report->getSectionStatusesCached()->shouldBeCalled()->willReturn([]);
-        $report->giftsSectionCompleted()->shouldBeCalled()->willReturn(true);
-        $report->getGifts()->shouldBeCalled()->willReturn(['a gift']);
-
-        $report->getUnSubmitDate()->shouldBeCalled()->willReturn(new \DateTime('now', new \DateTimeZone('UTC')));
-        $report->getSubmitted()->shouldBeCalled()->willReturn(false);
-
-        $sut = new ReportStatusService($report->reveal());
-        $status = $sut->getStatus();
-        self::assertEquals(Report::STATUS_CHANGES_NEEDED, $status);
-    }
-
     public function testGetStatus_not_started()
     {
         $report = $this->prophesize(Report::class);

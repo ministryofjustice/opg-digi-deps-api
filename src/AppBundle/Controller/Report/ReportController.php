@@ -628,7 +628,7 @@ class ReportController extends RestController
 
         // Calculate missing report statuses. Needed for the following code
         $this->updateReportStatusCache($userId);
-
+        
         // calculate counts, and apply limit/offset
         $counts = [
             Report::STATUS_NOT_STARTED => $repo->getAllReportsQb('count', Report::STATUS_NOT_STARTED, $userId, $exclude_submitted, $q)->getQuery()->getSingleScalarResult(),
@@ -638,6 +638,7 @@ class ReportController extends RestController
         $counts['total'] = array_sum($counts);
 
         // Get reports for the current page, hydrating as array (more efficient) and return the min amount of data needed for the dashboard
+        /** @var QueryBuilder $qb */
         $qb = $repo->getAllReportsQb('reports', $status, $userId, $exclude_submitted, $q)
             ->setFirstResult($offset)
             ->setMaxResults($limit);
