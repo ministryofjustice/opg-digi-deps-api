@@ -731,8 +731,7 @@ class ReportStatusServiceTest extends \PHPUnit_Framework_TestCase
         $report->getSectionStatusesCached()->shouldBeCalled()->willReturn([]);
         $report->giftsSectionCompleted()->shouldBeCalled()->willReturn(true);
         $report->getGifts()->shouldBeCalled()->willReturn(['a gift']);
-
-        $report->getUnSubmitDate()->shouldBeCalled()->willReturn(null);
+        
         $report->isDue()->shouldBeCalled()->willReturn(true);
 
         $sut = new ReportStatusService($report->reveal());
@@ -748,8 +747,7 @@ class ReportStatusServiceTest extends \PHPUnit_Framework_TestCase
         $report->getSectionStatusesCached()->shouldBeCalled()->willReturn([]);
         $report->giftsSectionCompleted()->shouldBeCalled()->willReturn(true);
         $report->getGifts()->shouldBeCalled()->willReturn(['a gift']);
-
-        $report->getUnSubmitDate()->shouldBeCalled()->willReturn(null);
+        
         $report->isDue()->shouldBeCalled()->willReturn(false);
 
         $sut = new ReportStatusService($report->reveal());
@@ -770,6 +768,9 @@ class ReportStatusServiceTest extends \PHPUnit_Framework_TestCase
         self::assertEquals(Report::STATUS_NOT_STARTED, $status);
     }
 
+    /**
+     * @group acs
+     */
     public function testGetStatusIgnoringDueDate_ready_to_submit()
     {
         $report = $this->prophesize(Report::class);
@@ -778,8 +779,6 @@ class ReportStatusServiceTest extends \PHPUnit_Framework_TestCase
         $report->getSectionStatusesCached()->shouldBeCalled()->willReturn([]);
         $report->giftsSectionCompleted()->shouldBeCalled()->willReturn(true);
         $report->getGifts()->shouldBeCalled()->willReturn(['a gift']);
-
-        $report->getUnSubmitDate()->shouldBeCalled()->willReturn(null);
 
         $sut = new ReportStatusService($report->reveal());
         $status = $sut->getStatusIgnoringDueDate();
