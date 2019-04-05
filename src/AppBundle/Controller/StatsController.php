@@ -6,6 +6,7 @@ use AppBundle\Entity\Report\Report;
 use AppBundle\Entity\User;
 use AppBundle\Model\Stats\StatsQueryResponse;
 use DateTime;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -18,6 +19,14 @@ use Throwable;
 
 class StatsController extends RestController
 {
+    /** @var EntityManager */
+    private $em;
+    
+    public function __construct(EntityManager $em)
+    {
+        $this->em = $em;
+    }
+
     /**
      * @Route("/stats")
      * @Method({"GET"})
@@ -50,10 +59,8 @@ class StatsController extends RestController
 
     private function countNamedDeputies($type, $from, $to)
     {
-        $em = $this->get('em');
-        
         /** @var QueryBuilder $qb */
-        $qb = $em->getRepository(User::class)->createQueryBuilder('u');
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
 
         try{
             return $qb->select('u.id')
@@ -69,10 +76,8 @@ class StatsController extends RestController
 
     private function countReports($from, $to)
     {
-        $em = $this->get('em');
-
         /** @var QueryBuilder $qb */
-        $qb = $em->getRepository(Report::class)->createQueryBuilder('r');
+        $qb = $this->em->getRepository(Report::class)->createQueryBuilder('r');
 
         try{
             return $qb->select('r.id')
