@@ -106,7 +106,7 @@ class UserFixtures extends Fixture
             'reportVariation' => 'HW',
         ],
         [
-            'id' => '-ndr',
+            'id' => 'ndr',
             'deputyType' => 'LAY',
             'reportType' => 'OPG102',
             'reportVariation' => 'L2',
@@ -134,7 +134,7 @@ class UserFixtures extends Fixture
         $user = (new User())
             ->setFirstname(ucfirst($data['deputyType']) . ' Deputy ' . $data['id'])
             ->setLastname('User')
-            ->setEmail('behat-' . strtolower($data['deputyType']) .  '-deputy' . $data['id'] . '@publicguardian.gov.uk')
+            ->setEmail('behat-' . strtolower($data['deputyType']) .  '-deputy-' . $data['id'] . '@publicguardian.gov.uk')
             ->setActive(true)
             ->setRegistrationDate(new \DateTime())
             ->setNdrEnabled(isset($data['ndr']))
