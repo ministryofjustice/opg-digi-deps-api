@@ -43,9 +43,9 @@ class StatsQueryResponse
     public function toArray()
     {
         return [
-            'prof_named_deputy_count' => $this->getProfNamedDeputyCount,
-            'pa_named_deputy_count' => $this->getPaNamedDeputyCount,
-            'reports_count' => $this->getReportsCount,
+            'prof_named_deputy_count' => $this->getProfNamedDeputyCount(),
+            'pa_named_deputy_count' => $this->getPaNamedDeputyCount(),
+            'reports_count' => $this->getReportsCount(),
         ];
     }
 }

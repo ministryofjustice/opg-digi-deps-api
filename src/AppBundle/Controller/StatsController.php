@@ -2,64 +2,87 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity as EntityDir;
+use AppBundle\Entity\Report\Report;
+use AppBundle\Entity\User;
+use AppBundle\Model\Stats\StatsQueryResponse;
+use DateTime;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\QueryBuilder;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\BrowserKit\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Throwable;
 
 
-class SettingController extends RestController
+class StatsController extends RestController
 {
     /**
      * @Route("/stats")
      * @Method({"GET"})
+     * @param Request $request
+     * @return JsonResponse|Response
      */
     public function getStats(Request $request)
     {
-        // Get dates for request
-        $dates = $request->getContent();
+        try {
+            $params = $request->query->all();
 
-        /** @var $em \Doctrine\ORM\EntityManager */ 
-        $em = $this->getContainer()->get('em'); 
-        $from = $dates['from'];
-        $to = $dates['to'];
+            $from = new DateTime($params['from']);
+            $to = new DateTime($params['to']);
 
-        $paCount = $this->countNamedDeputies('ROLE_PA_NAMED', $from, $to);
-        $profCount = $this->countNamedDeputies('ROLE_PROF_NAMED', $from, $to);
-        $reportCount = $this->countReports();
+            $paCount = $this->countNamedDeputies('ROLE_PA_NAMED', $from, $to);
+            $profCount = $this->countNamedDeputies('ROLE_PROF_NAMED', $from, $to);
+            $reportCount = $this->countReports($from, $to);
 
-        $queryResponse = new StatsQueryResponse();
-        $queryResponse->setPaNamedDeputyCount($paCount);
-        $queryResponse->setProfNamedDeputyCount($profCount);
-        $queryResponse->setReportCount($reportCount);
+            $queryResponse = new StatsQueryResponse();
+            $queryResponse->setPaNamedDeputyCount($paCount);
+            $queryResponse->setProfNamedDeputyCount($profCount);
+            $queryResponse->setReportsCount($reportCount);
 
-        return new JsonResponse($queryResponse->toArray());
+            return new JsonResponse($queryResponse->toArray());        
+        } catch(Throwable $e) {
+            return new Response($e->getMessage());
+        }
+        
     }
 
     private function countNamedDeputies($type, $from, $to)
     {
-        $qb = $em->getRepository(User::class)
-        ->createQueryBuilder('u');
+        $em = $this->get('em');
+        
+        /** @var QueryBuilder $qb */
+        $qb = $em->getRepository(User::class)->createQueryBuilder('u');
 
-        $query = $qb->select('u')
-        ->where('u.roleName IS :type')
-        ->andWhere('u.registrationDate BETWEEN :from AND :to')
-        ->setParameters(['from' => $from, 'to' => $to, 'type' => $type]);
-
-        return $qb->getQuery()->getSingleScalarResult();
+        try{
+            return $qb->select('u.id')
+                ->where('u.roleName = :type')
+                ->andWhere('u.registrationDate BETWEEN :from AND :to')
+                ->setParameters(['from' => $from, 'to' => $to, 'type' => $type])
+                ->getQuery()
+                ->getSingleScalarResult();
+        } catch(NoResultException $e) {
+            return 0;
+        }
     }
 
-    private function countReports()
+    private function countReports($from, $to)
     {
-        $qb = $em->getRepository(Report::class)
-        ->createQueryBuilder('r');
+        $em = $this->get('em');
 
-        $query = $qb->select('r')
-        ->where('r.registrationDate BETWEEN :from AND :to')
-        ->andWhere('r.submitted IS true')
-        ->setParameters(['from' => $from, 'to' => $to]);
+        /** @var QueryBuilder $qb */
+        $qb = $em->getRepository(Report::class)->createQueryBuilder('r');
 
-        return $qb->getQuery()->getSingleScalarResult();   
+        try{
+            return $qb->select('r.id')
+                ->where('r.submitDate BETWEEN :from AND :to')
+                ->andWhere('r.submitted = true')
+                ->setParameters(['from' => $from, 'to' => $to])
+                ->getQuery()
+                ->getSingleScalarResult();           
+        } catch(NoResultException $e) {
+            return 0;
+        }
     }
 }
