@@ -148,6 +148,18 @@ class UserFixtures extends Fixture
 
         $manager->persist($user);
 
+        // Create CasRec record
+        $casRec = new CasRec([
+            'Case' => $data['id'],
+            'Surname' => $data['id'],
+            'Deputy No' => str_replace('-', '', $data['id']),
+            'Dep Surname' => 'User',
+            'Dep Postcode' => 'SW1',
+            'Typeofrep' => $data['reportType'],
+            'Corref' => $data['reportVariation'],
+        ]);
+        $manager->persist($casRec);
+
         // Create client
         $client = new Client();
         $client
