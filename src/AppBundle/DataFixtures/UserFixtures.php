@@ -140,6 +140,7 @@ class UserFixtures extends Fixture
             ->setNdrEnabled(isset($data['ndr']))
             ->setPhoneMain('07911111111111')
             ->setAddress1('Victoria Road')
+            ->setAddressPostcode('SW1')
             ->setAddressCountry('GB')
             ->setRoleName($data['deputyType'] === 'LAY' ? 'ROLE_LAY_DEPUTY' : 'ROLE_' . $data['deputyType'] . '_NAMED');
 
@@ -150,9 +151,9 @@ class UserFixtures extends Fixture
         // Create client
         $client = new Client();
         $client
-            ->setCaseNumber('10101010')
+            ->setCaseNumber($data['id'])
             ->setFirstname('John')
-            ->setLastname('Smith')
+            ->setLastname($data['id'])
             ->setPhone('022222222222222')
             ->setAddress('Victoria road')
             ->setCourtDate(\DateTime::createFromFormat('d/m/Y', '01/11/2017'));
@@ -165,13 +166,18 @@ class UserFixtures extends Fixture
             $manager->persist($ndr);
         }
 
-        // Create report
-        $type = CasRec::getTypeBasedOnTypeofRepAndCorref($data['reportType'], $data['reportVariation'], $user->getRoleName());
-        $startDate = $client->getExpectedReportStartDate();
-        $endDate = $client->getExpectedReportEndDate();
 
-        $report = new Report($client, $type, $startDate, $endDate);
+        // Create report for PROF/PA user 2 years ago
+        if ($data['deputyType'] === 'PROF' || $data['deputyType'] === 'PA') {
+            $type = CasRec::getTypeBasedOnTypeofRepAndCorref($data['reportType'], $data['reportVariation'], $user->getRoleName());
+            $startDate = $client->getExpectedReportStartDate();
+            $startDate->sub(new \DateInterval('P2Y'));
+            $endDate = $client->getExpectedReportEndDate();
+            $endDate->sub(new \DateInterval('P2Y'));
 
-        $manager->persist($report);
+            $report = new Report($client, $type, $startDate, $endDate);
+
+            $manager->persist($report);
+        }
     }
 }
