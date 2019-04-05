@@ -1,24 +1,15 @@
 <?php
 namespace AppBundle\DataFixtures;
 
-use AppBundle\DataFixtures\UserFixtures;
 use AppBundle\Entity\Client;
 use AppBundle\Entity\Team;
 use AppBundle\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class TeamFixtures extends Fixture implements OrderedFixtureInterface
 {
-    private $encoder;
-
-    public function __construct(UserPasswordEncoderInterface $encoder)
-    {
-        $this->encoder = $encoder;
-    }
-
     public function load(ObjectManager $manager)
     {
         // Create teams
@@ -41,7 +32,6 @@ class TeamFixtures extends Fixture implements OrderedFixtureInterface
             ->setActive(true)
             ->setRoleName('ROLE_' . $code . '_ADMIN');
 
-        $teamAdminUser->setPassword($this->encoder->encodePassword($teamAdminUser, ''));
         $teamAdminUser->addTeam($team);
         $manager->persist($teamAdminUser);
 
@@ -53,7 +43,6 @@ class TeamFixtures extends Fixture implements OrderedFixtureInterface
             ->setActive(true)
             ->setRoleName('ROLE_' . $code . '_TEAM_MEMBER');
 
-        $teamMemberUser->setPassword($this->encoder->encodePassword($teamMemberUser, ''));
         $teamMemberUser->addTeam($team);
         $manager->persist($teamMemberUser);
 

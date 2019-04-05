@@ -8,12 +8,9 @@ use AppBundle\Entity\Report\Report;
 use AppBundle\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserFixtures extends Fixture
 {
-    private $encoder;
-
     private $userData = [
         [
             'id' => '103',
@@ -114,11 +111,6 @@ class UserFixtures extends Fixture
         ],
     ];
 
-    public function __construct(UserPasswordEncoderInterface $encoder)
-    {
-        $this->encoder = $encoder;
-    }
-
     public function load(ObjectManager $manager)
     {
         // Add users from array
@@ -143,8 +135,6 @@ class UserFixtures extends Fixture
             ->setAddressPostcode('SW1')
             ->setAddressCountry('GB')
             ->setRoleName($data['deputyType'] === 'LAY' ? 'ROLE_LAY_DEPUTY' : 'ROLE_' . $data['deputyType'] . '_NAMED');
-
-        $user->setPassword($this->encoder->encodePassword($user, 'Abcd1234'));
 
         $manager->persist($user);
 
