@@ -31,16 +31,15 @@ class StatsController extends RestController
      * @Route("/stats")
      * @Method({"GET"})
      * @param Request $request
-     * @return JsonResponse|Response
      */
     public function getStats(Request $request)
     {
         try {
             $params = $request->query->all();
 
-            $from = new DateTime($params['from']);
-            $to = new DateTime($params['to']);
-
+            $from = isset($params['from']) ? new DateTime($params['from']) : new Datetime('-7 days');
+            $to = isset($params['to']) ? new DateTime($params['to']) : new Datetime('now');
+            
             $paCount = $this->countNamedDeputies('ROLE_PA_NAMED', $from, $to);
             $profCount = $this->countNamedDeputies('ROLE_PROF_NAMED', $from, $to);
             $reportCount = $this->countReports($from, $to);
@@ -49,8 +48,10 @@ class StatsController extends RestController
             $queryResponse->setPaNamedDeputyCount($paCount);
             $queryResponse->setProfNamedDeputyCount($profCount);
             $queryResponse->setReportsCount($reportCount);
+            $queryResponse->setFrom($from);
+            $queryResponse->setTo($to);
 
-            return new JsonResponse($queryResponse->toArray());        
+            return $queryResponse;        
         } catch(Throwable $e) {
             return new Response($e->getMessage());
         }
