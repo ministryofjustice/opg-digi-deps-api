@@ -26,7 +26,7 @@ class AdminUserFixtures extends Fixture
 
         $caseManager = (new User())
             ->setFirstname('Case')
-            ->setLastname('Manager')
+            ->setLastname('Manager1')
             ->setEmail('casemanager@publicguardian.gov.uk')
             ->setActive(true)
             ->setRoleName('ROLE_CASE_MANAGER');
