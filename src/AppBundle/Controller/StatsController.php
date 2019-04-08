@@ -64,7 +64,7 @@ class StatsController extends RestController
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
 
         try{
-            return $qb->select('u.id')
+            return $qb->select('count(u.id)')
                 ->where('u.roleName = :type')
                 ->andWhere('u.registrationDate BETWEEN :from AND :to')
                 ->setParameters(['from' => $from, 'to' => $to, 'type' => $type])
@@ -81,7 +81,7 @@ class StatsController extends RestController
         $qb = $this->em->getRepository(Report::class)->createQueryBuilder('r');
 
         try{
-            return $qb->select('r.id')
+            return $qb->select('count(r.id)')
                 ->where('r.submitDate BETWEEN :from AND :to')
                 ->andWhere('r.submitted = true')
                 ->setParameters(['from' => $from, 'to' => $to])
