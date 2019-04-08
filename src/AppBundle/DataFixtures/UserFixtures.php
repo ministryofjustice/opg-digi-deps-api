@@ -6,10 +6,9 @@ use AppBundle\Entity\Client;
 use AppBundle\Entity\Ndr\Ndr;
 use AppBundle\Entity\Report\Report;
 use AppBundle\Entity\User;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class UserFixtures extends Fixture
+class UserFixtures extends AbstractDataFixture
 {
     private $userData = [
         [
@@ -111,7 +110,7 @@ class UserFixtures extends Fixture
         ],
     ];
 
-    public function load(ObjectManager $manager)
+    public function doLoad(ObjectManager $manager)
     {
         // Add users from array
         foreach ($this->userData as $data) {
@@ -181,5 +180,10 @@ class UserFixtures extends Fixture
 
             $manager->persist($report);
         }
+    }
+
+    protected function getEnvironments()
+    {
+        return array('dev');
     }
 }

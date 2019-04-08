@@ -4,13 +4,12 @@ namespace AppBundle\DataFixtures;
 use AppBundle\Entity\Client;
 use AppBundle\Entity\Team;
 use AppBundle\Entity\User;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class TeamFixtures extends Fixture implements OrderedFixtureInterface
+class TeamFixtures extends AbstractDataFixture implements OrderedFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function doLoad(ObjectManager $manager)
     {
         // Create teams
         $this->createTeam('PA', 'Public Authority', $manager);
@@ -59,5 +58,10 @@ class TeamFixtures extends Fixture implements OrderedFixtureInterface
     public function getOrder()
     {
         return 10;
+    }
+
+    protected function getEnvironments()
+    {
+        return array('dev');
     }
 }

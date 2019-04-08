@@ -2,12 +2,11 @@
 namespace AppBundle\DataFixtures;
 
 use AppBundle\Entity\User;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
-class UserPasswordFixtures extends Fixture implements OrderedFixtureInterface
+class UserPasswordFixtures extends AbstractDataFixture implements OrderedFixtureInterface
 {
     private $encoder;
     private $config;
@@ -18,7 +17,7 @@ class UserPasswordFixtures extends Fixture implements OrderedFixtureInterface
         $this->config = $config;
     }
 
-    public function load(ObjectManager $manager)
+    public function doLoad(ObjectManager $manager)
     {
         // Set all user passwords
         $userRepository = $manager->getRepository(User::class);
@@ -35,5 +34,10 @@ class UserPasswordFixtures extends Fixture implements OrderedFixtureInterface
     public function getOrder()
     {
         return 11;
+    }
+
+    protected function getEnvironments()
+    {
+        return array('dev', 'test');
     }
 }

@@ -2,12 +2,11 @@
 namespace AppBundle\DataFixtures;
 
 use AppBundle\Entity\User;
-use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class AdminUserFixtures extends Fixture
+class AdminUserFixtures extends AbstractDataFixture
 {
-    public function load(ObjectManager $manager)
+    public function doLoad(ObjectManager $manager)
     {
         // Add admin users
         $adminUser = (new User())
@@ -36,5 +35,10 @@ class AdminUserFixtures extends Fixture
         $manager->persist($caseManager);
 
         $manager->flush();
+    }
+
+    protected function getEnvironments()
+    {
+        return array('dev');
     }
 }
