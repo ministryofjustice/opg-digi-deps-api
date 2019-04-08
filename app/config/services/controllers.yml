@@ -14,9 +14,3 @@ services:
     - '@ClientAssemblerFromReportEntity'
     - '@AppBundle\v2\Transformer\ClientTransformer'
     public: true
-
-  AppBundle\Controller\StatsController:
-    class: AppBundle\Controller\StatsController
-    arguments:
-    - "@em"
-    public: true

@@ -56,6 +56,12 @@ services:
           - "@em"
         public: true
 
+    opg_digideps.stats_service:
+        class: AppBundle\Service\StatsService
+        arguments:
+          - "@em"
+        public: true
+
     gedmo.listener.softdeleteable:
       class: Gedmo\SoftDeleteable\SoftDeleteableListener
       tags:
