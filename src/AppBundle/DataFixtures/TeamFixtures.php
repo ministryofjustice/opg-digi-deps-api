@@ -62,6 +62,6 @@ class TeamFixtures extends AbstractDataFixture implements OrderedFixtureInterfac
 
     protected function getEnvironments()
     {
-        return array('dev');
+        return ['dev'];
     }
 }
