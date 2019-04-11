@@ -16,6 +16,7 @@ bin/doctrine
 bin/doctrine.php
 bin/phpunit
 build
+log
 components/*
 composer.phar
 junit.xml
