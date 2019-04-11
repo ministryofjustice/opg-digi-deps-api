@@ -18,7 +18,7 @@ services:
             - ./app/DoctrineMigrations:/app/app/DoctrineMigrations
             - ./web:/app/web
         env_file:
-            - ../digi-deps-local-dev/develop/env/api.env
+            - ./docker/env/api.env
         restart: always
         networks:
             - default
@@ -30,7 +30,7 @@ services:
         ports:
             - 5432:5432
         env_file:
-            - ../digi-deps-local-dev/develop/env/postgres.env
+            - ./docker/env/postgres.env
         environment:
             # use a different data directory to avoid using the old 9.3 version
             PGDATA: /var/lib/postgresql96/data
