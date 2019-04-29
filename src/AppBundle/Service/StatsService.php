@@ -18,7 +18,7 @@ class StatsService
         $this->em = $em;
     }
 
-    public function countNamedDeputies($type, $from, $to)
+    public function countNamedDeputies($type, \DateTime $from, \DateTime $to)
     {
         /** @var QueryBuilder $qb */
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
@@ -35,7 +35,7 @@ class StatsService
         }
     }
 
-    public function countReports($from, $to)
+    public function countReports(\DateTime $from, \DateTime $to)
     {
         /** @var QueryBuilder $qb */
         $qb = $this->em->getRepository(Report::class)->createQueryBuilder('r');
