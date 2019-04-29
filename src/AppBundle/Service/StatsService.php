@@ -18,7 +18,7 @@ class StatsService
         $this->em = $em;
     }
 
-    public function countNamedDeputies($type, \DateTime $from, \DateTime $to)
+    public function countNamedDeputies($role, \DateTime $from, \DateTime $to)
     {
         /** @var QueryBuilder $qb */
         $qb = $this->em->getRepository(User::class)->createQueryBuilder('u');
@@ -27,7 +27,7 @@ class StatsService
             return $qb->select('count(u.id)')
                 ->where('u.roleName = :type')
                 ->andWhere('u.registrationDate BETWEEN :from AND :to')
-                ->setParameters(['from' => $from, 'to' => $to, 'type' => $type])
+                ->setParameters(['from' => $from, 'to' => $to, 'type' => $role])
                 ->getQuery()
                 ->getSingleScalarResult();
         } catch(NoResultException $e) {
