@@ -6,6 +6,7 @@ use AppBundle\Controller\RestController;
 use AppBundle\Entity as EntityDir;
 use AppBundle\Entity\Report\Report;
 use AppBundle\Service\ReportService;
+use AppBundle\Service\RestHandler\Report\DeputyCostsEstimateReportUpdateHandler;
 use Doctrine\ORM\AbstractQuery;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -18,6 +19,17 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ReportController extends RestController
 {
+    /** @var array */
+    private $updateHandlers;
+
+    /**
+     * @param array $updateHandlers
+     */
+    public function __construct(array $updateHandlers)
+    {
+        $this->updateHandlers = $updateHandlers;
+    }
+
     /**
      * Add a report
      * Currently only used by Lay deputy during registration steps
@@ -437,92 +449,8 @@ class ReportController extends RestController
             ]);
         }
 
-        if (array_key_exists('prof_deputy_costs_how_charged_fixed', $data)) {
-            $report->setProfDeputyCostsHowChargedFixed($data['prof_deputy_costs_how_charged_fixed']);
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        if (array_key_exists('prof_deputy_costs_how_charged_assessed', $data)) {
-            $report->setProfDeputyCostsHowChargedAssessed($data['prof_deputy_costs_how_charged_assessed']);
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        if (array_key_exists('prof_deputy_costs_how_charged_agreed', $data)) {
-            $report->setProfDeputyCostsHowChargedAgreed($data['prof_deputy_costs_how_charged_agreed']);
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        // update depending data depending on the selection on the "how charged" checkboxes
-        if (array_key_exists('prof_deputy_costs_how_charged_fixed', $data)
-            || array_key_exists('prof_deputy_costs_how_charged_assessed', $data)
-            || array_key_exists('prof_deputy_costs_how_charged_agreed', $data)
-        ) {
-            if ($report->hasProfDeputyCostsHowChargedFixedOnly()) {
-                $report->setProfDeputyCostsHasInterim(null);
-                foreach ($report->getProfDeputyInterimCosts() as $ic) {
-                    $this->getEntityManager()->remove($ic);
-                }
-            } else if ($report->getProfDeputyCostsHasInterim() === 'yes') {
-                $report->setProfDeputyFixedCost(null);
-            }
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        if (!empty($data['prof_deputy_costs_has_previous']) && $data['prof_deputy_costs_has_previous']) {
-            $report->setProfDeputyCostsHasPrevious($data['prof_deputy_costs_has_previous']);
-            foreach ($report->getProfDeputyPreviousCosts() as $pc) {
-                $this->getEntityManager()->remove($pc);
-            }
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        if (!empty($data['prof_deputy_costs_has_interim']) && $data['prof_deputy_costs_has_interim']) {
-            $report->setProfDeputyCostsHasInterim($data['prof_deputy_costs_has_interim']);
-            // remove interim if changed to "no"
-            if ($data['prof_deputy_costs_has_interim'] === 'no') {
-                foreach ($report->getProfDeputyInterimCosts() as $ic) {
-                    $this->getEntityManager()->remove($ic);
-                }
-            } else if ($data['prof_deputy_costs_has_interim'] === 'yes') {
-                $report->setProfDeputyFixedCost(null);
-            }
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        if (array_key_exists('prof_deputy_interim_costs', $data)) {
-            // wipe existing interim costs in order to overwrite
-            // TODO consider keeping and updating the existing ones if simpler to implement
-            foreach ($report->getProfDeputyInterimCosts() as $ic) {
-                $this->getEntityManager()->remove($ic);
-            }
-            // add new
-            foreach ($data['prof_deputy_interim_costs'] as $row) {
-                if ($row['date'] && $row['amount']) {
-                    $report->addProfDeputyInterimCosts(
-                        new EntityDir\Report\ProfDeputyInterimCost($report, new \DateTime($row['date']), $row['amount'])
-                    );
-                }
-                if (count($report->getProfDeputyInterimCosts())) {
-                    $report->setProfDeputyCostsHasInterim('yes');
-                }
-            }
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-            $this->getEntityManager()->flush();
-        }
-
-        if (array_key_exists('prof_deputy_fixed_cost', $data)) {
-            $report->setProfDeputyFixedCost($data['prof_deputy_fixed_cost']);
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        if (array_key_exists('prof_deputy_costs_amount_to_scco', $data)) {
-            $report->setProfDeputyCostsAmountToScco($data['prof_deputy_costs_amount_to_scco']);
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
-        }
-
-        if (array_key_exists('prof_deputy_costs_reason_beyond_estimate', $data)) {
-            $report->setProfDeputyCostsReasonBeyondEstimate($data['prof_deputy_costs_reason_beyond_estimate']);
-            $report->updateSectionsStatusCache([Report::SECTION_PROF_DEPUTY_COSTS]);
+        foreach ($this->updateHandlers as $updateHandler) {
+            $updateHandler->handle($report, $data);
         }
 
         $this->getEntityManager()->flush();
@@ -628,7 +556,7 @@ class ReportController extends RestController
 
         // Calculate missing report statuses. Needed for the following code
         $this->updateReportStatusCache($userId);
-
+        
         // calculate counts, and apply limit/offset
         $counts = [
             Report::STATUS_NOT_STARTED => $repo->getAllReportsQb('count', Report::STATUS_NOT_STARTED, $userId, $exclude_submitted, $q)->getQuery()->getSingleScalarResult(),
@@ -653,7 +581,8 @@ class ReportController extends RestController
             $reports[] = [
                 'id' => $reportArray['id'],
                 'type' => $reportArray['type'],
-                'hasUnsumitDate' => $reportArray['unSubmitDate'] ? true : false,
+                'un_submit_date' => $reportArray['unSubmitDate'] instanceof \DateTime ?
+                    $reportArray['unSubmitDate']->format('Y-m-d') : null,
                 'status' => [
                     // adjust report status cached using end date
                     'status' => $rs->adjustReportStatus($reportArray['reportStatusCached'], $reportArray['endDate'])
@@ -668,16 +597,23 @@ class ReportController extends RestController
             ];
         }
 
-        // if an unsubmitted report is present, delete the other non-unsubmitted client's reports
-        foreach ($reports as $k => $unsubmittedReport) {
-            if ($unsubmittedReport['hasUnsumitDate']) {
-                foreach ($reports as $k2 => $currentReport) {
-                    if (!$currentReport['hasUnsumitDate'] && $currentReport['client']['id'] == $unsubmittedReport['client']['id']) {
-                        unset($reports[$k2]);
-                    }
-                }
-            }
-        }
+        /**
+         * @to-do the code below is intended to remove all other reports for a given client in the event that their last
+         * report is rejected by a case manager. We need to check that this is still required since currently a client
+         * will show 2 reports in the dashboard for a given client. The one that has been rejected and the current one.
+         * This may be desirable if a deputy is waiting for something before being able to re-submit a previously
+         *  rejected report.
+         */
+//        // if an unsubmitted report is present, delete the other non-unsubmitted client's reports
+//        foreach ($reports as $k => $unsubmittedReport) {
+//            if (!empty($unsubmittedReport['un_submit_date'])) {
+//                foreach ($reports as $k2 => $currentReport) {
+//                    if (($currentReport['client']['id'] == $unsubmittedReport['client']['id'])) {
+//                        unset($reports[$k2]);
+//                    }
+//                }
+//            }
+//        }
 
         return [
             'counts' => $counts,
@@ -796,6 +732,10 @@ class ReportController extends RestController
             'future_significant_decisions' => 'setFutureSignificantDecisions',
             'has_deputy_raised_concerns' => 'setHasDeputyRaisedConcerns',
             'case_worker_satisified' => 'setCaseWorkerSatisified',
+            'payments_match_cost_certificate' => 'setPaymentsMatchCostCertificate',
+            'prof_costs_reasonable_and_proportionate' => 'setProfCostsReasonableAndProportionate',
+            'has_deputy_overcharged_from_previous_estimates' => 'setHasDeputyOverchargedFromPreviousEstimates',
+            'next_billing_estimates_satisfactory' => 'setNextBillingEstimatesSatisfactory',
             'lodging_summary' => 'setLodgingSummary',
             'final_decision' => 'setFinalDecision',
             'button_clicked' => 'setButtonClicked'

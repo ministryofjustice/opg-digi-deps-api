@@ -1,6 +1,7 @@
 imports:
     - { resource: services/assemblers.yml }
     - { resource: services/controllers.yml }
+    - { resource: services/rest_handlers.yml }
     - { resource: services/repositories.yml }
     - { resource: services/transformers.yml }
 
@@ -87,3 +88,8 @@ services:
 
     AppBundle\Service\ReportStatusServiceFactory:
         class: AppBundle\Service\ReportStatusServiceFactory
+
+    AppBundle\DataFixtures\:
+        resource: '../../src/AppBundle/DataFixtures'
+        tags: ['doctrine.fixture.orm']
+        arguments: ['@security.password_encoder']
