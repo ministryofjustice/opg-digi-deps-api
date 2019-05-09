@@ -44,6 +44,16 @@ services:
         image: redis:2.8.21
         restart: always
 
+    composer:
+        build:
+            context: .
+            dockerfile: docker/composer/Dockerfile
+        volumes:
+            - .:/app
+
+volumes:
+    certs:
+
 networks:
     opg-digi-deps-client_default:
         external: true
