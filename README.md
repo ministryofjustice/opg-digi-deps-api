@@ -19,12 +19,11 @@ Repositories
 
 ## Setup
 
-Setup local environment following instructions on the docker repository.
+If you haven't already, you need to create a docker network called "digideps": `docker network create digideps`.
 
-`app/config/parameters.yml` is generated via docker init scripts.
+Run `docker-compose up -d` to start the client containers.
 
-If installed locally, use scripts under `/scripts` to recreate db and add initial fixtures
-
+Use scripts under `/scripts` to recreate db and add initial fixtures.
 
 ## Authentication endpoint
 via    `/auth/login`: (
