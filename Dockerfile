@@ -1,39 +1,36 @@
-FROM registry.service.opg.digital/opguk/digi-deps-api-base:nightly
+FROM php:5.5-fpm-alpine
 
-# build app dependencies
-WORKDIR /app
-USER app
-ENV  HOME /app
-COPY composer.json /app/
-COPY composer.lock /app/
-RUN  composer install --prefer-dist --no-interaction --no-scripts
+# Install postgresql drivers
+RUN apk add --no-cache postgresql-dev \
+  && docker-php-ext-install pdo pdo_pgsql
 
-# install remaining parts of app
-ADD  . /app
-USER root
-RUN find . -not -user app -exec chown app:app {} \;
-# crontab
-COPY scripts/cron/digideps /etc/cron.d/digideps
-RUN chmod 0744 /etc/cron.d/digideps
-USER app
-ENV  HOME /app
-RUN  composer run-script post-install-cmd --no-interaction
-RUN  composer dump-autoload --optimize
+# Install openssl for wget
+RUN apk add --update openssl
 
-# cleanup
-RUN  rm /app/app/config/parameters.yml
-USER root
-ENV  HOME /root
+# Add Confd to configure parameters on start
+ENV CONFD_VERSION="0.16.0"
+RUN wget -q -O /usr/local/bin/confd "https://github.com/kelseyhightower/confd/releases/download/v${CONFD_VERSION}/confd-${CONFD_VERSION}-linux-amd64" \
+  && chmod +x /usr/local/bin/confd
 
-# app configuration
-ADD docker/confd /etc/confd
+# Add Waitforit to wait on db starting
+ENV WAITFORIT_VERSION="v2.4.1"
+RUN wget -q -O /usr/local/bin/waitforit https://github.com/maxcnunes/waitforit/releases/download/$WAITFORIT_VERSION/waitforit-linux_amd64 \
+  && chmod +x /usr/local/bin/waitforit
 
-# let's make sure they always work
-RUN dos2unix /app/scripts/*
-
-# copy init scripts
-ADD  docker/my_init.d /etc/my_init.d
-RUN  chmod a+x /etc/my_init.d/*
-
-ENV  OPG_SERVICE api
-
+WORKDIR /var/www
+# See this page for directories required
+# https://symfony.com/doc/3.4/quick_tour/the_architecture.html
+COPY web/app_dev.php web/app_dev.php
+RUN mkdir -p web/assets
+COPY web/config.php web/config.php
+COPY vendor vendor
+COPY src src
+COPY app app
+COPY docker/confd /etc/confd
+ENV TIMEOUT=20
+CMD confd -onetime -backend env \
+  && waitforit -address=tcp://$API_DATABASE_HOSTNAME:$API_DATABASE_PORT -timeout=$TIMEOUT \
+  && php app/console doctrine:migrations:migrate --no-interaction \
+  && chown -R www-data app/cache \
+  && chown -R www-data app/logs \
+  && php-fpm
