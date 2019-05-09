@@ -1,28 +1,65 @@
 version: '2'
 
 services:
-    api:
+    openssl:
+        image: buildpack-deps:stretch
+        entrypoint: openssl
+        command:
+            - req
+            - -newkey
+            - rsa:4096
+            - -x509
+            - -nodes
+            - -keyout
+            - /export/app.key
+            - -new
+            - -out
+            - /export/app.crt
+            - -subj
+            - "/C=GB/ST=GB/L=London/O=OPG/OU=Digital/CN=default"
+            - -sha256
+            - -days
+            - "3650"
+        volumes:
+            - certs:/export
+
+    web:
         container_name: opgdigidepsdocker_api_1
-        build: .
+        build:
+            context: .
+            dockerfile: docker/web/Dockerfile
+        volumes:
+            - certs:/etc/nginx/certs
+            - ./web:/var/www/web
         ports:
             - 8090:443
+        depends_on:
+            - php
+        environment:
+            APP_HOST: php
+            APP_PORT: 9000
+            NGINX_LOG_LEVEL: warn
+        networks:
+            default: ~
+            digideps:
+                aliases:
+                    - api
+
+    php:
+        container_name: opgdigidepsdocker_phpapi_1
+        build: .
+        ports:
+            - 9000:9000
         links:
             - postgres
             - redisapi
         volumes:
-            - ./log:/var/log
-            - ./src:/app/src
-            - ./scripts:/app/scripts
-            - ./tests:/app/tests
-            - ./app/config:/app/app/config
-            - ./app/DoctrineMigrations:/app/app/DoctrineMigrations
-            - ./web:/app/web
+            - ./app:/var/www/app
+            - ./src:/var/www/src:ro
+            - ./web:/var/www/web
         env_file:
             - ./docker/env/api.env
         restart: always
-        networks:
-            - default
-            - opg-digi-deps-client_default
 
     postgres:
         container_name: opgdigidepsdocker_postgres_1
@@ -37,7 +74,7 @@ services:
         restart: always
         networks:
             - default
-            - opg-digi-deps-client_default
+            - digideps
 
     redisapi:
         container_name: opgdigidepsdocker_redisapi_1
@@ -55,5 +92,5 @@ volumes:
     certs:
 
 networks:
-    opg-digi-deps-client_default:
+    digideps:
         external: true
