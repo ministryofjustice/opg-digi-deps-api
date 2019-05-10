@@ -2,6 +2,7 @@
 
 namespace AppBundle\Service;
 
+use AppBundle\Entity\Ndr\Ndr;
 use AppBundle\Entity\Repository\TeamRepository;
 use AppBundle\Entity\Repository\UserRepository;
 use AppBundle\Entity\Team;
@@ -79,9 +80,15 @@ class UserService
             $this->exceptionIfEmailExist($userToEdit->getEmail());
         }
 
-//        if ($loggedInUser->isOrgNamedOrAdmin()) {
-//            $this->orgService->addTeamAndClientsFrom($loggedInUser, $userToAdd, $data);
-//        }
+        if ($userToEdit->isLayDeputy()) {
+            $client = $userToEdit->getFirstClient();
+
+            if ($userToEdit->getNdrEnabled() && null === $client->getNdr()) {
+                $ndr = new Ndr($client);
+                $this->em->persist($ndr);
+                $this->em->flush($ndr, $client);
+            }
+        }
 
         $this->em->flush($userToEdit);
     }
