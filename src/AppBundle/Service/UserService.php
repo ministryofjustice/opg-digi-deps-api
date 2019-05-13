@@ -111,11 +111,11 @@ class UserService
      */
     private function handleNdrStatusUpdate(User $updatedUser)
     {
-        if (!$updatedUser->isLayDeputy()) {
+        $client = $updatedUser->getFirstClient();
+        if (!$updatedUser->isLayDeputy() || !$client instanceof Client) {
             return;
         }
 
-        $client = $updatedUser->getFirstClient();
         if ($updatedUser->getNdrEnabled() && !$this->clientHasExistingNdr($client)) {
             $this->createNdrForClient($client);
         }
