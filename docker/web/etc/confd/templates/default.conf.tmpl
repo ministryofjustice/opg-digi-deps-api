@@ -7,7 +7,9 @@ server {
     listen     443 ssl;
     server_name digideps-api.local;
     root /var/www/web;
-    client_max_body_size 0;
+    
+    client_max_body_size {{ getv "/opg/nginx/clientmaxbodysize" }};
+    client_body_timeout {{ getv "/opg/nginx/clientbodytimeout" }};
 
     ssl_certificate         /etc/nginx/certs/app.crt;
     ssl_certificate_key     /etc/nginx/certs/app.key;

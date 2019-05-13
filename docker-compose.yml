@@ -39,6 +39,8 @@ services:
             APP_HOST: php
             APP_PORT: 9000
             NGINX_LOG_LEVEL: warn
+            OPG_NGINX_CLIENTMAXBODYSIZE: 10M
+            OPG_NGINX_CLIENTBODYTIMEOUT: 120s
         networks:
             default: ~
             digideps:
