@@ -31,6 +31,6 @@ ENV TIMEOUT=20
 CMD confd -onetime -backend env \
   && waitforit -address=tcp://$API_DATABASE_HOSTNAME:$API_DATABASE_PORT -timeout=$TIMEOUT \
   && php app/console doctrine:migrations:migrate --no-interaction \
-  && chown -R www-data app/cache \
-  && chown -R www-data app/logs \
+  && php app/console doctrine:fixtures:load --no-interaction \
+  && chown -R www-data var \
   && php-fpm
