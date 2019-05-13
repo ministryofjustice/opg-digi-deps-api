@@ -21,6 +21,8 @@ Repositories
 
 If you haven't already, you need to create a docker network called "digideps": `docker network create digideps`.
 
+Run `docker-compose run --rm composer composer install` to install all dependencies prior to starting the application.
+
 Run `docker-compose up -d` to start the client containers.
 
 Use scripts under `/scripts` to recreate db and add initial fixtures.
