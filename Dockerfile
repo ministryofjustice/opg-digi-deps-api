@@ -26,7 +26,6 @@ WORKDIR /var/www
 # See this page for directories required
 # https://symfony.com/doc/3.4/quick_tour/the_architecture.html
 COPY web/app_dev.php web/app_dev.php
-RUN mkdir -p web/assets
 COPY web/config.php web/config.php
 COPY vendor vendor
 COPY src src
@@ -37,5 +36,6 @@ CMD confd -onetime -backend env \
   && waitforit -address=tcp://$API_DATABASE_HOSTNAME:$API_DATABASE_PORT -timeout=$TIMEOUT \
   && php app/console doctrine:migrations:migrate --no-interaction \
   && php app/console doctrine:fixtures:load --no-interaction \
+  && mkdir -p var \
   && chown -R www-data var \
   && php-fpm
