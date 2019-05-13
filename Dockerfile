@@ -4,6 +4,11 @@ FROM php:5.5-fpm-alpine
 RUN apk add --no-cache postgresql-dev \
   && docker-php-ext-install pdo pdo_pgsql
 
+# Enable Redis driver
+RUN apk add --no-cache autoconf g++ make \
+  && pecl install redis \
+  && docker-php-ext-enable redis
+
 # Install openssl for wget
 RUN apk add --update openssl
 
