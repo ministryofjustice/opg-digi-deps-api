@@ -59,6 +59,7 @@ services:
             - ./app:/var/www/app
             - ./scripts:/var/www/scripts
             - ./src:/var/www/src:ro
+            - ./tests:/var/www/tests
             - ./web:/var/www/web
         env_file:
             - ./docker/env/api.env
