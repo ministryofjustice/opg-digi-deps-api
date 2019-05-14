@@ -1,7 +1,7 @@
 FROM php:5.5-fpm-alpine
 
 # Install postgresql drivers
-RUN apk add --no-cache postgresql-dev \
+RUN apk add --no-cache postgresql-dev postgresql-client \
   && docker-php-ext-install pdo pdo_pgsql
 
 # Enable Redis driver
