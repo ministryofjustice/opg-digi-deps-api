@@ -30,6 +30,7 @@ COPY web/config.php web/config.php
 COPY vendor vendor
 COPY src src
 COPY app app
+COPY scripts scripts
 COPY docker/confd /etc/confd
 ENV TIMEOUT=20
 CMD confd -onetime -backend env \

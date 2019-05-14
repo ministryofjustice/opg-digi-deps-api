@@ -8,15 +8,15 @@ export PGPASSWORD=${API_DATABASE_PASSWORD:=api}
 export PGDATABASE=${API_DATABASE_NAME:=digideps_unit_test}
 export PGUSER=${API_DATABASE_USERNAME:=api}
 
-cd /app
+cd /var/www
 # clear cache
-rm -rf app/cache/*
+rm -rf var/*
 
 rm -f /tmp/dd_stats.csv
 rm -f /tmp/dd_stats.unittest.csv
-/sbin/setuser app php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller/
-/sbin/setuser app php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller-Report/
-/sbin/setuser app php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller-Ndr/
-/sbin/setuser app php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Service/
-/sbin/setuser app php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Entity/
-/sbin/setuser app php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Transformer/
+php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller/
+php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller-Report/
+php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller-Ndr/
+php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Service/
+php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Entity/
+php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Transformer/

@@ -57,6 +57,7 @@ services:
             - redisapi
         volumes:
             - ./app:/var/www/app
+            - ./scripts:/var/www/scripts
             - ./src:/var/www/src:ro
             - ./web:/var/www/web
         env_file:
