@@ -53,9 +53,6 @@ services:
         build: .
         ports:
             - 9000:9000
-        links:
-            - postgres
-            - redisapi
         volumes:
             - ./app:/var/www/app
             - ./scripts:/var/www/scripts
