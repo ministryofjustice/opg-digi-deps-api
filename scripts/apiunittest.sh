@@ -1,7 +1,5 @@
 #!/bin/bash
 set -e
-#let's configure environment
-run-parts /etc/my_init.d
 
 export PGHOST=${API_DATABASE_HOSTNAME:=postgres}
 export PGPASSWORD=${API_DATABASE_PASSWORD:=api}
@@ -14,6 +12,10 @@ rm -rf var/*
 
 rm -f /tmp/dd_stats.csv
 rm -f /tmp/dd_stats.unittest.csv
+
+php app/console doctrine:migrations:status-check
+php app/console doctrine:migrations:migrate-lock --no-interaction --verbose
+
 php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller/
 php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller-Report/
 php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller-Ndr/
