@@ -1,5 +1,54 @@
 version: '2'
 
 services:
-  api:
-    build: .
+    api:
+        container_name: opgdigidepsdocker_api_1
+        build: .
+        ports:
+            - 8090:443
+        volumes:
+            - ./app:/var/www/app
+            - ./scripts:/var/www/scripts
+            - ./src:/var/www/src:ro
+            - ./tests:/var/www/tests
+            - ./web:/var/www/web
+        env_file:
+            - ./docker/env/api.env
+        environment:
+            NGINX_LOG_LEVEL: warn
+            OPG_NGINX_CLIENTMAXBODYSIZE: 10M
+            OPG_NGINX_CLIENTBODYTIMEOUT: 120s
+            OPG_NGINX_INDEX: app_dev.php
+        restart: always
+        networks:
+            default: ~
+            digideps:
+                aliases:
+                    - api
+
+    postgres:
+        container_name: opgdigidepsdocker_postgres_1
+        image: postgres:9.5.13
+        ports:
+            - 5432:5432
+        env_file:
+            - ./docker/env/postgres.env
+        environment:
+            # use a different data directory to avoid using the old 9.3 version
+            PGDATA: /var/lib/postgresql96/data
+        restart: always
+        networks:
+            - default
+            - digideps
+
+    redisapi:
+        container_name: opgdigidepsdocker_redisapi_1
+        image: redis:2.8.21
+        restart: always
+
+volumes:
+    certs:
+
+networks:
+    digideps:
+        external: true
