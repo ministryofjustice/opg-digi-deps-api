@@ -1,58 +1,11 @@
 version: '2'
 
 services:
-    openssl:
-        image: buildpack-deps:stretch
-        entrypoint: openssl
-        command:
-            - req
-            - -newkey
-            - rsa:4096
-            - -x509
-            - -nodes
-            - -keyout
-            - /export/app.key
-            - -new
-            - -out
-            - /export/app.crt
-            - -subj
-            - "/C=GB/ST=GB/L=London/O=OPG/OU=Digital/CN=default"
-            - -sha256
-            - -days
-            - "3650"
-        volumes:
-            - certs:/export
-
-    web:
+    api:
         container_name: opgdigidepsdocker_api_1
-        build:
-            context: .
-            dockerfile: docker/web/Dockerfile
-        volumes:
-            - certs:/etc/nginx/certs
-            - ./web:/var/www/web
-        ports:
-            - 8090:443
-        depends_on:
-            - php
-        environment:
-            APP_HOST: php
-            APP_PORT: 9000
-            NGINX_LOG_LEVEL: warn
-            OPG_NGINX_CLIENTMAXBODYSIZE: 10M
-            OPG_NGINX_CLIENTBODYTIMEOUT: 120s
-            OPG_NGINX_INDEX: app_dev.php
-        networks:
-            default: ~
-            digideps:
-                aliases:
-                    - api
-
-    php:
-        container_name: opgdigidepsdocker_phpapi_1
         build: .
         ports:
-            - 9000:9000
+            - 8090:443
         volumes:
             - ./app:/var/www/app
             - ./scripts:/var/www/scripts
@@ -61,7 +14,17 @@ services:
             - ./web:/var/www/web
         env_file:
             - ./docker/env/api.env
+        environment:
+            NGINX_LOG_LEVEL: warn
+            OPG_NGINX_CLIENTMAXBODYSIZE: 10M
+            OPG_NGINX_CLIENTBODYTIMEOUT: 120s
+            OPG_NGINX_INDEX: app_dev.php
         restart: always
+        networks:
+            default: ~
+            digideps:
+                aliases:
+                    - api
 
     postgres:
         container_name: opgdigidepsdocker_postgres_1
@@ -82,13 +45,6 @@ services:
         container_name: opgdigidepsdocker_redisapi_1
         image: redis:2.8.21
         restart: always
-
-    composer:
-        build:
-            context: .
-            dockerfile: docker/composer/Dockerfile
-        volumes:
-            - .:/app
 
 volumes:
     certs:
