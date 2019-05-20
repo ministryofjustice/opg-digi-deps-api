@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+confd -onetime -backend env
 
 export PGHOST=${API_DATABASE_HOSTNAME:=postgres}
 export PGPASSWORD=${API_DATABASE_PASSWORD:=api}
