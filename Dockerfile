@@ -58,6 +58,7 @@ COPY --from=composer /app/vendor vendor
 COPY src src
 COPY app app
 COPY scripts scripts
+COPY tests tests
 COPY web web
 COPY docker/confd /etc/confd
 ENV TIMEOUT=20
