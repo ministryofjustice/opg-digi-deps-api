@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e
 #let's configure environment
-run-parts /etc/my_init.d
+confd -onetime -backend env
 
 cd /var/www
 
-# the following are not needed, as `run-parts` above already calls migration scripts
-# to remove after next release in February
 php app/console doctrine:migrations:status-check
 php app/console doctrine:migrations:migrate --no-interaction -vvv
 
