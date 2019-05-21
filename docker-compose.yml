@@ -28,7 +28,7 @@ services:
 
     postgres:
         container_name: opgdigidepsdocker_postgres_1
-        image: postgres:9.5.13
+        image: postgres:9.6
         ports:
             - 5432:5432
         env_file:
@@ -45,9 +45,6 @@ services:
         container_name: opgdigidepsdocker_redisapi_1
         image: redis:2.8.21
         restart: always
-
-volumes:
-    certs:
 
 networks:
     digideps:
