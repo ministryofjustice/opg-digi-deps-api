@@ -3,10 +3,10 @@ _Briefly describe the purpose of the change, and/or link to the JIRA ticket for 
 
 Fixes [DDPB-####](link to JIRA issue)
 
-## Approach
+## Approach
 _Explain how your code addresses the purpose of the change_
 
-## Learning
+## Learning
 _Any tips and tricks, blog posts or tools which helped you. Plus anything notable you've discovered about DigiDeps_
 
 ## Checklist
