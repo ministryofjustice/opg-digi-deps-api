@@ -72,12 +72,13 @@ COPY tests tests
 COPY web web
 COPY docker/confd /etc/confd
 ENV TIMEOUT=20
+
+RUN mkdir -p var/cache \
+  && mkdir -p var/logs \
+  && chown -R www-data var
+
 CMD confd -onetime -backend env \
   && waitforit -address=tcp://$API_DATABASE_HOSTNAME:$API_DATABASE_PORT -timeout=$TIMEOUT \
   && php app/console doctrine:migrations:migrate --no-interaction \
-  && php app/console doctrine:fixtures:load --no-interaction \
-  && mkdir -p var/cache \
-  && mkdir -p var/logs \
-  && chown -R www-data var \
   && php-fpm -D \
   && nginx
