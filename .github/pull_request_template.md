@@ -16,4 +16,5 @@ _Any tips and tricks, blog posts or tools which helped you. Plus anything notabl
 - [ ] I have successfully built my branch to a feature environment
 - [ ] New and existing unit tests pass locally with my changes (`docker-compose run --rm test sh scripts/clienttest.sh`)
 - [ ] There are no new frontend linting errors (`docker-compose run --rm npm run lint`)
+- [ ] There are no NPM security issues (`docker-compose run --rm npm audit`)
 - [ ] The product team have tested these changes
