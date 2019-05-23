@@ -108,6 +108,13 @@ class UserFixtures extends AbstractDataFixture
             'reportVariation' => 'L2',
             'ndr' => true,
         ],
+        [
+            'id' => 'codep',
+            'deputyType' => 'LAY',
+            'reportType' => 'OPG102',
+            'reportVariation' => 'L2',
+            'codeputyEnabled' => true,
+        ],
     ];
 
     public function doLoad(ObjectManager $manager)
@@ -129,6 +136,7 @@ class UserFixtures extends AbstractDataFixture
             ->setActive(true)
             ->setRegistrationDate(new \DateTime())
             ->setNdrEnabled(isset($data['ndr']))
+            ->setCoDeputyClientConfirmed(isset($data['codeputyEnabled']))
             ->setPhoneMain('07911111111111')
             ->setAddress1('Victoria Road')
             ->setAddressPostcode('SW1')
