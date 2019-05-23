@@ -42,6 +42,9 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log \
 # Install openssl for wget and certificate generation
 RUN apk add --update openssl
 
+# Install su-exec to run commands Symfony as www-data
+RUN apk add --no-cache su-exec
+
 # Add Confd to configure parameters on start
 ENV CONFD_VERSION="0.16.0"
 RUN wget -q -O /usr/local/bin/confd "https://github.com/kelseyhightower/confd/releases/download/v${CONFD_VERSION}/confd-${CONFD_VERSION}-linux-amd64" \
