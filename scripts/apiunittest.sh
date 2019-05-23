@@ -14,8 +14,8 @@ rm -rf var/*
 rm -f /tmp/dd_stats.csv
 rm -f /tmp/dd_stats.unittest.csv
 
-php app/console doctrine:migrations:status-check
-php app/console doctrine:migrations:migrate-lock --no-interaction --verbose
+su-exec www-data php app/console doctrine:migrations:status-check
+su-exec www-data php app/console doctrine:migrations:migrate-lock --no-interaction --verbose
 
 php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller/
 php vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml tests/AppBundle/Controller-Report/

@@ -5,6 +5,6 @@ confd -onetime -backend env
 
 . /var/www/scripts/initialize_schema.sh
 
-php app/console doctrine:migrations:status-check
-php app/console doctrine:migrations:migrate --no-interaction -vvv
-php app/console doctrine:fixtures:load --no-interaction
+su-exec www-data php app/console doctrine:migrations:status-check
+su-exec www-data php app/console doctrine:migrations:migrate --no-interaction -vvv
+su-exec www-data php app/console doctrine:fixtures:load --no-interaction
