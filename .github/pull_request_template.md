@@ -14,8 +14,6 @@ _Any tips and tricks, blog posts or tools which helped you. Plus anything notabl
 - [ ] I have updated documentation (Confluence/GitHub wiki) where relevant
 - [ ] I have added tests to prove my work, and they follow our [best practices](https://github.com/ministryofjustice/opg-digi-deps-client/wiki/Testing-best-practices)
 - [ ] I have successfully built my branch to a feature environment
-- [ ] New and existing unit tests pass locally with my changes (`docker-compose run --rm test sh scripts/clienttest.sh`)
-- [ ] There are no new frontend linting errors (`docker-compose run --rm npm run lint`)
-- [ ] There are no NPM security issues (`docker-compose run --rm npm audit`)
+- [ ] New and existing unit tests pass locally with my changes (`docker-compose run --rm api sh scripts/apiunittest.sh`)
 - [ ] There are no Composer security issues (`docker-compose run api php app/console security:check`)
 - [ ] The product team have tested these changes
