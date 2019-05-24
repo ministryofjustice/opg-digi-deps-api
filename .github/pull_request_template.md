@@ -17,4 +17,5 @@ _Any tips and tricks, blog posts or tools which helped you. Plus anything notabl
 - [ ] New and existing unit tests pass locally with my changes (`docker-compose run --rm test sh scripts/clienttest.sh`)
 - [ ] There are no new frontend linting errors (`docker-compose run --rm npm run lint`)
 - [ ] There are no NPM security issues (`docker-compose run --rm npm audit`)
+- [ ] There are no Composer security issues (`docker-compose run -v $(pwd)/../opg-digi-deps-api/composer.lock:/var/www/composer.lock api php app/console security:check`)
 - [ ] The product team have tested these changes
