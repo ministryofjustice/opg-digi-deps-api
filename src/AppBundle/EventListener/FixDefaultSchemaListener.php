@@ -9,17 +9,15 @@ class FixDefaultSchemaListener implements EventSubscriber
 {
     public function getSubscribedEvents()
     {
-        return array(
-            'postGenerateSchema',
-        );
+        return ['postGenerateSchema'];
     }
 
-    public function postGenerateSchema(GenerateSchemaEventArgs $Args)
+    public function postGenerateSchema(GenerateSchemaEventArgs $args)
     {
-        $Schema = $Args->getSchema();
+        $schema = $args->getSchema();
 
-        if (! $Schema->hasNamespace('public')) {
-            $Schema->createNamespace('public');
+        if (!$schema->hasNamespace('public')) {
+            $schema->createNamespace('public');
         }
     }
 }
