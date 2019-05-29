@@ -175,7 +175,6 @@ class UserFixtures extends AbstractDataFixture
             $manager->persist($ndr);
         }
 
-
         // Create report for PROF/PA user 2 years ago
         if ($data['deputyType'] === 'PROF' || $data['deputyType'] === 'PA') {
             $type = CasRec::getTypeBasedOnTypeofRepAndCorref($data['reportType'], $data['reportVariation'], $user->getRoleName());
@@ -187,6 +186,16 @@ class UserFixtures extends AbstractDataFixture
             $report = new Report($client, $type, $startDate, $endDate);
 
             $manager->persist($report);
+        }
+
+        // If codeputy was enabled, add a secondary account
+        if (isset($data['codeputyEnabled'])) {
+            $user2 = clone $user;
+            $user2->setLastname($user2->getLastname() . '-2');
+            $user2->setEmail('behat-' . strtolower($data['deputyType']) .  '-deputy-' . $data['id'] . '-2@publicguardian.gov.uk');
+            $user2->addClient($client);
+
+            $manager->persist($user2);
         }
     }
 
