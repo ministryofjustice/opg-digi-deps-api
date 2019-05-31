@@ -429,6 +429,8 @@ class ReportTest extends \PHPUnit_Framework_TestCase
         $values = ['not_deputy', 'only_deputy', 'more_deputies_behalf', 'more_deputies_not_behalf'];
         foreach ($values as $value) {
             $this->report->setAgreedBehalfDeputy($value);
+
+            $this->assertEquals($this->report->getAgreedBehalfDeputy(), $value);
         }
     }
 }
