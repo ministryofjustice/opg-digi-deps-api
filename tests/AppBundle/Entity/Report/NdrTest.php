@@ -27,7 +27,7 @@ class NdrTest extends \PHPUnit_Framework_TestCase
 
     public function testValidAgreedBehalfOptions()
     {
-        $values = ['not_deputy', 'only_deputy', 'more_deputies_behalf', 'more_deputies_not_behalf'];
+        $values = ['only_deputy', 'more_deputies_behalf', 'more_deputies_not_behalf'];
         foreach ($values as $value) {
             $this->ndr->setAgreedBehalfDeputy($value);
 
