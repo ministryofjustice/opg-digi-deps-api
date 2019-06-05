@@ -420,17 +420,24 @@ class ReportTest extends \PHPUnit_Framework_TestCase
 
     public function testInvalidAgreedBehalfOption()
     {
+        $this->report->setType(Report::TYPE_102);
+
         $this->setExpectedException(\InvalidArgumentException::class);
-        $this->report->setAgreedBehalfDeputy('BAD_VALUE');
+        $this->report->setAgreedBehalfDeputy('not_deputy');
     }
 
     public function testValidAgreedBehalfOptions()
     {
-        $values = ['not_deputy', 'only_deputy', 'more_deputies_behalf', 'more_deputies_not_behalf'];
+        $values = ['only_deputy', 'more_deputies_behalf', 'more_deputies_not_behalf'];
         foreach ($values as $value) {
             $this->report->setAgreedBehalfDeputy($value);
 
             $this->assertEquals($this->report->getAgreedBehalfDeputy(), $value);
         }
+
+        $this->report->setType(Report::TYPE_102_5);
+        $this->report->setAgreedBehalfDeputy('not_deputy');
+
+        $this->assertEquals($this->report->getAgreedBehalfDeputy(), 'not_deputy');
     }
 }
