@@ -901,11 +901,7 @@ class Report implements ReportInterface
 
     public function setAgreedBehalfDeputy($agreeBehalfDeputy)
     {
-        $acceptedValues = ['only_deputy', 'more_deputies_behalf', 'more_deputies_not_behalf'];
-
-        if (!$this->isLayReport()) {
-            $acceptedValues[] = 'not_deputy';
-        }
+        $acceptedValues = ['not_deputy', 'only_deputy', 'more_deputies_behalf', 'more_deputies_not_behalf'];
 
         if ($agreeBehalfDeputy && !in_array($agreeBehalfDeputy, $acceptedValues)) {
             throw new \InvalidArgumentException(__METHOD__ . " {$agreeBehalfDeputy} given. Expected value: " . implode(' or ', $acceptedValues));
