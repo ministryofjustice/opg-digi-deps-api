@@ -418,43 +418,6 @@ class ReportTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->report->getReportTitle());
     }
 
-    public function testisLayReport()
-    {
-        $startDate = new \Datetime('2017-01-01');
-        $endDate = new \Datetime('2018-12-31');
-
-        $layReportTypes = [
-            Report::TYPE_102,
-            Report::TYPE_103,
-            Report::TYPE_104,
-            Report::TYPE_102_4,
-            Report::TYPE_103_4,
-        ];
-        foreach ($layReportTypes as $reportType)
-        {
-            $report = new Report($this->client, $reportType, $startDate, $endDate, false);
-            $this->assertEquals($report->isLayReport(), true);
-        }
-
-        $profPaReportTypes = [
-            Report::TYPE_102_5,
-            Report::TYPE_103_5,
-            Report::TYPE_104_5,
-            Report::TYPE_102_4_5,
-            Report::TYPE_103_4_5,
-            Report::TYPE_102_6,
-            Report::TYPE_103_6,
-            Report::TYPE_104_6,
-            Report::TYPE_102_4_6,
-            Report::TYPE_103_4_6,
-        ];
-        foreach ($profPaReportTypes as $reportType)
-        {
-            $report = new Report($this->client, $reportType, $startDate, $endDate, false);
-            $this->assertEquals($report->isLayReport(), false);
-        }
-    }
-
     public function testInvalidAgreedBehalfOption()
     {
         $this->setExpectedException(\InvalidArgumentException::class);

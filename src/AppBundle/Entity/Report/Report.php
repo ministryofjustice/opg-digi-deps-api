@@ -526,18 +526,6 @@ class Report implements ReportInterface
     }
 
     /**
-     * @JMS\VirtualProperty
-     * @JMS\SerializedName("is_lay_report")
-     * @JMS\Groups({"report"})
-     */
-    public function isLayReport()
-    {
-        $layReportTypes = [Report::TYPE_102, Report::TYPE_103, Report::TYPE_104, Report::TYPE_102_4, Report::TYPE_103_4];
-        return in_array($this->getType(), $layReportTypes);
-    }
-
-
-    /**
      * set Due date to +8 weeks after end date
      */
     public function updateDueDateBasedOnEndDate()
