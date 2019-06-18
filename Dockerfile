@@ -1,4 +1,4 @@
-FROM php:5-fpm-alpine3.8 AS composer
+FROM composer AS composer
 
 # Install Git for Composer
 RUN apk add --no-cache git
@@ -21,7 +21,7 @@ RUN composer dump-autoload --optimize
 
 
 
-FROM php:5-fpm-alpine3.8
+FROM php:7-fpm-alpine
 
 # Install postgresql drivers
 RUN apk add --no-cache postgresql-dev postgresql-client \
