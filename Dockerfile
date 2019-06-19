@@ -23,19 +23,21 @@ RUN composer dump-autoload --optimize
 
 FROM php:7-fpm-alpine
 
-# Install postgresql drivers
-RUN apk add --no-cache postgresql-dev postgresql-client \
-  && docker-php-ext-install pdo pdo_pgsql
+# Install Postgres tools and command line client
+RUN apk add --no-cache autoconf g++ make postgresql-dev postgresql-client
 
-# Enable Redis driver
-RUN apk add --no-cache autoconf g++ make \
-  && pecl install redis \
+# Install core PHP extensions
+RUN docker-php-ext-install pdo_pgsql opcache
+
+# Install Redis
+RUN pecl install redis \
   && docker-php-ext-enable redis
 
 # Install Xdebug if directed to with build arg from docker-compose.yml
 ARG REQUIRE_XDEBUG=false
 RUN if [ $REQUIRE_XDEBUG = "true" ] ; then \
-        apk add php7-xdebug; \
+        pecl install xdebug; \
+        docker-php-ext-enable xdebug; \
     fi ;
 
 # Add NGINX
