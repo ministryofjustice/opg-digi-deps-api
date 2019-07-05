@@ -59,6 +59,10 @@ docker-compose run --rm api sh scripts/apiunittest.sh
 
 We use [Mockery][mockery] to mock classes and entities which are not being tested.
 
+## Deployment
+
+_See [deployment documentation][docs-deployment]_
+
 ## Built with
 
 - Symfony 3.4
@@ -83,3 +87,4 @@ The OPG Digideps API is released under the MIT license, a copy of which can be f
 [service]: https://complete-deputy-report.service.gov.uk/
 [jms-groups]: https://www.jmsyst.com/libs/serializer/master/cookbook/exclusion_strategies#creating-different-views-of-your-objects
 [mockery]: http://docs.mockery.io/en/latest/
+[docs-deployment]: https://github.com/ministryofjustice/opg-digi-deps-client/blob/master/docs/DEPLOYMENT.md
