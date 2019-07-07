@@ -9,8 +9,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/lay-deputyship")
@@ -26,25 +24,19 @@ class LayDeputyshipUploadController
     /** @var CasRecLayDeputyshipUploader */
     private $uploader;
 
-    /** @var AuthorizationCheckerInterface */
-    private $authChecker;
-
     /**
      * @param DataCompression $dataCompression
      * @param LayDeputyshipDtoCollectionAssembler $assembler
      * @param CasRecLayDeputyshipUploader $uploader
-     * @param AuthorizationCheckerInterface $authChecker
      */
     public function __construct(
         DataCompression $dataCompression,
         LayDeputyshipDtoCollectionAssembler $assembler,
-        CasRecLayDeputyshipUploader $uploader,
-        AuthorizationCheckerInterface $authChecker
+        CasRecLayDeputyshipUploader $uploader
     ) {
         $this->dataCompression = $dataCompression;
         $this->assembler = $assembler;
         $this->uploader = $uploader;
-        $this->authChecker = $authChecker;
     }
 
     /**

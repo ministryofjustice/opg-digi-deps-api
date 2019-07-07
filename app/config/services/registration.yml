@@ -6,7 +6,6 @@ services:
       - '@AppBundle\v2\Registration\DataCompression'
       - '@AppBundle\v2\Registration\Assembler\LayDeputyshipDtoCollectionAssembler'
       - '@AppBundle\v2\Registration\Uploader\CasRecLayDeputyshipUploader'
-      - '@security.authorization_checker'
     public: true
 
   AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssembler:
