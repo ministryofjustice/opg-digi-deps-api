@@ -24,7 +24,7 @@ class LayDeputyshipDtoCollectionAssemblerTest extends TestCase
     {
         $this->layDeputyshipDtoAssembler = $this
             ->getMockBuilder(LayDeputyshipDtoAssembler::class)
-            ->setMethods(['assembleFromArray'])
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->sut = new LayDeputyshipDtoCollectionAssembler($this->layDeputyshipDtoAssembler);

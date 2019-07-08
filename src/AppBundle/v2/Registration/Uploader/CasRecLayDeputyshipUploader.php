@@ -27,14 +27,23 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
     /** @var CasRecFactory */
     private $casRecFactory;
 
+    /** @var int */
+    private $added = 0;
+
+    /** @var array */
+    private $ignored = [];
+
     /** @var array */
     private $errors = [];
+
+    /** @var array */
+    private $casRecEntities = [];
 
     /** @var int */
     const MAX_UPLOAD = 10000;
 
     /** @var int */
-    const PERSIST_EVERY = 5000;
+    const FLUSH_EVERY = 5000;
 
     /**
      * @param EntityManager $em
@@ -62,39 +71,41 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
     {
         $this->throwExceptionIfDataTooLarge($collection);
 
-        $added = 0;
-        $casRecEntities = [];
-
         try {
             $this->em->beginTransaction();
 
             foreach ($collection as $index => $layDeputyshipDto) {
 
-                if ($this->clientBelongsToDifferentDeputy($layDeputyshipDto)) { continue; }
-
-                try {
-                    $casRecEntities[] = $this->createAndPersistNewCasRecEntity($layDeputyshipDto);
-
-                    if ((++$added % self::PERSIST_EVERY) === 0) {
-                        $this->em->flush();
-                        $this->em->clear();
-                    }
-                } catch (CasRecCreationException $e) {
-                    $this->logError($index + 2, $e->getMessage());
+                if ($this->clientBelongsToDifferentDeputy($layDeputyshipDto)) {
+                    $this->ignored[] = sprintf('%s:%s', $layDeputyshipDto->getCaseNumber(), $layDeputyshipDto->getDeputyNumber());
                     continue;
                 }
+
+
+                try {
+                    $this->createAndPersistNewCasRecEntity($layDeputyshipDto);
+                } catch (CasRecCreationException $e) {
+                    $this->errors[] = sprintf('ERROR IN LINE %d: %s', $index + 2, $e->getMessage());
+                    continue;
+                }
+
+                $this->handleBatchDatabaseFlush();
             }
 
-            $this->em->flush();
-            $this->reportService->updateCurrentReportTypes($casRecEntities, User::ROLE_LAY_DEPUTY);
-            $this->em->commit();
-            $this->em->clear();
+            $this
+                ->updateReportTypes()
+                ->commitTransactionToDatabase();
 
         } catch (\Throwable $e) {
-            return ['added' => $added - 1, 'errors' => [$e->getMessage()]];
+            return ['added' => $this->added, 'errors' => [$e->getMessage()]];
         }
 
-        return ['added' => $added, 'errors' => $this->errors];
+        return [
+            'added' => $this->added,
+            'errors' => $this->errors,
+            'ignored-count' => count($this->ignored),
+            'ignored' => $this->ignored
+        ];
     }
 
     /**
@@ -102,7 +113,7 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
      */
     private function throwExceptionIfDataTooLarge(LayDeputyshipDtoCollection $collection): void
     {
-        if (count($collection) > self::MAX_UPLOAD) {
+        if ($collection->count() > self::MAX_UPLOAD) {
             throw new \RuntimeException(sprintf(
                 'Max %d records allowed in a single bulk insert',
                 self::MAX_UPLOAD
@@ -117,32 +128,71 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
      */
     private function clientBelongsToDifferentDeputy(LayDeputyshipDto $layDeputyshipDto): bool
     {
-        return $this
+        $result = $this
             ->clientRepository
             ->clientIsAttachedButNotToThisDeputy($layDeputyshipDto->getCaseNumber(), $layDeputyshipDto->getDeputyNumber());
+
+        if (false === $result) { return false; }
+
+
+        // Some deputies have a ',' separated list of deputy nums so if the above query tells us the client is registered to
+        // a different deputy, it may be a false result if the deputy num is concealed with a string list.
+        // Double check for the deputy num within a string list.
+        $deputyNumbers = explode(',', $result['deputy_no']);
+        if (count($deputyNumbers) > 1 && in_array($layDeputyshipDto->getDeputyNumber(), $deputyNumbers)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * @param LayDeputyshipDto $layDeputyshipDto
-     * @return CasRec
+     * @return CasRecLayDeputyshipUploader
      * @throws \Doctrine\ORM\ORMException
      */
-    private function createAndPersistNewCasRecEntity(LayDeputyshipDto $layDeputyshipDto): CasRec
+    private function createAndPersistNewCasRecEntity(LayDeputyshipDto $layDeputyshipDto): CasRecLayDeputyshipUploader
     {
-        $casRecEntity = $this->casRecFactory->createFromDto($layDeputyshipDto);
+        $this->casRecEntities[] = $casRecEntity = $this->casRecFactory->createFromDto($layDeputyshipDto);
 
         $this->em->persist($casRecEntity);
 
-        return $casRecEntity;
+        return $this;
     }
 
     /**
-     * @param $line
-     * @param $message
-     * @return array
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
      */
-    private function logError($line, $message): array
+    private function handleBatchDatabaseFlush(): void
     {
-        $this->errors[] = sprintf('ERROR IN LINE %d: %s', $line, $message);
+        if ((++$this->added % self::FLUSH_EVERY) === 0) {
+            $this->em->flush();
+            $this->em->clear();
+        }
+    }
+
+    /**
+     * @return CasRecLayDeputyshipUploader
+     * @throws \Exception
+     */
+    private function updateReportTypes(): CasRecLayDeputyshipUploader
+    {
+        $this->reportService->updateCurrentReportTypes($this->casRecEntities, User::ROLE_LAY_DEPUTY);
+
+        return $this;
+    }
+
+    /**
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function commitTransactionToDatabase(): void
+    {
+        $this->em->flush();
+        $this->em->commit();
+        $this->em->clear();
     }
 }

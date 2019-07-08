@@ -124,7 +124,7 @@ class ClientRepository extends EntityRepository
         $conn = $this->getEntityManager()->getConnection();
 
         $stmt = $conn->executeQuery(
-            'select * from client c 
+            'select u.deputy_no from client c 
                     inner join deputy_case dc on c.id = dc.client_id 
                     inner join dd_user u on dc.user_id = u.id 
                     where c.case_number = ? 
@@ -133,9 +133,7 @@ class ClientRepository extends EntityRepository
             [$caseNumber, $deputyNumber]
         );
 
-        $result = $stmt->fetch();
-
-        // Query will only return a result that is attached, but not to this deputy.
-        return ($result === false) ? false : true;
+        // Result is either false for no match, or an array result for the different deputy that is assigned.
+        return $stmt->fetch();
     }
 }

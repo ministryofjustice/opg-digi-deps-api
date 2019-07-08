@@ -2,6 +2,7 @@
 
 namespace Tests\AppBundle\v2\Registration\Assembler;
 
+use AppBundle\Service\DataNormaliser;
 use AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssembler;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 use PHPUnit\Framework\TestCase;
@@ -14,7 +15,7 @@ class LayDeputyshipDtoAssemblerTest extends TestCase
     /** {@inheritDoc} */
     protected function setUp()
     {
-        $this->sut = new LayDeputyshipDtoAssembler();
+        $this->sut = new LayDeputyshipDtoAssembler(new DataNormaliser());
     }
 
     /**
@@ -32,11 +33,11 @@ class LayDeputyshipDtoAssemblerTest extends TestCase
         $result = $this->sut->assembleFromArray($this->getInput());
 
         $this->assertInstanceOf(LayDeputyshipDto::class, $result);
-        $this->assertEquals('case', $result->getCaseNumber());
+        $this->assertEquals('caset', $result->getCaseNumber());
         $this->assertEquals('surname', $result->getClientSurname());
         $this->assertEquals('deputy_no', $result->getDeputyNumber());
-        $this->assertEquals('deputy_surname', $result->getDeputySurname());
-        $this->assertEquals('deputy_postcode', $result->getDeputyPostcode());
+        $this->assertEquals('deputy-surname', $result->getDeputySurname());
+        $this->assertEquals('deputypostcode', $result->getDeputyPostcode());
         $this->assertEquals('type_of_rep', $result->getTypeOfReport());
         $this->assertEquals('corref', $result->getCorref());
         $this->assertEquals(true, $result->isNdrEnabled());
@@ -74,10 +75,10 @@ class LayDeputyshipDtoAssemblerTest extends TestCase
     private function getInput(): array
     {
         return [
-            'Case' => 'case',
+            'Case' => 'caseT',
             'Surname' => 'surname',
             'Deputy No' => 'deputy_no',
-            'Dep Surname' => 'deputy_surname',
+            'Dep Surname' => 'deputy-surname',
             'Dep Postcode' => 'deputy_postcode',
             'Typeofrep' => 'type_of_rep',
             'Corref' => 'corref',
