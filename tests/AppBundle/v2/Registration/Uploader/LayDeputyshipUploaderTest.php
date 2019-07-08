@@ -71,16 +71,10 @@ class LayDeputyshipUploaderTest extends TestCase
         $collection->append($this->buildLayDeputyshipDto(1));
 
         // Ensure Client will belong with another deputy.
-        $this
-            ->clientRepository
-            ->method('clientIsAttachedButNotToThisDeputy')
-            ->willReturn(['deputy_no' => '123']);
+        $this->clientRepository->method('clientIsAttachedButNotToThisDeputy')->willReturn(['deputy_no' => '123']);
 
         // Assert CasRec Entity will not be created.
-        $this
-            ->factory
-            ->expects($this->never())
-            ->method('createFromDto');
+        $this->factory->expects($this->never())->method('createFromDto');
 
         $this->assertReportTypeWillNotBeSentForEvaluation();
 
@@ -110,15 +104,13 @@ class LayDeputyshipUploaderTest extends TestCase
         $c = new CasRec([]);
 
         // Assert 3 CasRec entities will be created.
-        $this
-            ->factory
+        $this->factory
             ->expects($this->exactly(3))
             ->method('createFromDto')
             ->willReturnOnConsecutiveCalls($a, $b, $c);
 
         // Assert Report Types will be sent for evaluation for each CasRec that is created.
-        $this
-            ->reportService
+        $this->reportService
             ->expects($this->once())
             ->method('updateCurrentReportTypes')
             ->with([$a, $b, $c], User::ROLE_LAY_DEPUTY);
@@ -169,16 +161,14 @@ class LayDeputyshipUploaderTest extends TestCase
 
     private function ensureClientWillNotBelongToAnotherDeputy(): void
     {
-        $this
-            ->clientRepository
+        $this->clientRepository
             ->method('clientIsAttachedButNotToThisDeputy')
             ->willReturn(false);
     }
 
     private function assertReportTypeWillNotBeSentForEvaluation(): void
     {
-        $this
-            ->reportService
+        $this->reportService
             ->expects($this->once())
             ->method('updateCurrentReportTypes')
             ->with([], User::ROLE_LAY_DEPUTY);

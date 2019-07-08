@@ -52,6 +52,7 @@ class CasRecFactory
             'Dep Surname' => $dto->getDeputySurname(),
             'Dep Postcode' => $dto->getDeputyPostcode(),
             'Typeofrep' => $dto->getTypeOfReport(),
+            'Corref' => $dto->getCorref(),
             'NDR' => $dto->isNdrEnabled()
         ];
     }

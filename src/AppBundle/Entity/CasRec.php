@@ -354,4 +354,12 @@ class CasRec
 
         return $this;
     }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
 }
