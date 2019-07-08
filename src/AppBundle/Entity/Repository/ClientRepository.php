@@ -112,4 +112,28 @@ class ClientRepository extends EntityRepository
 
         return count($result) === 0 ? null : $result[0];
     }
+
+    /**
+     * @param $caseNumber
+     * @param $deputyNumber
+     * @return bool
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function clientIsAttachedButNotToThisDeputy($caseNumber, $deputyNumber)
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $stmt = $conn->executeQuery(
+            'select u.deputy_no from client c 
+                    inner join deputy_case dc on c.id = dc.client_id 
+                    inner join dd_user u on dc.user_id = u.id 
+                    where c.case_number = ? 
+                    and u.deputy_no != ? 
+                    and u.deputy_no is not null',
+            [$caseNumber, $deputyNumber]
+        );
+
+        // Result is either false for no match, or an array result for the different deputy that is assigned.
+        return $stmt->fetch();
+    }
 }
