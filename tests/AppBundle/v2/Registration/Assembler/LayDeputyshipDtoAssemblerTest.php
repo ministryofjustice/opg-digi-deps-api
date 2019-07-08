@@ -21,10 +21,29 @@ class LayDeputyshipDtoAssemblerTest extends TestCase
     /**
      * @test
      * @expectedException \InvalidArgumentException
+     * @dataProvider getMissingDataVariations
      */
-    public function assembleFromArrayThrowsExceptionsIfGivenIncompleteData(): void
+    public function assembleFromArrayThrowsExceptionsIfGivenIncompleteData($itemToRemove): void
     {
-        $this->sut->assembleFromArray([]);
+        $input = $this->getInput();
+        unset($input[$itemToRemove]);
+
+        $this->sut->assembleFromArray($input);
+    }
+
+    /** @return array */
+    public function getMissingDataVariations(): array
+    {
+        return [
+            ['Case'],
+            ['Surname'],
+            ['Deputy No'],
+            ['Dep Surname'],
+            ['Dep Postcode'],
+            ['Typeofrep'],
+            ['Corref'],
+            ['NDR']
+        ];
     }
 
     /** @test */

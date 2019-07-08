@@ -123,12 +123,6 @@ class ClientRepository extends EntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        // create client, add to a user, query with that client and that user - return false
-        // create client, add to a user, query with that client and NOT that user - return result
-        // create client, add to nobody, query with that client and any user - return false
-        // client does not exist - return false
-
-
         $stmt = $conn->executeQuery(
             'select u.deputy_no from client c 
                     inner join deputy_case dc on c.id = dc.client_id 

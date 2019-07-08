@@ -75,12 +75,10 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
             $this->em->beginTransaction();
 
             foreach ($collection as $index => $layDeputyshipDto) {
-
                 if ($this->clientBelongsToDifferentDeputy($layDeputyshipDto)) {
                     $this->ignored[] = sprintf('%s:%s', $layDeputyshipDto->getCaseNumber(), $layDeputyshipDto->getDeputyNumber());
                     continue;
                 }
-
 
                 try {
                     $this->createAndPersistNewCasRecEntity($layDeputyshipDto);
@@ -134,16 +132,12 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
 
         if (false === $result) { return false; }
 
-
         // Some deputies have a ',' separated list of deputy nums so if the above query tells us the client is registered to
         // a different deputy, it may be a false result if the deputy num is concealed with a string list.
         // Double check for the deputy num within a string list.
         $deputyNumbers = explode(',', $result['deputy_no']);
-        if (count($deputyNumbers) > 1 && in_array($layDeputyshipDto->getDeputyNumber(), $deputyNumbers)) {
-            return false;
-        }
 
-        return true;
+        return (in_array($layDeputyshipDto->getDeputyNumber(), $deputyNumbers)) ? false : true;
     }
 
     /**
