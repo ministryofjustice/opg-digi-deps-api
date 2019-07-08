@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\v2\Registration;
+namespace AppBundle\Service;
 
 class DataCompression
 {

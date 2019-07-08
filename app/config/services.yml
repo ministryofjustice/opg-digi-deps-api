@@ -75,3 +75,9 @@ services:
         resource: '../../src/AppBundle/DataFixtures'
         tags: ['doctrine.fixture.orm']
         arguments: ['@security.password_encoder']
+
+    AppBundle\Service\DataCompression:
+        class: AppBundle\Service\DataCompression
+
+    AppBundle\Service\DataNormaliser:
+        class: AppBundle\Service\DataNormaliser

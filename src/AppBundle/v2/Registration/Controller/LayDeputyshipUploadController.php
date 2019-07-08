@@ -3,7 +3,7 @@
 namespace AppBundle\v2\Registration\Controller;
 
 use AppBundle\v2\Registration\Assembler\LayDeputyshipDtoCollectionAssembler;
-use AppBundle\v2\Registration\DataCompression;
+use AppBundle\Service\DataCompression;
 use AppBundle\v2\Registration\Uploader\CasRecLayDeputyshipUploader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;

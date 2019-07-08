@@ -2,13 +2,21 @@
 
 namespace AppBundle\v2\Registration\Assembler;
 
-use AppBundle\Entity\CasRec;
-use AppBundle\v2\DTO\DtoPropertySetterTrait;
+use AppBundle\Service\DataNormaliser;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 
 class LayDeputyshipDtoAssembler
 {
-    use DtoPropertySetterTrait;
+    /** @var DataNormaliser */
+    private $normaliser;
+
+    /**
+     * @param DataNormaliser $normaliser
+     */
+    public function __construct(DataNormaliser $normaliser)
+    {
+        $this->normaliser = $normaliser;
+    }
 
     /**
      * @param array $data
@@ -22,11 +30,11 @@ class LayDeputyshipDtoAssembler
 
         return
             (new LayDeputyshipDto())
-            ->setCaseNumber(CasRec::normaliseCaseNumber($data['Case']))
-            ->setClientSurname(CasRec::normaliseSurname($data['Surname']))
-            ->setDeputyNumber(CasRec::normaliseDeputyNo($data['Deputy No']))
-            ->setDeputySurname(CasRec::normaliseSurname($data['Dep Surname']))
-            ->setDeputyPostcode(CasRec::normaliseSurname($data['Dep Postcode']))
+            ->setCaseNumber($this->normaliser->normaliseCaseNumber($data['Case']))
+            ->setClientSurname($this->normaliser->normaliseSurname($data['Surname']))
+            ->setDeputyNumber($this->normaliser->normaliseDeputyNo($data['Deputy No']))
+            ->setDeputySurname($this->normaliser->normaliseSurname($data['Dep Surname']))
+            ->setDeputyPostcode($this->normaliser->normalisePostCode($data['Dep Postcode']))
             ->setTypeOfReport($data['Typeofrep'])
             ->setCorref($data['Corref'])
             ->setIsNdrEnabled($this->determineNdrStatus($data['NDR']));
