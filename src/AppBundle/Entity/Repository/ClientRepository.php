@@ -116,10 +116,10 @@ class ClientRepository extends EntityRepository
     /**
      * @param $caseNumber
      * @param $deputyNumber
-     * @return bool
+     * @return mixed[]
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function clientIsAttachedButNotToThisDeputy($caseNumber, $deputyNumber)
+    public function getAttachedDeputiesIfNotAttachedToThis($caseNumber, $deputyNumber)
     {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -133,7 +133,6 @@ class ClientRepository extends EntityRepository
             [$caseNumber, $deputyNumber]
         );
 
-        // Result is either false for no match, or an array result for the different deputy that is assigned.
-        return $stmt->fetch();
+        return $stmt->fetchAll();
     }
 }

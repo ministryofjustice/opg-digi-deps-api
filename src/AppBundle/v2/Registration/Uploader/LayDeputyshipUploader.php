@@ -126,16 +126,19 @@ class LayDeputyshipUploader
     {
         $result = $this
             ->clientRepository
-            ->clientIsAttachedButNotToThisDeputy($layDeputyshipDto->getCaseNumber(), $layDeputyshipDto->getDeputyNumber());
+            ->getAttachedDeputiesIfNotAttachedToThis($layDeputyshipDto->getCaseNumber(), $layDeputyshipDto->getDeputyNumber());
 
-        if (false === $result) { return false; }
+        if (!$result) { return false; }
 
-        // Some deputies have a ',' separated list of deputy nums so if the above query tells us the client is registered to
-        // a different deputy, it may be a false result if the deputy num is concealed with a string list.
-        // Double check for the deputy num within a string list.
-        $deputyNumbers = explode(',', $result['deputy_no']);
+        if (count($result) === 1) {
+            // A single result could be this Lay deputy but with a ',' separated list of deputy nums (Multiple Lay Deputyship)..
+            // Before we rule out this result not belonging to this Lay deputy, double check for the deputy num within a string list.
+            $deputyNumbers = explode(',', $result[0]['deputy_no']);
 
-        return (in_array($layDeputyshipDto->getDeputyNumber(), $deputyNumbers)) ? false : true;
+            return !in_array($layDeputyshipDto->getDeputyNumber(), $deputyNumbers);
+        }
+
+        return true;
     }
 
     /**

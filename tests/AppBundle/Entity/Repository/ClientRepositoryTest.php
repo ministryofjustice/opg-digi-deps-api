@@ -35,30 +35,30 @@ class ClientRepositoryTest extends KernelTestCase
      */
     public function clientIsAttachedButNotToThisDeputyReturnsFalseIfClientNotExist()
     {
-        $result = $this->repository->clientIsAttachedButNotToThisDeputy('case-num', 'dep-num');
+        $result = $this->repository->getAttachedDeputiesIfNotAttachedToThis('case-num', 'dep-num');
 
-        $this->assertFalse($result);
+        $this->assertEmpty($result);
     }
 
     /**
      * @test
      */
-    public function clientIsAttachedButNotToThisDeputyReturnsFalseIfClientExistButHasNoDeputy()
+    public function getAttachedDeputiesIfNotAttachedToThisReturnsFalseIfClientExistButHasNoDeputy()
     {
         $this->persistClientWithCaseNumber('case-num-alpha');
         $this->entityManager->flush();
 
         $result = $this->entityManager
             ->getRepository(Client::class)
-            ->clientIsAttachedButNotToThisDeputy('case-num-alpha', 'dep-num');
+            ->getAttachedDeputiesIfNotAttachedToThis('case-num-alpha', 'dep-num');
 
-        $this->assertFalse($result);
+        $this->assertEmpty($result);
     }
 
     /**
      * @test
      */
-    public function clientIsAttachedButNotToThisDeputyReturnsFalseIfClientExistAndAttachedToGivenDeputy()
+    public function getAttachedDeputiesIfNotAttachedToThisReturnsFalseIfClientExistAndAttachedToGivenDeputy()
     {
         $client = $this->persistClientWithCaseNumber('case-num-beta');
         $deputy = $this->persistDeputyWithDeputyNumber('dep-num-alpha');
@@ -68,30 +68,31 @@ class ClientRepositoryTest extends KernelTestCase
 
         $result = $this->entityManager
             ->getRepository(Client::class)
-            ->clientIsAttachedButNotToThisDeputy('case-num-beta', 'dep-num-alpha');
+            ->getAttachedDeputiesIfNotAttachedToThis('case-num-beta', 'dep-num-alpha');
 
-        $this->assertFalse($result);
+        $this->assertEmpty($result);
     }
 
     /**
      * @test
      */
-    public function clientIsAttachedButNotToThisDeputyReturnsRowIfClientExistAndAttachedButNotToGivenDeputy()
+    public function getAttachedDeputiesIfNotAttachedToThisReturnsRowsIfClientExistAndAttachedButNotToGivenDeputy()
     {
         $this->persistDeputyWithDeputyNumber('dep-num-beta');
 
         $client = $this->persistClientWithCaseNumber('case-num-charlie');
         $deputyAttachedTo = $this->persistDeputyWithDeputyNumber('dep-num-charlie');
+        $deputyAlsoAttachedTo = $this->persistDeputyWithDeputyNumber('dep-num-delta');
 
-        $client->addUser($deputyAttachedTo);
+        $client->addUser($deputyAttachedTo)->addUser($deputyAlsoAttachedTo);
         $this->entityManager->flush();
 
         $result = $this->entityManager
             ->getRepository(Client::class)
-            ->clientIsAttachedButNotToThisDeputy('case-num-charlie', 'dep-num-beta');
+            ->getAttachedDeputiesIfNotAttachedToThis('case-num-charlie', 'dep-num-beta');
 
-        $this->assertInternalType('array', $result);
-        $this->assertEquals('dep-num-charlie', $result['deputy_no']);
+        $this->assertEquals('dep-num-charlie', $result[0]['deputy_no']);
+        $this->assertEquals('dep-num-delta', $result[1]['deputy_no']);
     }
 
     /**

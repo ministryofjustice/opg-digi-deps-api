@@ -29,7 +29,7 @@ class DataNormaliser
         // remove MBE suffix
         $value = preg_replace('/ (mbe|m b e)$/i', '', $value);
 
-        $value = preg_replace('/([^a-z0-9-])/i', '', $value);
+        $value = preg_replace('/([^a-z0-9])/i', '', $value);
 
         return $value;
     }
