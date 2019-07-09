@@ -52,8 +52,6 @@ class LayDeputyshipUploadController
         ini_set('memory_limit', '1024M');
 
         $postedData = $this->dataCompression->decompress($request->getContent());
-        $postedData[0]['Case'] = '';
-        $postedData[0]['Dep Postcode'] = '1';
         $uploadCollection = $this->assembler->assembleFromArray($postedData);
 
         return $this->uploader->upload($uploadCollection);
