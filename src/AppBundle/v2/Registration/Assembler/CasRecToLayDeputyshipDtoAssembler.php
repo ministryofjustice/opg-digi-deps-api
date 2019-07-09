@@ -5,7 +5,7 @@ namespace AppBundle\v2\Registration\Assembler;
 use AppBundle\Service\DataNormaliser;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 
-class LayDeputyshipDtoAssembler
+class CasRecToLayDeputyshipDtoAssembler implements LayDeputyshipDtoAssemblerInterface
 {
     /** @var DataNormaliser */
     private $normaliser;
@@ -24,10 +24,6 @@ class LayDeputyshipDtoAssembler
      */
     public function assembleFromArray(array $data)
     {
-        if (!$this->canAssemble($data)) {
-            throw new \InvalidArgumentException('Cannot assemble LayDeputyshipDto: Missing expected data');
-        }
-
         return
             (new LayDeputyshipDto())
             ->setCaseNumber($this->normaliser->normaliseCaseNumber($data['Case']))
@@ -44,7 +40,7 @@ class LayDeputyshipDtoAssembler
      * @param array $data
      * @return bool
      */
-    private function canAssemble(array $data): bool
+    public function canAssemble(array $data)
     {
         return
             array_key_exists('Case', $data) &&

@@ -10,7 +10,7 @@ use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDtoCollection;
 use AppBundle\v2\Registration\SelfRegistration\Factory\CasRecCreationException;
 use AppBundle\v2\Registration\SelfRegistration\Factory\CasRecFactory;
-use AppBundle\v2\Registration\Uploader\CasRecLayDeputyshipUploader;
+use AppBundle\v2\Registration\Uploader\LayDeputyshipUploader;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\TestCase;
 
@@ -28,7 +28,7 @@ class LayDeputyshipUploaderTest extends TestCase
     /** @var CasRecFactory | \PHPUnit_Framework_MockObject_MockObject */
     private $factory;
 
-    /** @var CasRecLayDeputyshipUploader */
+    /** @var LayDeputyshipUploader */
     private $sut;
 
     /** {@inheritDoc} */
@@ -39,7 +39,7 @@ class LayDeputyshipUploaderTest extends TestCase
         $this->reportService = $this->getMockBuilder(ReportService::class)->disableOriginalConstructor()->setMethods(['updateCurrentReportTypes'])->getMock();
         $this->factory = $this->getMockBuilder(CasRecFactory::class)->disableOriginalConstructor()->enableArgumentCloning()->getMock();
 
-        $this->sut = new CasRecLayDeputyshipUploader(
+        $this->sut = new LayDeputyshipUploader(
             $this->em,
             $this->clientRepository,
             $this->reportService,
@@ -55,7 +55,7 @@ class LayDeputyshipUploaderTest extends TestCase
     {
         $collection = new LayDeputyshipDtoCollection();
 
-        for ($i = 0; $i < CasRecLayDeputyshipUploader::MAX_UPLOAD + 1; $i++) {
+        for ($i = 0; $i < LayDeputyshipUploader::MAX_UPLOAD + 1; $i++) {
             $collection->append(new LayDeputyshipDto());
         }
 

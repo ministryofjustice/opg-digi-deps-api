@@ -3,32 +3,41 @@
 namespace Tests\AppBundle\v2\Registration\Assembler;
 
 use AppBundle\Service\DataNormaliser;
-use AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssembler;
+use AppBundle\v2\Registration\Assembler\CasRecToLayDeputyshipDtoAssembler;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 use PHPUnit\Framework\TestCase;
 
 class LayDeputyshipDtoAssemblerTest extends TestCase
 {
-    /** @var LayDeputyshipDtoAssembler */
+    /** @var CasRecToLayDeputyshipDtoAssembler */
     private $sut;
 
     /** {@inheritDoc} */
     protected function setUp()
     {
-        $this->sut = new LayDeputyshipDtoAssembler(new DataNormaliser());
+        $this->sut = new CasRecToLayDeputyshipDtoAssembler(new DataNormaliser());
     }
 
     /**
      * @test
-     * @expectedException \InvalidArgumentException
+     */
+    public function canAssembleReturnsTrueIfGivenCompleteData(): void
+    {
+        $input = $this->getInput();
+
+        $this->assertTrue($this->sut->canAssemble($input));
+    }
+
+    /**
+     * @test
      * @dataProvider getMissingDataVariations
      */
-    public function assembleFromArrayThrowsExceptionsIfGivenIncompleteData($itemToRemove): void
+    public function canAssembleReturnsFalseIfGivenIncompleteData($itemToRemove): void
     {
         $input = $this->getInput();
         unset($input[$itemToRemove]);
 
-        $this->sut->assembleFromArray($input);
+        $this->assertFalse($this->sut->canAssemble($input));
     }
 
     /** @return array */

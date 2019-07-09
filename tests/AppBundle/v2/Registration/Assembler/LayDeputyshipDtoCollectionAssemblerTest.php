@@ -2,7 +2,7 @@
 
 namespace Tests\AppBundle\v2\Registration\Assembler;
 
-use AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssembler;
+use AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssemblerInterface;
 use AppBundle\v2\Registration\Assembler\LayDeputyshipDtoCollectionAssembler;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDtoCollection;
@@ -13,7 +13,7 @@ class LayDeputyshipDtoCollectionAssemblerTest extends TestCase
     /** @var LayDeputyshipDtoCollectionAssembler */
     private $sut;
 
-    /** @var LayDeputyshipDtoAssembler | \PHPUnit_Framework_MockObject_MockObject */
+    /** @var LayDeputyshipDtoAssemblerInterface | \PHPUnit_Framework_MockObject_MockObject */
     private $layDeputyshipDtoAssembler;
 
     /** @var LayDeputyshipDtoCollection */
@@ -23,11 +23,28 @@ class LayDeputyshipDtoCollectionAssemblerTest extends TestCase
     protected function setUp()
     {
         $this->layDeputyshipDtoAssembler = $this
-            ->getMockBuilder(LayDeputyshipDtoAssembler::class)
+            ->getMockBuilder(LayDeputyshipDtoAssemblerInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->sut = new LayDeputyshipDtoCollectionAssembler($this->layDeputyshipDtoAssembler);
+    }
+
+    /**
+     * @test
+     * @expectedException \InvalidArgumentException
+     */
+    public function assembleFromArrayThrowsExceptionIfItemContainsMissingData(): void
+    {
+        $input = [['alpha' => 'alpha-data']];
+
+        $this->layDeputyshipDtoAssembler
+            ->expects($this->once())
+            ->method('canAssemble')
+            ->with(['alpha' => 'alpha-data'])
+            ->willReturn(false);
+
+        $this->sut->assembleFromArray($input);
     }
 
     /** @test */
@@ -37,6 +54,8 @@ class LayDeputyshipDtoCollectionAssemblerTest extends TestCase
             ['alpha' => 'alpha-data'],
             ['beta' => 'beta-data']
         ];
+
+        $this->layDeputyshipDtoAssembler->method('canAssemble')->willReturn(true);
 
         $this->assertEachItemWillBeAssembled($input);
         $this->result = $this->sut->assembleFromArray($input);

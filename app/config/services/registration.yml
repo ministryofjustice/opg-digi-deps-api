@@ -4,21 +4,21 @@ services:
     arguments:
       - '@AppBundle\Service\DataCompression'
       - '@AppBundle\v2\Registration\Assembler\LayDeputyshipDtoCollectionAssembler'
-      - '@AppBundle\v2\Registration\Uploader\CasRecLayDeputyshipUploader'
+      - '@AppBundle\v2\Registration\Uploader\LayDeputyshipUploader'
     public: true
 
   AppBundle\v2\Registration\Assembler\LayDeputyshipDtoCollectionAssembler:
     class: AppBundle\v2\Registration\Assembler\LayDeputyshipDtoCollectionAssembler
     arguments:
-      - '@AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssembler'
+      - '@AppBundle\v2\Registration\Assembler\CasRecToLayDeputyshipDtoAssembler'
 
-  AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssembler:
-    class: AppBundle\v2\Registration\Assembler\LayDeputyshipDtoAssembler
+  AppBundle\v2\Registration\Assembler\CasRecToLayDeputyshipDtoAssembler:
+    class: AppBundle\v2\Registration\Assembler\CasRecToLayDeputyshipDtoAssembler
     arguments:
       - '@AppBundle\Service\DataNormaliser'
 
-  AppBundle\v2\Registration\Uploader\CasRecLayDeputyshipUploader:
-    class: AppBundle\v2\Registration\Uploader\CasRecLayDeputyshipUploader
+  AppBundle\v2\Registration\Uploader\LayDeputyshipUploader:
+    class: AppBundle\v2\Registration\Uploader\LayDeputyshipUploader
     arguments:
       - '@em'
       - '@AppBundle\Entity\Repository\ClientRepository'

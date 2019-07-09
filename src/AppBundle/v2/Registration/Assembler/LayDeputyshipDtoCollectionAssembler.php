@@ -6,15 +6,15 @@ use AppBundle\v2\Registration\DTO\LayDeputyshipDtoCollection;
 
 class LayDeputyshipDtoCollectionAssembler
 {
-    /** @var LayDeputyshipDtoAssembler */
-    private $uploadDtoAssembler;
+    /** @var CasRecToLayDeputyshipDtoAssembler */
+    private $layDeputyshipDtoAssembler;
 
     /**
-     * @param LayDeputyshipDtoAssembler $uploadDtoAssembler
+     * @param LayDeputyshipDtoAssemblerInterface $layDeputyshipDtoAssembler
      */
-    public function __construct(LayDeputyshipDtoAssembler $uploadDtoAssembler)
+    public function __construct(LayDeputyshipDtoAssemblerInterface $layDeputyshipDtoAssembler)
     {
-        $this->uploadDtoAssembler = $uploadDtoAssembler;
+        $this->layDeputyshipDtoAssembler = $layDeputyshipDtoAssembler;
     }
 
     /**
@@ -26,7 +26,12 @@ class LayDeputyshipDtoCollectionAssembler
         $collection = new LayDeputyshipDtoCollection();
 
         foreach ($data as $uploadRow) {
-            $item = $this->uploadDtoAssembler->assembleFromArray($uploadRow);
+
+            if (!$this->layDeputyshipDtoAssembler->canAssemble($uploadRow)) {
+                throw new \InvalidArgumentException('Cannot assemble LayDeputyshipDto: Missing expected data');
+            }
+
+            $item = $this->layDeputyshipDtoAssembler->assembleFromArray($uploadRow);
             $collection->append($item);
         }
 

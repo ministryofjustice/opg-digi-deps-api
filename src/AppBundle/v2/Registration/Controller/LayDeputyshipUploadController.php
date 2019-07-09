@@ -4,7 +4,7 @@ namespace AppBundle\v2\Registration\Controller;
 
 use AppBundle\v2\Registration\Assembler\LayDeputyshipDtoCollectionAssembler;
 use AppBundle\Service\DataCompression;
-use AppBundle\v2\Registration\Uploader\CasRecLayDeputyshipUploader;
+use AppBundle\v2\Registration\Uploader\LayDeputyshipUploader;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
@@ -21,18 +21,18 @@ class LayDeputyshipUploadController
     /** @var LayDeputyshipDtoCollectionAssembler */
     private $assembler;
 
-    /** @var CasRecLayDeputyshipUploader */
+    /** @var LayDeputyshipUploader */
     private $uploader;
 
     /**
      * @param DataCompression $dataCompression
      * @param LayDeputyshipDtoCollectionAssembler $assembler
-     * @param CasRecLayDeputyshipUploader $uploader
+     * @param LayDeputyshipUploader $uploader
      */
     public function __construct(
         DataCompression $dataCompression,
         LayDeputyshipDtoCollectionAssembler $assembler,
-        CasRecLayDeputyshipUploader $uploader
+        LayDeputyshipUploader $uploader
     ) {
         $this->dataCompression = $dataCompression;
         $this->assembler = $assembler;

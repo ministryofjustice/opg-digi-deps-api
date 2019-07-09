@@ -2,18 +2,16 @@
 
 namespace AppBundle\v2\Registration\Uploader;
 
-use AppBundle\Entity\CasRec;
 use AppBundle\Entity\Repository\ClientRepository;
 use AppBundle\Entity\User;
 use AppBundle\Service\ReportService;
-use AppBundle\v2\Registration\DeputyshipValidator;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDtoCollection;
 use AppBundle\v2\Registration\SelfRegistration\Factory\CasRecCreationException;
 use AppBundle\v2\Registration\SelfRegistration\Factory\CasRecFactory;
 use Doctrine\ORM\EntityManager;
 
-class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
+class LayDeputyshipUploader
 {
     /** @var EntityManager */
     protected $em;
@@ -142,10 +140,10 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
 
     /**
      * @param LayDeputyshipDto $layDeputyshipDto
-     * @return CasRecLayDeputyshipUploader
+     * @return LayDeputyshipUploader
      * @throws \Doctrine\ORM\ORMException
      */
-    private function createAndPersistNewCasRecEntity(LayDeputyshipDto $layDeputyshipDto): CasRecLayDeputyshipUploader
+    private function createAndPersistNewCasRecEntity(LayDeputyshipDto $layDeputyshipDto): LayDeputyshipUploader
     {
         $this->casRecEntities[] = $casRecEntity = $this->casRecFactory->createFromDto($layDeputyshipDto);
 
@@ -168,10 +166,10 @@ class CasRecLayDeputyshipUploader implements LayDeputyshipUploaderInterface
     }
 
     /**
-     * @return CasRecLayDeputyshipUploader
+     * @return LayDeputyshipUploader
      * @throws \Exception
      */
-    private function updateReportTypes(): CasRecLayDeputyshipUploader
+    private function updateReportTypes(): LayDeputyshipUploader
     {
         $this->reportService->updateCurrentReportTypes($this->casRecEntities, User::ROLE_LAY_DEPUTY);
 
