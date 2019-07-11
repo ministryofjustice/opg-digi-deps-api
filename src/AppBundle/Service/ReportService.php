@@ -178,7 +178,7 @@ class ReportService
                 $casRec = $casRecEntitiesWithKey[$reportClientCaseNumber];
                 $casRecReportType = CasRec::getTypeBasedOnTypeofRepAndCorref($casRec->getTypeOfReport(), $casRec->getCorref(), $userRoleName);
 
-                if ($report->getType() != $casRecReportType) {
+                if ($report->getType() != $casRecReportType && strpos($report->getType(), '-') === false) {
                     $report->setType($casRecReportType);
                     $this->_em->persist($report);
                 }

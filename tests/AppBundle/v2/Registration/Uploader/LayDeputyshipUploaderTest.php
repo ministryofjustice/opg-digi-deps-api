@@ -19,9 +19,6 @@ class LayDeputyshipUploaderTest extends TestCase
     /** @var EntityManager | \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
 
-    /** @var ClientRepository | \PHPUnit_Framework_MockObject_MockObject */
-    protected $clientRepository;
-
     /** @var ReportService | \PHPUnit_Framework_MockObject_MockObject */
     protected $reportService;
 
@@ -35,13 +32,11 @@ class LayDeputyshipUploaderTest extends TestCase
     protected function setUp()
     {
         $this->em = $this->getMockBuilder(EntityManager::class)->disableOriginalConstructor()->getMock();
-        $this->clientRepository = $this->getMockBuilder(ClientRepository::class)->disableOriginalConstructor()->getMock();
         $this->reportService = $this->getMockBuilder(ReportService::class)->disableOriginalConstructor()->setMethods(['updateCurrentReportTypes'])->getMock();
         $this->factory = $this->getMockBuilder(CasRecFactory::class)->disableOriginalConstructor()->enableArgumentCloning()->getMock();
 
         $this->sut = new LayDeputyshipUploader(
             $this->em,
-            $this->clientRepository,
             $this->reportService,
             $this->factory
         );
@@ -64,68 +59,6 @@ class LayDeputyshipUploaderTest extends TestCase
 
     /**
      * @test
-     * @dataProvider getDeputyQueryResultVariations
-     * @param $queryResult
-     */
-    public function ignoresDeputyshipsWhereClientAlreadyRegisteredToAnotherDeputy($queryResult)
-    {
-        $collection = new LayDeputyshipDtoCollection();
-        $collection->append($this->buildLayDeputyshipDto(1));
-
-        // Ensure Client will belong with another deputy(s).
-        $this->clientRepository->method('getAttachedDeputiesIfNotAttachedToThis')->willReturn($queryResult);
-
-        // Assert CasRec Entity will not be created.
-        $this->factory->expects($this->never())->method('createFromDto');
-
-        $this->assertReportTypeWillNotBeSentForEvaluation();
-
-        $return = $this->sut->upload($collection);
-
-        $this->assertEquals(0, $return['added']);
-        $this->assertCount(0, $return['errors']);
-        $this->assertCount(1, $return['ignored']);
-        $this->assertEquals('case-1:depnum-1', $return['ignored'][0]);
-    }
-
-    /** @return array */
-    public function getDeputyQueryResultVariations(): array
-    {
-        return [
-            ['queryResult' => [['deputy_no' => '123'], ['deputy_no' => 'depnum-1']]],
-            ['queryResult' => [['deputy_no' => '123,456']]],
-            ['queryResult' => [['deputy_no' => 'depnum-1,123'], ['deputy_no' => '456']]],
-        ];
-    }
-
-    /**
-     * @test
-     */
-    public function processesDeputyshipsWhereClientIsAttachedToDeputyUnderAmultipleLayDeputyship()
-    {
-        $collection = new LayDeputyshipDtoCollection();
-        $collection->append($this->buildLayDeputyshipDto(1));
-
-        // Ensure Client will belong with another deputy(s).
-        $this->clientRepository->method('getAttachedDeputiesIfNotAttachedToThis')->willReturn([
-            ['deputy_no' => 'depnum-2,depnum-1'],
-        ]);
-
-        $this->factory
-            ->expects($this->once())
-            ->method('createFromDto')
-            ->willReturn(new CasRec([]));
-
-        $return = $this->sut->upload($collection);
-
-        $this->assertEquals(1, $return['added']);
-        $this->assertCount(0, $return['errors']);
-        $this->assertCount(0, $return['ignored']);
-
-    }
-
-    /**
-     * @test
      */
     public function persistsAnEntryForEachValidDeputyship()
     {
@@ -134,8 +67,6 @@ class LayDeputyshipUploaderTest extends TestCase
         for ($i = 0; $i < 3; $i++) {
             $collection->append($this->buildLayDeputyshipDto($i));
         }
-
-        $this->ensureClientWillNotBelongToAnotherDeputy();
 
         $a = new CasRec([]);
         $b = new CasRec([]);
@@ -157,7 +88,6 @@ class LayDeputyshipUploaderTest extends TestCase
 
         $this->assertEquals(3, $return['added']);
         $this->assertCount(0, $return['errors']);
-        $this->assertCount(0, $return['ignored']);
     }
 
     /**
@@ -167,8 +97,6 @@ class LayDeputyshipUploaderTest extends TestCase
     {
         $collection = new LayDeputyshipDtoCollection();
         $collection->append($this->buildLayDeputyshipDto(1));
-
-        $this->ensureClientWillNotBelongToAnotherDeputy();
 
         // Ensure factory will throw an exception
         $this
@@ -181,7 +109,6 @@ class LayDeputyshipUploaderTest extends TestCase
         $return = $this->sut->upload($collection);
 
         $this->assertEquals(0, $return['added']);
-        $this->assertCount(0, $return['ignored']);
         $this->assertCount(1, $return['errors']);
         $this->assertEquals('ERROR IN LINE 2: Unable to create CasRec entity', $return['errors'][0]);
     }
@@ -195,13 +122,6 @@ class LayDeputyshipUploaderTest extends TestCase
         return (new LayDeputyshipDto())
             ->setCaseNumber('case-'.$count)
             ->setDeputyNumber('depnum-'.$count);
-    }
-
-    private function ensureClientWillNotBelongToAnotherDeputy(): void
-    {
-        $this->clientRepository
-            ->method('getAttachedDeputiesIfNotAttachedToThis')
-            ->willReturn([]);
     }
 
     private function assertReportTypeWillNotBeSentForEvaluation(): void

@@ -21,7 +21,6 @@ services:
     class: AppBundle\v2\Registration\Uploader\LayDeputyshipUploader
     arguments:
       - '@em'
-      - '@AppBundle\Entity\Repository\ClientRepository'
       - '@opg_digideps.report_service'
       - '@AppBundle\v2\Registration\SelfRegistration\Factory\CasRecFactory'
 

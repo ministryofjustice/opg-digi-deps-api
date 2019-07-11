@@ -64,7 +64,7 @@ class LayDeputyshipDtoAssemblerTest extends TestCase
         $this->assertEquals('caset', $result->getCaseNumber());
         $this->assertEquals('surname', $result->getClientSurname());
         $this->assertEquals('deputy_no', $result->getDeputyNumber());
-        $this->assertEquals('deputy-surname', $result->getDeputySurname());
+        $this->assertEquals('deputysurname', $result->getDeputySurname());
         $this->assertEquals('deputypostcode', $result->getDeputyPostcode());
         $this->assertEquals('type_of_rep', $result->getTypeOfReport());
         $this->assertEquals('corref', $result->getCorref());
@@ -106,7 +106,7 @@ class LayDeputyshipDtoAssemblerTest extends TestCase
             'Case' => 'caseT',
             'Surname' => 'surname',
             'Deputy No' => 'deputy_no',
-            'Dep Surname' => 'deputy-surname',
+            'Dep Surname' => 'deputysurname',
             'Dep Postcode' => 'deputy_postcode',
             'Typeofrep' => 'type_of_rep',
             'Corref' => 'corref',

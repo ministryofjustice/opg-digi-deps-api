@@ -2,6 +2,7 @@
 
 namespace AppBundle\v2\Registration\Uploader;
 
+use AppBundle\Entity\CasRec;
 use AppBundle\Entity\Repository\ClientRepository;
 use AppBundle\Entity\User;
 use AppBundle\Service\ReportService;
@@ -16,9 +17,6 @@ class LayDeputyshipUploader
     /** @var EntityManager */
     protected $em;
 
-    /** @var ClientRepository  */
-    private $clientRepository;
-
     /** @var ReportService */
     protected $reportService;
 
@@ -27,9 +25,6 @@ class LayDeputyshipUploader
 
     /** @var int */
     private $added = 0;
-
-    /** @var array */
-    private $ignored = [];
 
     /** @var array */
     private $errors = [];
@@ -45,18 +40,15 @@ class LayDeputyshipUploader
 
     /**
      * @param EntityManager $em
-     * @param ClientRepository $clientRepository
      * @param ReportService $reportService
      * @param CasRecFactory $casRecFactory
      */
     public function __construct(
         EntityManager $em,
-        ClientRepository $clientRepository,
         ReportService $reportService,
         CasRecFactory $casRecFactory
     ) {
         $this->em = $em;
-        $this->clientRepository = $clientRepository;
         $this->reportService = $reportService;
         $this->casRecFactory = $casRecFactory;
     }
@@ -73,13 +65,9 @@ class LayDeputyshipUploader
             $this->em->beginTransaction();
 
             foreach ($collection as $index => $layDeputyshipDto) {
-                if ($this->clientBelongsToDifferentDeputy($layDeputyshipDto)) {
-                    $this->ignored[] = sprintf('%s:%s', $layDeputyshipDto->getCaseNumber(), $layDeputyshipDto->getDeputyNumber());
-                    continue;
-                }
 
                 try {
-                    $this->createAndPersistNewCasRecEntity($layDeputyshipDto);
+                    $this->casRecEntities[] = $this->createAndPersistNewCasRecEntity($layDeputyshipDto);
                 } catch (CasRecCreationException $e) {
                     $this->errors[] = sprintf('ERROR IN LINE %d: %s', $index + 2, $e->getMessage());
                     continue;
@@ -96,12 +84,7 @@ class LayDeputyshipUploader
             return ['added' => $this->added, 'errors' => [$e->getMessage()]];
         }
 
-        return [
-            'added' => $this->added,
-            'errors' => $this->errors,
-            'ignored-count' => count($this->ignored),
-            'ignored' => $this->ignored
-        ];
+        return ['added' => $this->added, 'errors' => $this->errors];
     }
 
     /**
@@ -119,40 +102,16 @@ class LayDeputyshipUploader
 
     /**
      * @param LayDeputyshipDto $layDeputyshipDto
-     * @return bool
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    private function clientBelongsToDifferentDeputy(LayDeputyshipDto $layDeputyshipDto): bool
-    {
-        $result = $this
-            ->clientRepository
-            ->getAttachedDeputiesIfNotAttachedToThis($layDeputyshipDto->getCaseNumber(), $layDeputyshipDto->getDeputyNumber());
-
-        if (!$result) { return false; }
-
-        if (count($result) === 1) {
-            // A single result could be this Lay deputy but with a ',' separated list of deputy nums (Multiple Lay Deputyship)..
-            // Before we rule out this result not belonging to this Lay deputy, double check for the deputy num within a string list.
-            $deputyNumbers = explode(',', $result[0]['deputy_no']);
-
-            return !in_array($layDeputyshipDto->getDeputyNumber(), $deputyNumbers);
-        }
-
-        return true;
-    }
-
-    /**
-     * @param LayDeputyshipDto $layDeputyshipDto
-     * @return LayDeputyshipUploader
+     * @return CasRec
      * @throws \Doctrine\ORM\ORMException
      */
-    private function createAndPersistNewCasRecEntity(LayDeputyshipDto $layDeputyshipDto): LayDeputyshipUploader
+    private function createAndPersistNewCasRecEntity(LayDeputyshipDto $layDeputyshipDto): CasRec
     {
-        $this->casRecEntities[] = $casRecEntity = $this->casRecFactory->createFromDto($layDeputyshipDto);
+        $casRecEntity = $this->casRecFactory->createFromDto($layDeputyshipDto);
 
         $this->em->persist($casRecEntity);
 
-        return $this;
+        return $casRecEntity;
     }
 
     /**
