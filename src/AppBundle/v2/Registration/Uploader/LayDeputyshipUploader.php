@@ -3,9 +3,8 @@
 namespace AppBundle\v2\Registration\Uploader;
 
 use AppBundle\Entity\CasRec;
-use AppBundle\Entity\Repository\ClientRepository;
+use AppBundle\Entity\Repository\ReportRepository;
 use AppBundle\Entity\User;
-use AppBundle\Service\ReportService;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDto;
 use AppBundle\v2\Registration\DTO\LayDeputyshipDtoCollection;
 use AppBundle\v2\Registration\SelfRegistration\Factory\CasRecCreationException;
@@ -17,20 +16,17 @@ class LayDeputyshipUploader
     /** @var EntityManager */
     protected $em;
 
-    /** @var ReportService */
-    protected $reportService;
+    /** @var ReportRepository */
+    protected $reportRepository;
 
     /** @var CasRecFactory */
     private $casRecFactory;
 
-    /** @var int */
-    private $added = 0;
+    /** @var array */
+    private $reportsUpdated = [];
 
     /** @var array */
-    private $errors = [];
-
-    /** @var array */
-    private $casRecEntities = [];
+    private $casRecEntriesByCaseNumber = [];
 
     /** @var int */
     const MAX_UPLOAD = 10000;
@@ -40,16 +36,16 @@ class LayDeputyshipUploader
 
     /**
      * @param EntityManager $em
-     * @param ReportService $reportService
+     * @param ReportRepository $reportRepository
      * @param CasRecFactory $casRecFactory
      */
     public function __construct(
         EntityManager $em,
-        ReportService $reportService,
+        ReportRepository $reportRepository,
         CasRecFactory $casRecFactory
     ) {
         $this->em = $em;
-        $this->reportService = $reportService;
+        $this->reportRepository = $reportRepository;
         $this->casRecFactory = $casRecFactory;
     }
 
@@ -61,19 +57,22 @@ class LayDeputyshipUploader
     {
         $this->throwExceptionIfDataTooLarge($collection);
 
+        $added = 0;
+        $errors = [];
+
         try {
             $this->em->beginTransaction();
 
             foreach ($collection as $index => $layDeputyshipDto) {
 
                 try {
-                    $this->casRecEntities[] = $this->createAndPersistNewCasRecEntity($layDeputyshipDto);
+                    $caseNumber = (string) $layDeputyshipDto->getCaseNumber();
+                    $this->casRecEntriesByCaseNumber[$caseNumber] = $this->createAndPersistNewCasRecEntity($layDeputyshipDto);
+                    ++$added;
                 } catch (CasRecCreationException $e) {
-                    $this->errors[] = sprintf('ERROR IN LINE %d: %s', $index + 2, $e->getMessage());
+                    $errors[] = sprintf('ERROR IN LINE %d: %s', $index + 2, $e->getMessage());
                     continue;
                 }
-
-                $this->handleBatchDatabaseFlush();
             }
 
             $this
@@ -81,10 +80,15 @@ class LayDeputyshipUploader
                 ->commitTransactionToDatabase();
 
         } catch (\Throwable $e) {
-            return ['added' => $this->added, 'errors' => [$e->getMessage()]];
+            return ['added' => $added, 'errors' => [$e->getMessage()]];
         }
 
-        return ['added' => $this->added, 'errors' => $this->errors];
+        return [
+            'added' => $added,
+            'errors' => $errors,
+            'report-update-count' => count($this->reportsUpdated),
+            'cases-with-updated-reports' => $this->reportsUpdated
+        ];
     }
 
     /**
@@ -115,25 +119,24 @@ class LayDeputyshipUploader
     }
 
     /**
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     */
-    private function handleBatchDatabaseFlush(): void
-    {
-        if ((++$this->added % self::FLUSH_EVERY) === 0) {
-            $this->em->flush();
-            $this->em->clear();
-        }
-    }
-
-    /**
      * @return LayDeputyshipUploader
      * @throws \Exception
      */
     private function updateReportTypes(): LayDeputyshipUploader
     {
-        $this->reportService->updateCurrentReportTypes($this->casRecEntities, User::ROLE_LAY_DEPUTY);
+        $caseNumbers = array_keys($this->casRecEntriesByCaseNumber);
+        $reports = $this->reportRepository->findAllActiveReportsByCaseNumbersAndRole($caseNumbers, User::ROLE_LAY_DEPUTY);
+
+        foreach ($reports as $currentActiveReport) {
+            $reportCaseNumber = $currentActiveReport->getClient()->getCaseNumber();
+            $casRec = $this->casRecEntriesByCaseNumber[$reportCaseNumber];
+            $determinedReportType = CasRec::getTypeBasedOnTypeofRepAndCorref($casRec->getTypeOfReport(), $casRec->getCorref(), User::ROLE_LAY_DEPUTY);
+
+            if ($currentActiveReport->getType() != $determinedReportType) {
+                $currentActiveReport->setType($determinedReportType);
+                $this->reportsUpdated[] = $reportCaseNumber;
+            }
+        }
 
         return $this;
     }
