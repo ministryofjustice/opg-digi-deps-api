@@ -20,24 +20,16 @@ class LayDeputyshipDtoAssemblerTest extends TestCase
 
     /**
      * @test
-     */
-    public function canAssembleReturnsTrueIfGivenCompleteData(): void
-    {
-        $input = $this->getInput();
-
-        $this->assertTrue($this->sut->canAssemble($input));
-    }
-
-    /**
-     * @test
+     * @expectedException \InvalidArgumentException
      * @dataProvider getMissingDataVariations
+     * @param $itemToRemove
      */
-    public function canAssembleReturnsFalseIfGivenIncompleteData($itemToRemove): void
+    public function assembleFromArrayThrowsExceptionIfGivenIncompleteData($itemToRemove): void
     {
         $input = $this->getInput();
         unset($input[$itemToRemove]);
 
-        $this->assertFalse($this->sut->canAssemble($input));
+        $this->sut->assembleFromArray($input);
     }
 
     /** @return array */

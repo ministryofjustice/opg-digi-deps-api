@@ -11,10 +11,4 @@ interface LayDeputyshipDtoAssemblerInterface
      * @return LayDeputyshipDto
      */
     public function assembleFromArray(array $data);
-
-    /**
-     * @param array $data
-     * @return bool
-     */
-    public function canAssemble(array $data);
 }

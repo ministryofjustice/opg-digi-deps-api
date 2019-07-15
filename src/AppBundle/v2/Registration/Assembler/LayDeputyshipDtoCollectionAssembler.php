@@ -26,11 +26,6 @@ class LayDeputyshipDtoCollectionAssembler
         $collection = new LayDeputyshipDtoCollection();
 
         foreach ($data as $uploadRow) {
-
-            if (!$this->layDeputyshipDtoAssembler->canAssemble($uploadRow)) {
-                throw new \InvalidArgumentException('Cannot assemble LayDeputyshipDto: Missing expected data');
-            }
-
             $item = $this->layDeputyshipDtoAssembler->assembleFromArray($uploadRow);
             $collection->append($item);
         }

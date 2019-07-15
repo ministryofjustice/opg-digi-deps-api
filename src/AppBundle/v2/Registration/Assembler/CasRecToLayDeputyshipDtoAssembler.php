@@ -24,6 +24,10 @@ class CasRecToLayDeputyshipDtoAssembler implements LayDeputyshipDtoAssemblerInte
      */
     public function assembleFromArray(array $data)
     {
+        if (!$this->canAssemble($data)) {
+            throw new \InvalidArgumentException('Cannot assemble LayDeputyshipDto: Missing expected data');
+        }
+
         return
             (new LayDeputyshipDto())
             ->setCaseNumber($this->normaliser->normaliseCaseNumber($data['Case']))
@@ -40,7 +44,7 @@ class CasRecToLayDeputyshipDtoAssembler implements LayDeputyshipDtoAssemblerInte
      * @param array $data
      * @return bool
      */
-    public function canAssemble(array $data)
+    private function canAssemble(array $data)
     {
         return
             array_key_exists('Case', $data) &&

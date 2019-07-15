@@ -30,23 +30,6 @@ class LayDeputyshipDtoCollectionAssemblerTest extends TestCase
         $this->sut = new LayDeputyshipDtoCollectionAssembler($this->layDeputyshipDtoAssembler);
     }
 
-    /**
-     * @test
-     * @expectedException \InvalidArgumentException
-     */
-    public function assembleFromArrayThrowsExceptionIfItemContainsMissingData(): void
-    {
-        $input = [['alpha' => 'alpha-data']];
-
-        $this->layDeputyshipDtoAssembler
-            ->expects($this->once())
-            ->method('canAssemble')
-            ->with(['alpha' => 'alpha-data'])
-            ->willReturn(false);
-
-        $this->sut->assembleFromArray($input);
-    }
-
     /** @test */
     public function assembleFromArrayAssemblesACollectionAndReturnsIt(): void
     {
