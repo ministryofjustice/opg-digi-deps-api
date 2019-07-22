@@ -193,7 +193,13 @@ class ReportService
             //unsubmitted report
             $currentReport->setUnSubmitDate(null);
             $currentReport->setUnsubmittedSectionsList(null);
-            $newYearReport = null;
+
+            // Find the next report and clone assets/accounts across
+            $calculatedEndDate = clone $currentReport->getEndDate();
+            $calculatedEndDate->modify('+12 months');
+            $newYearReport = $currentReport->getClient()->getReportByEndDate($calculatedEndDate);
+
+            $this->clonePersistentResources($newYearReport, $currentReport);
         } else {
             // first-time submission
             $newYearReport = $this->createNextYearReport($currentReport);
