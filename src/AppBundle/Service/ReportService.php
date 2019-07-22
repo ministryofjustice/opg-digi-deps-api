@@ -104,17 +104,45 @@ class ReportService
             false
         );
 
+        $this->clonePersistentResources($newReport, $oldReport);
+
+        $newReport->updateSectionsStatusCache($newReport->getAvailableSections());
+        $this->_em->persist($newReport);
+
+        return $newReport;
+    }
+
+    /**
+     * Clone resources which cross report periods from one account to another
+     *
+     * @param Ndr|Report $toReport
+     * @param Ndr|Report $fromReport
+     */
+    function clonePersistentResources($toReport, $fromReport)
+    {
+        // delete existing assets
+        foreach ($toReport->getAssets() as $asset) {
+            $this->_em->remove($asset);
+        }
+
+        // delete existing bank accounts
+        foreach ($toReport->getBankAccounts() as $account) {
+            $this->_em->remove($account);
+        }
+
+        $this->_em->flush();
+
         // copy assets
-        $newReport->setNoAssetToAdd($oldReport->getNoAssetToAdd());
-        foreach ($oldReport->getAssets() as $asset) {
+        $toReport->setNoAssetToAdd($fromReport->getNoAssetToAdd());
+        foreach ($fromReport->getAssets() as $asset) {
             $newAsset = clone $asset;
-            $newAsset->setReport($newReport);
+            $newAsset->setReport($toReport);
             $this->_em->detach($newAsset);
             $this->_em->persist($newAsset);
         }
 
         // copy bank accounts (opening balance = closing balance, opening date = closing date)
-        foreach ($oldReport->getBankAccounts() as $account) {
+        foreach ($fromReport->getBankAccounts() as $account) {
             if (!$account->getIsClosed()) {
                 $newAccount = new ReportBankAccount();
                 $newAccount->setBank($account->getBank());
@@ -124,16 +152,11 @@ class ReportService
                 $newAccount->setOpeningBalance($account->getClosingBalance());
                 $newAccount->setIsJointAccount($account->getIsJointAccount());
                 $newAccount->setCreatedAt(new \DateTime());
-                $newAccount->setReport($newReport);
+                $newAccount->setReport($toReport);
 
                 $this->_em->persist($newAccount);
             }
         }
-
-        $newReport->updateSectionsStatusCache($newReport->getAvailableSections());
-        $this->_em->persist($newReport);
-
-        return $newReport;
     }
 
     /**
