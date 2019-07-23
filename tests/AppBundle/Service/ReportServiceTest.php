@@ -92,8 +92,12 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
     {
         $report = $this->report;
 
+        // Create partial mock of ReportService
+        $reportService = \Mockery::mock(ReportService::class, [$this->em])->makePartial();
+
         // mocks
         $this->em->shouldReceive('detach');
+        $this->em->shouldReceive('flush');
         // assert persists on report and submission record
         $this->em->shouldReceive('persist')->with(\Mockery::on(function ($report) {
             return $report instanceof Report;
@@ -102,17 +106,12 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
         $this->em->shouldReceive('persist')->with(\Mockery::on(function ($report) {
             return $report instanceof EntityDir\Report\ReportSubmission;
         }));
-        // assert asset and bank accounts are copied. can't get from the returned report as they are added form the "Many" side
-        $this->em->shouldReceive('persist')->with(\Mockery::on(function ($asset) {
-            return $asset instanceof EntityDir\Report\AssetProperty && $asset->getAddress() === 'SW1';
-        }))->once();
-        $this->em->shouldReceive('persist')->with(\Mockery::on(function ($bankAccount) {
-            return $bankAccount instanceof EntityDir\Report\BankAccount && $bankAccount->getAccountNumber() === '1234';
-        }))->once();
-        $this->em->shouldReceive('flush')->with()->once(); //last in createNextYearReport
+
+        // clonePersistentResources should be called
+        $reportService->shouldReceive('clonePersistentResources')->with(\Mockery::type(Report::class), $report);
 
         $report->setAgreedBehalfDeputy(true);
-        $newYearReport = $this->sut->submit($report, $this->user, new \DateTime('2016-01-15'));
+        $newYearReport = $reportService->submit($report, $this->user, new \DateTime('2016-01-15'));
 
         // assert current report
         $this->assertTrue($report->getSubmitted());
@@ -133,6 +132,14 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
         $report = $this->report;
         $report->setUnSubmitDate(new \DateTime('2018-02-14'));
 
+        // A report for the next report period should already exist
+        $client = $this->report->getClient();
+        $nextReport = new Report($client, Report::TYPE_102, new \DateTime('2016-01-01'), new \DateTime('2016-12-31'));
+        $client->addReport($nextReport);
+
+        // Create partial mock of ReportService
+        $reportService = \Mockery::mock(ReportService::class, [$this->em])->makePartial();
+
         // mocks
         $this->em->shouldReceive('detach');
         // assert persists on report and submission record
@@ -141,8 +148,11 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
         }));
         $this->em->shouldReceive('flush')->with()->once(); //last in createNextYearReport
 
+        // clonePersistentResources should be called
+        $reportService->shouldReceive('clonePersistentResources')->with($nextReport, $report);
+
         $report->setAgreedBehalfDeputy(true);
-        $newYearReport = $this->sut->submit($report, $this->user, new \DateTime('2016-01-15'));
+        $newYearReport = $reportService->submit($report, $this->user, new \DateTime('2016-01-15'));
 
         // assert current report
         $this->assertTrue($report->getSubmitted());
