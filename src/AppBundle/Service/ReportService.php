@@ -118,7 +118,7 @@ class ReportService
      * @param Ndr|Report $toReport
      * @param Ndr|Report $fromReport
      */
-    function clonePersistentResources($toReport, $fromReport)
+    public function clonePersistentResources($toReport, $fromReport)
     {
         // delete existing assets
         foreach ($toReport->getAssets() as $asset) {
@@ -129,8 +129,6 @@ class ReportService
         foreach ($toReport->getBankAccounts() as $account) {
             $this->_em->remove($account);
         }
-
-        $this->_em->flush();
 
         // copy assets
         $toReport->setNoAssetToAdd($fromReport->getNoAssetToAdd());
@@ -157,6 +155,8 @@ class ReportService
                 $this->_em->persist($newAccount);
             }
         }
+
+        $this->_em->flush();
     }
 
     /**
