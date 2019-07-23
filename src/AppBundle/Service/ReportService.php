@@ -130,6 +130,8 @@ class ReportService
             $this->_em->remove($account);
         }
 
+        $this->_em->flush();
+
         // copy assets
         $toReport->setNoAssetToAdd($fromReport->getNoAssetToAdd());
         foreach ($fromReport->getAssets() as $asset) {
@@ -155,8 +157,6 @@ class ReportService
                 $this->_em->persist($newAccount);
             }
         }
-
-        $this->_em->flush();
     }
 
     /**
