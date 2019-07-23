@@ -120,30 +120,51 @@ class ReportService
      */
     public function clonePersistentResources($toReport, $fromReport)
     {
-        // delete existing assets
-        foreach ($toReport->getAssets() as $asset) {
-            $this->_em->remove($asset);
-        }
-
-        // delete existing bank accounts
-        foreach ($toReport->getBankAccounts() as $account) {
-            $this->_em->remove($account);
-        }
-
-        $this->_em->flush();
-
         // copy assets
         $toReport->setNoAssetToAdd($fromReport->getNoAssetToAdd());
         foreach ($fromReport->getAssets() as $asset) {
-            $newAsset = clone $asset;
-            $newAsset->setReport($toReport);
-            $this->_em->detach($newAsset);
-            $this->_em->persist($newAsset);
+            // Check that the target report doesn't already have a matching asset
+            $assetExists = false;
+            foreach ($toReport->getAssets() as $toAsset) {
+                if ($asset->getType() === 'property') {
+                    if ($toAsset->getType() === 'property'
+                        && $toAsset->getAddress() === $asset->getAddress()
+                        && $toAsset->getAddress2() === $asset->getAddress2()
+                        && $toAsset->getPostcode() === $asset->getPostcode()) {
+                        $assetExists = true;
+                        break;
+                    }
+                } else {
+                    if ($toAsset->getType() === 'other' && $toAsset->getDescription() === $asset->getDescription()) {
+                        $assetExists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!$assetExists) {
+                $newAsset = clone $asset;
+                $newAsset->setReport($toReport);
+                $this->_em->detach($newAsset);
+                $this->_em->persist($newAsset);
+            }
         }
 
         // copy bank accounts (opening balance = closing balance, opening date = closing date)
         foreach ($fromReport->getBankAccounts() as $account) {
-            if (!$account->getIsClosed()) {
+            // Check that the target report doesn't already have a bank account with that account number
+            $accountExists = false;
+            foreach ($toReport->getBankAccounts() as $toAccount) {
+                if ($toAccount->getAccountType() === $account->getAccountType()
+                    && $toAccount->getBank() === $account->getBank()
+                    && $toAccount->getAccountNumber() === $account->getAccountNumber()
+                    && $toAccount->getSortCode() === $account->getSortCode()) {
+                    $accountExists = true;
+                    break;
+                }
+            }
+
+            if (!$account->getIsClosed() && !$accountExists) {
                 $newAccount = new ReportBankAccount();
                 $newAccount->setBank($account->getBank());
                 $newAccount->setAccountType($account->getAccountType());
