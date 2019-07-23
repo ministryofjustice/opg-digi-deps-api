@@ -193,6 +193,25 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
         $this->sut->clonePersistentResources($newReport, $this->report);
     }
 
+    public function testDuplicateResourcesNotPersisted()
+    {
+        $client = $this->report->getClient();
+        $newReport = new Report($client, Report::TYPE_102, new \DateTime('2016-01-01'), new \DateTime('2016-12-31'));
+
+        $newAsset = clone $this->report->getAssets()[0];
+        $newReport->addAsset($newAsset);
+
+        $newAccount = clone $this->report->getBankAccounts()[0];
+        $newReport->addAccount($newAccount);
+
+        // Since assets and accounts already exist, no DB functions should be called
+        $this->em->shouldNotReceive('detach');
+        $this->em->shouldNotReceive('persist');
+        $this->em->shouldNotReceive('flush');
+
+        $this->sut->clonePersistentResources($newReport, $this->report);
+    }
+
     public function testSubmitAdditionalDocuments()
     {
         $this->em->shouldReceive('persist')->with(\Mockery::on(function ($report) {
