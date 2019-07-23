@@ -165,7 +165,32 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($report->getSubmittedBy(), $submission->getCreatedBy());
 
         //assert new year report
-        $this->assertNull($newYearReport);
+        $this->assertEquals($newYearReport, $nextReport);
+    }
+
+    public function testPersistentResourcesCloned()
+    {
+        $client = $this->report->getClient();
+        $newReport = new Report($client, Report::TYPE_102, new \DateTime('2016-01-01'), new \DateTime('2016-12-31'));
+
+        // Assert asset is cloned
+        $this->em->shouldReceive('detach')->once();
+        $this->em->shouldReceive('persist')->with(\Mockery::on(function ($asset) {
+            return $asset instanceof EntityDir\Report\AssetProperty
+                && $asset->getAddress() === 'SW1';
+        }))->once();
+
+        // Assert bank account is cloned, with opening/closing balance modified
+        $this->em->shouldReceive('persist')->with(\Mockery::on(function ($bankAccount) {
+            return $bankAccount instanceof EntityDir\Report\BankAccount
+                && $bankAccount->getAccountNumber() === '1234'
+                && $bankAccount->getOpeningBalance() === $this->report->getBankAccounts()[0]->getClosingBalance()
+                && is_null($bankAccount->getClosingBalance());
+        }))->once();
+
+        $this->em->shouldReceive('flush');
+
+        $this->sut->clonePersistentResources($newReport, $this->report);
     }
 
     public function testSubmitAdditionalDocuments()
