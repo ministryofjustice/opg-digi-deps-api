@@ -220,7 +220,9 @@ class ReportService
             $calculatedEndDate->modify('+12 months');
             $newYearReport = $currentReport->getClient()->getReportByEndDate($calculatedEndDate);
 
-            $this->clonePersistentResources($newYearReport, $currentReport);
+            if ($newYearReport) {
+                $this->clonePersistentResources($newYearReport, $currentReport);
+            }
         } else {
             // first-time submission
             $newYearReport = $this->createNextYearReport($currentReport);
