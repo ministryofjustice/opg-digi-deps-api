@@ -56,6 +56,7 @@ class BehatController extends RestController
             {
                 $client->removeUser($existingDeputy);
             }
+            $this->get('em')->flush($client);
 
             $client->addUser($newDeputy);
             $this->get('em')->flush($client);
