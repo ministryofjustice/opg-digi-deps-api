@@ -152,7 +152,7 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
         $reportService->shouldReceive('clonePersistentResources')->with($nextReport, $report);
 
         $report->setAgreedBehalfDeputy(true);
-        $newYearReport = $reportService->submit($report, $this->user, new \DateTime('2016-01-15'));
+        $newYearReport = $reportService->submit($report, $this->user, new \DateTime());
 
         // assert current report
         $this->assertTrue($report->getSubmitted());
@@ -166,6 +166,35 @@ class ReportServiceTest extends \PHPUnit_Framework_TestCase
 
         //assert new year report
         $this->assertEquals($newYearReport, $nextReport);
+    }
+
+    public function testResubmitPersistenceRequiresReport()
+    {
+        $report = $this->report;
+        $report->setUnSubmitDate(new \DateTime('2018-02-14'));
+        $report->setAgreedBehalfDeputy(true);
+
+        // Create partial mock of ReportService
+        $reportService = \Mockery::mock(ReportService::class, [$this->em])->makePartial();
+        $this->em->shouldReceive('detach');
+        $this->em->shouldReceive('persist');
+        $this->em->shouldReceive('flush');
+
+        // Assert that clonePersistentResources should not be called
+        $reportService->shouldNotReceive('clonePersistentResources');
+
+        // Submit a report without one set up for next year
+        $reportService->submit($report, $this->user, new \DateTime());
+
+        // Submit a report where next year's dates don't match
+        $client = $this->report->getClient();
+        $nextReport = new Report($client, Report::TYPE_102, new \DateTime('2016-01-17'), new \DateTime('2017-01-16'));
+        $client->addReport($nextReport);
+
+        $report->setUnSubmitDate(new \DateTime('2018-02-14'));
+        $report->setAgreedBehalfDeputy(true);
+
+        $reportService->submit($report, $this->user, new \DateTime());
     }
 
     public function testPersistentResourcesCloned()
