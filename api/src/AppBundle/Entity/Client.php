@@ -234,6 +234,20 @@ class Client implements ClientInterface
     private $archivedAt;
 
     /**
+     * Holds the organisation the client belongs to
+     * Loaded from the CSV upload
+     *
+     * @var Organisation
+     *
+     * @JMS\Groups({"client-organisation"})
+     * @JMS\Type("AppBundle\Entity\Organisation")
+     *
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Organisation")
+     * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", onDelete="SET NULL")
+     */
+    private $organisation;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -846,6 +860,25 @@ class Client implements ClientInterface
     public function setNamedDeputy($namedDeputy)
     {
         $this->namedDeputy = $namedDeputy;
+        return $this;
+    }
+
+    /**
+     * @return Organisation
+     */
+    public function getOrganisation()
+    {
+        return $this->organisation;
+    }
+
+    /**
+     * @param Organisation $organisation
+     *
+     * @return Client
+     */
+    public function setOrganisation(Organisation $organisation)
+    {
+        $this->organisation = $organisation;
         return $this;
     }
 

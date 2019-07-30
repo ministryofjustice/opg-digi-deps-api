@@ -48,6 +48,8 @@ class OrgService
         $this->userRepository = $em->getRepository(EntityDir\User::class);
         $this->reportRepository = $em->getRepository(EntityDir\Report\Report::class);
         $this->clientRepository = $em->getRepository(EntityDir\Client::class);
+        $this->organisationRepository = $em->getRepository(EntityDir\Organisation::class);
+        $this->addressRepository = $em->getRepository(EntityDir\Address::class);
         $this->log = [];
     }
 
@@ -240,12 +242,15 @@ class OrgService
             $this->log('FOUND client in database with id: ' . $client->getId());
             $client->setUsers(new ArrayCollection());
         } else {
+            $organisation = $this->identifyOrgansation($row);
+
             $this->log('Creating client');
             $client = new EntityDir\Client();
             $client
                 ->setCaseNumber($caseNumber)
                 ->setFirstname(trim($row['Forename']))
-                ->setLastname(trim($row['Surname']));
+                ->setLastname(trim($row['Surname']))
+                ->setOrganisation($organisation);
 
             // set court date from Last report day
             $courtDate = new \DateTime($row['Last Report Day']);
@@ -432,6 +437,60 @@ class OrgService
         }
 
         $this->em->flush();
+    }
+
+    /**
+     * Returns the organisation populated with address
+     *
+     * @param $row
+     *
+     * @return EntityDir\Organisation
+     */
+    private function identifyOrgansation($row)
+    {
+        $organisation = $this->organisationRepository->findOneBy(['organisationName' => $row['Dep Adrs1']]);
+        /** @var ArrayCollection $addresses */
+        $address = $this->identifyAddress($row);
+
+        if ($organisation instanceof EntityDir\Organisation) {
+            $organisation->addAddress($address);
+        } else {
+            $organisation = new EntityDir\Organisation($row['Dep Adrs1'], $address);
+        }
+
+        return $organisation;
+    }
+
+    /**
+     * @param array $row
+     * @return EntityDir\Address
+     */
+    private function identifyAddress(array $row)
+    {
+        $address = $this->addressRepository->findOneBy(['deputyAddressNo' => $row['DepAddr No']]);
+        if (!$address instanceof EntityDir\Address) {
+            $addressData = $this->extractOrgAddressFromRow($row);
+            $address = new EntityDir\Address($addressData);
+        }
+
+        return $address;
+    }
+
+    /**
+     * @param array $row
+     * @return array
+     */
+    private function extractOrgAddressFromRow(array $row)
+    {
+        return [
+            'address1' => $row['Dep Adrs1'],
+            'address2' => $row['Dep Adrs2'],
+            'address3' => $row['Dep Adrs3'],
+            'address4' => $row['Dep Adrs4'],
+            'address5' => $row['Dep Adrs5'],
+            'postcode' => $row['Dep Postcode'],
+            'country' => 'gb'
+        ];
     }
 
     /**
