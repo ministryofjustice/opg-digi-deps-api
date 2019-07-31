@@ -59,7 +59,10 @@ class Organisation
      * @JMS\Groups({"organisation-address"})
      *
      * @JMS\Type("ArrayCollection<AppBundle\Entity\Address>")
-     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Address", mappedBy="organisations", cascade={"persist"}, fetch="EAGER")
+     * @ORM\OneToMany(targetEntity="AppBundle\Entity\Address",
+     *     mappedBy="organisation", cascade={"persist", "remove"},
+     *     fetch="EAGER"
+     * )
      */
     private $addresses;
 

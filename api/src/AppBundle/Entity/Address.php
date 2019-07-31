@@ -26,6 +26,14 @@ class Address
     private $id;
 
     /**
+     * @var Organisation
+     *
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Organisation", inversedBy="addresses")
+     * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    private $organisation;
+
+    /**
      * @var string
      *
      * @JMS\Groups({"address"})
@@ -123,6 +131,7 @@ class Address
      * @ORM\Column(name="country", type="string", length=10, nullable=true)
      */
     private $country;
+
 
     /**
      * Address constructor.
