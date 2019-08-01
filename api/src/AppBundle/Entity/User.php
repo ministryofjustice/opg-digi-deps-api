@@ -288,6 +288,7 @@ class User implements UserInterface
         $this->clients = new ArrayCollection();
         $this->password = '';
         $this->teams = new ArrayCollection();
+        $this->organisations = new ArrayCollection();
         $this->setCoDeputyClientConfirmed($coDeputyClientConfirmed);
     }
 

@@ -75,6 +75,7 @@ class Organisation
     public function __construct($organisationName, Address $address)
     {
         $this->setOrganisationName($organisationName);
+        $this->addresses = new ArrayCollection();
         $this->addAddress($address);
     }
 
@@ -162,6 +163,7 @@ class Organisation
      */
     public function addAddress(Address $address) {
         if (!$this->getAddresses()->contains($address)) {
+            $address->setOrganisation($this);
             $this->addresses->add($address);
         }
 

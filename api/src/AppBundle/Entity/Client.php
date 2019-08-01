@@ -242,7 +242,7 @@ class Client implements ClientInterface
      * @JMS\Groups({"client-organisation"})
      * @JMS\Type("AppBundle\Entity\Organisation")
      *
-     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Organisation")
+     * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Organisation", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $organisation;

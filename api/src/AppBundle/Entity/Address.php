@@ -168,6 +168,25 @@ class Address
     }
 
     /**
+     * @return Organisation
+     */
+    public function getOrganisation()
+    {
+        return $this->organisation;
+    }
+
+    /**
+     * @param Organisation $organisation
+     *
+     * @return $this
+     */
+    public function setOrganisation(Organisation $organisation)
+    {
+        $this->organisation = $organisation;
+        return $this;
+    }
+
+    /**
      * @return integer
      */
     public function getDeputyAddressNo()
