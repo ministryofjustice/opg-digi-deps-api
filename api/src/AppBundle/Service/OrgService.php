@@ -152,7 +152,7 @@ class OrgService
         }
 
         // create user if not existing
-        if (!$user) {
+        if (!$user instanceof EntityDir\User) {
             // check for duplicate email address
 
             $userWithSameEmail = $this->userRepository->findOneBy(['email' => $csvEmail]);
@@ -161,6 +161,7 @@ class OrgService
                 $this->warnings[] = 'Deputy ' . $deputyNo .
                     ' cannot be added with email ' . $csvEmail .
                     '. Email already taken by Deputy No: ' . $userWithSameEmail->getDeputyNo();
+
             } else {
                 $this->log('Creating new deputy ' . $deputyNo);
 
@@ -238,12 +239,13 @@ class OrgService
         /** @var EntityDir\Client $client */
         $client = $this->clientRepository->findOneBy(['caseNumber' => $caseNumber]);
 
+        $organisation = $this->identifyOrgansation($row);
+
         if ($client) {
             $this->log('FOUND client in database with id: ' . $client->getId());
             $client->setUsers(new ArrayCollection());
+            $client->setOrganisation($organisation);
         } else {
-            $organisation = $this->identifyOrgansation($row);
-
             $this->log('Creating client');
             $client = new EntityDir\Client();
             $client
@@ -470,7 +472,7 @@ class OrgService
         $address = $this->addressRepository->findOneBy(['deputyAddressNo' => $row['DepAddr No']]);
         if (!$address instanceof EntityDir\Address) {
             $addressData = $this->extractOrgAddressFromRow($row);
-            $address = new EntityDir\Address($addressData);
+            $address = new EntityDir\Address($addressData, $row['DepAddr No']);
         }
 
         return $address;
@@ -483,13 +485,18 @@ class OrgService
     private function extractOrgAddressFromRow(array $row)
     {
         return [
+            'deputyAddrNo' => $row['DepAddr No'],
             'address1' => $row['Dep Adrs1'],
             'address2' => $row['Dep Adrs2'],
             'address3' => $row['Dep Adrs3'],
             'address4' => $row['Dep Adrs4'],
             'address5' => $row['Dep Adrs5'],
             'postcode' => $row['Dep Postcode'],
-            'country' => 'gb'
+            'country' => 'gb',
+            'email1' => $row['Email1'],
+            'email2' => $row['Email2'],
+            'email3' => $row['Email3'],
+
         ];
     }
 

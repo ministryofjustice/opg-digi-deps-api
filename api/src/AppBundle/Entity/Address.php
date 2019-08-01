@@ -28,6 +28,7 @@ class Address
     /**
      * @var Organisation
      *
+     s* @JMS\Groups({"address"})
      * @ORM\ManyToOne(targetEntity="AppBundle\Entity\Organisation", inversedBy="addresses")
      * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", onDelete="CASCADE")
      */
@@ -38,7 +39,7 @@ class Address
      *
      * @JMS\Groups({"address"})
      * @JMS\Type("integer")
-     * @ORM\Column(name="deputyAddressNo", type="integer", length=10, nullable=true)
+     * @ORM\Column(name="deputy_address_no", type="integer", length=10, nullable=false)
      */
     private $deputyAddressNo;
 
@@ -132,20 +133,25 @@ class Address
      */
     private $country;
 
-
     /**
      * Address constructor.
-     *
      * @param array $address
+     * @param int $deputyAddressNo
      */
-    public function __construct(array $address)
+    public function __construct(array $address, $deputyAddressNo)
     {
-        $this->address1 = array_key_exists('address1', $address) ? $address['address1'] : null;
-        $this->address2 = array_key_exists('address2', $address) ? $address['address2'] : null;
-        $this->address3 = array_key_exists('address3', $address) ? $address['address3'] : null;
-        $this->address4 = array_key_exists('address4', $address) ? $address['address4'] : null;
-        $this->address5 = array_key_exists('address5', $address) ? $address['address5'] : null;
-        $this->postcode = array_key_exists('postcode', $address) ? $address['postcode'] : null;
+        $this->setDeputyAddressNo($deputyAddressNo);
+        $this->setAddress1(array_key_exists('address1', $address) ? $address['address1'] : null);
+        $this->setAddress2(array_key_exists('address2', $address) ? $address['address2'] : null);
+        $this->setAddress3(array_key_exists('address3', $address) ? $address['address3'] : null);
+        $this->setAddress4(array_key_exists('address4', $address) ? $address['address4'] : null);
+        $this->setAddress5(array_key_exists('address5', $address) ? $address['address5'] : null);
+        $this->setPostcode(array_key_exists('postcode', $address) ? $address['postcode'] : null);
+
+        $this->setEmail1(array_key_exists   ('email1', $address) ? $address['email1'] : null);
+        $this->setEmail2(array_key_exists('email2', $address) ? $address['email2'] : null);
+        $this->setEmail3(array_key_exists('email3', $address) ? $address['email3'] : null);
+
         $this->country = array_key_exists('country', $address) ? $address['country'] : null;
     }
 

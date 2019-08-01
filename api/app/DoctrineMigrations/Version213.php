@@ -15,7 +15,7 @@ final class Version213 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'postgresql', 'Migration can only be executed safely on \'postgresql\'.');
 
-        $this->addSql('CREATE TABLE address (id SERIAL NOT NULL, organisation_id INT DEFAULT NULL, deputyAddressNo INT DEFAULT NULL, address1 VARCHAR(100) DEFAULT NULL, email1 VARCHAR(100) DEFAULT NULL, email2 VARCHAR(100) DEFAULT NULL, email3 VARCHAR(100) DEFAULT NULL, address2 VARCHAR(100) DEFAULT NULL, address3 VARCHAR(100) DEFAULT NULL, address4 VARCHAR(100) DEFAULT NULL, address5 VARCHAR(100) DEFAULT NULL, postcode VARCHAR(8) DEFAULT NULL, country VARCHAR(10) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE address (id SERIAL NOT NULL, organisation_id INT DEFAULT NULL, deputy_address_no INT NOT NULL, address1 VARCHAR(100) DEFAULT NULL, email1 VARCHAR(100) DEFAULT NULL, email2 VARCHAR(100) DEFAULT NULL, email3 VARCHAR(100) DEFAULT NULL, address2 VARCHAR(100) DEFAULT NULL, address3 VARCHAR(100) DEFAULT NULL, address4 VARCHAR(100) DEFAULT NULL, address5 VARCHAR(100) DEFAULT NULL, postcode VARCHAR(8) DEFAULT NULL, country VARCHAR(10) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_D4E6F819E6B1585 ON address (organisation_id)');
         $this->addSql('CREATE TABLE organisation (id SERIAL NOT NULL, organisation_name VARCHAR(100) NOT NULL, email_domain VARCHAR(100) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE user_organisation (user_id INT NOT NULL, organisation_id INT NOT NULL, PRIMARY KEY(user_id, organisation_id))');
