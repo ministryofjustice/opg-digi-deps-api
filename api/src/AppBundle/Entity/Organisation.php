@@ -72,11 +72,24 @@ class Organisation
      * @param $organisationName
      * @param ArrayCollection $addresses
      */
-    public function __construct($organisationName, Address $address)
+    public function __construct($organisationName, Address $address, $contactEmail)
     {
         $this->setOrganisationName($organisationName);
         $this->addresses = new ArrayCollection();
         $this->addAddress($address);
+        $this->setEmailDomain(self::extractEmailDomain($contactEmail));
+    }
+
+    /**
+     * Extract Email domain
+     *
+     * @param $email
+     * @return mixed
+     */
+    public static function extractEmailDomain($email)
+    {
+        $parts = explode('@', $email);
+        return $parts[1];
     }
 
     /**

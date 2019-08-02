@@ -457,7 +457,7 @@ class OrgService
         if ($organisation instanceof EntityDir\Organisation) {
             $organisation->addAddress($address);
         } else {
-            $organisation = new EntityDir\Organisation($row['Dep Adrs1'], $address);
+            $organisation = new EntityDir\Organisation($row['Dep Adrs1'], $address, $row['Email']);
         }
 
         return $organisation;
