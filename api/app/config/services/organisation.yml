@@ -1,0 +1,8 @@
+services:
+  AppBundle\v2\Organisation\Controller\OrganisationController:
+    class: AppBundle\v2\Organisation\Controller\OrganisationController
+    arguments:
+      - '@AppBundle\Entity\Repository\OrganisationRepository'
+      - '@AppBundle\v2\Organisation\Assembler\OrganisationDtoCollectionAssembler'
+      - '@AppBundle\v2\Transformer\OrganisationTransformer'
+    public: true

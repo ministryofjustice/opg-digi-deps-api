@@ -33,3 +33,9 @@ services:
     class: AppBundle\v2\Assembler\DeputyAssembler
     arguments:
       - '@AppBundle\v2\Assembler\ClientAssembler'
+
+  AppBundle\v2\Organisation\Assembler\OrganisationAssembler:
+    class: AppBundle\v2\Organisation\Assembler\OrganisationAssembler
+
+  AppBundle\v2\Organisation\Assembler\OrganisationDtoCollectionAssembler:
+    class: AppBundle\v2\Organisation\Assembler\OrganisationDtoCollectionAssembler
